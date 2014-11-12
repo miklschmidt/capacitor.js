@@ -1,0 +1,26 @@
+{
+  "name": "capacitor",
+  "version": "0.0.1",
+  "description": "An implementation of the flux pattern",
+  "keywords": [
+    "flux",
+    "capacitor",
+    "facebook",
+    "dispatcher",
+    "store",
+    "action"
+  ],
+  "homepage": "",
+  "author": {
+    "name": "Mikkel Schmidt",
+    "url": "https://github.com/miklschmidt/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/miklschmidt/capacitor.js.git"
+  },
+  "dependencies": {
+    "requirejs": "=2.1.15",
+    "signals": "=1.0.0"
+  }
+}
