@@ -1,2 +1,5 @@
+# WIP
+Another Flux implentation. More to come.
+
 ## Credits
-Some concepts inspired by https://github.com/AlexGalays/fluxx
+Basic concepts inspired by https://github.com/AlexGalays/fluxx
