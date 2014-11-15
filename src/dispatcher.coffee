@@ -1,6 +1,6 @@
 define [
 	'invariant'
-	'signal'
+	'signals'
 ], (invariant, {Signal}) ->
 
 	'use strict'
@@ -56,7 +56,7 @@ define [
 		prepareForDispatching = () ->
 			dispatching = yes 
 
-			for id in stores
+			for id of stores
 				isPending[id] = no
 				isHandled[id] = no
 
@@ -80,14 +80,23 @@ define [
 				"Cannot notify store without an action and a payload"
 
 			isPending[id] = yes
-			stores[id]._handleAction currentAction, currentPayload, @waitFor
+			stores[id]._handleAction.call stores[id], currentAction, currentPayload, @waitFor
 			isHandled[id] = yes
 
 		register: (store) ->
 			stores[storeID] = store
 			store._id = storeID++;
 
-		waitFor: (storeDependencies...) ->
+		unregister: (store) ->
+			invariant store._id? and stores[store._id]?,
+				"dispatcher.unregister("
+				store
+				"):"
+				store
+				"is not registered with the dispatcher."
+			delete stores[store._id]
+
+		waitFor: (storeDependencies...) =>
 			# We can only wait for dependencies if the dispatcher is dispatching.
 			# In other words, waitFor() has to be called inside an action handler.
 			invariant dispatching,
@@ -98,10 +107,10 @@ define [
 
 			# Find dependencies with an unhandled action.
 			for dependency in storeDependencies
-				id = dependency.id
+				id = dependency._id
 
 				# The dependency should be registered with the dispatcher
-				invariant stores[id],
+				invariant id? and stores[id]?,
 					"dispatcher.waitFor("
 					storeDependencies
 					"):"
@@ -120,9 +129,9 @@ define [
 					continue
 
 				# Make the dependency handle the action.
-				notifyStore id
+				notifyStore.call @, id
 
-		dispatch: (actionName, payload) ->
+		dispatch: (actionName, payload) =>
 			# The flux architecture dictates that an action cannot 
 			# immediately trigger another action, which leads to cascading 
 			# updates and possibly infinite loops. 
@@ -134,17 +143,17 @@ define [
 			currentAction = actionName
 			currentPayload = payload
 
-			prepareForDispatching()
+			prepareForDispatching.call @
 
-			for id in stores
-				continue if isPending[id]
-				notifyStore id
+			try
+				for id of stores
+					continue if isPending[id]
+					notifyStore.call @, id
+			finally
+				finalizeDispatching.call @
 
-			finalizeDispatching()
 
-
-
-
+	return new Dispatcher()
 
 
 

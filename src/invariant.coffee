@@ -22,10 +22,11 @@ define [
 			        for the full error message and additional helpful warnings.
 				"""
 			else
-				logger.error args...
-				error = new Error """
-					Invariant violation. See error message above.
-				"""
-
+				if window?
+					logger.error args...
+					error = new Error "Invariant violation. See error message above (You are not supposed to catch these)."
+				else
+					error = new Error args.join(" ")
+					
 			error.framesToPop = 1 # We don't care about invariant's own frame
 			throw error

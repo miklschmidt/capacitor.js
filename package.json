@@ -1,14 +1,12 @@
 {
   "name": "capacitor",
   "version": "0.0.1",
-  "description": "An implementation of the flux pattern",
+  "description": "An implementation of the flux pattern, great Scott!",
   "keywords": [
     "flux",
     "capacitor",
     "facebook",
-    "dispatcher",
-    "store",
-    "action"
+    "react"
   ],
   "homepage": "",
   "author": {
@@ -22,5 +20,15 @@
   "dependencies": {
     "requirejs": "=2.1.15",
     "signals": "=1.0.0"
+  },
+  "devDependencies": {
+    "chai": "^1.10.0",
+    "coffee-script": "^1.8.0",
+    "gulp": "^3.8.10",
+    "gulp-coffee": "^2.2.0",
+    "gulp-mocha": "^1.1.1",
+    "gulp-util": "^3.0.1",
+    "mocha": "^2.0.1",
+    "sinon": "^1.11.1"
   }
 }

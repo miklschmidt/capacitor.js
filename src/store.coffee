@@ -15,27 +15,19 @@ define [
 	#				@doOtherStuff()
 	#				@profit()
 	#		]
-	#		events: [
-	#			'changed'
-	#			'deleted'
-	#			'added'
-	#			'startedFetching'
-	#			'finishedFetching'
-	#		]
 	#
 	#		doStuff: () ->
-	#			@added.dispatch()
+	#			# Do things..
 	#			@changed.dispatch()
 	#
 	#
 	#		doOtherStuff: () ->
-	#			@deleted.dispatch()
+	#			# Do things..
+	#			@changed.dispatch()
 	#
 	#		profit: () ->
-	#			@startedFetching.dispatch()
-	#			setTimeout () =>
-	#				@finishedFetching.dispatch()
-	#			, 3000
+	#			# Do things..
+	#			@changed.dispatch()
 	###
 
 
@@ -47,6 +39,8 @@ define [
 		constructor: () ->
 			dispatcher.register(@)
 			@handlers = []
+			invariant @actions?.length > 1,
+				"Actions array should be an array of actions and handlers"
 			for action, i in @actions by 2
 				invariant action instanceof Action and typeof @actions[i+1] is "function",
 					"Action array is malformed: every second argument should be a function"
@@ -58,20 +52,12 @@ define [
 
 				@_handlers[action] = @actions[i+1]
 
-			for eventName in @events
-				invariant typeof eventName is "string", 
-					"Event array is malformed"
-					@events
+			# Set up change event.
 
-				invariant !@[eventName]?, 
-					"There's already a property or method with the name"
-					eventName,
-					"on"
-					@,
-					"This error is usually due to improper naming."
-					"Event names should be past tense, methods should be present tense."
+			@changed = new Signal
 
-				@[eventName] = new Signal
+			# Call initialize, if it's there.
+			@initialize?()
 
 		###
 		# Method for calling handlers on the store when an action is executed.

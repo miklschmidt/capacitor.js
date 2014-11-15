@@ -45,3 +45,5 @@ define ->
 		warn: (args...) -> @write 'warn', args
 
 		trace: (args...) -> @write 'trace', args
+
+	return new Logger
