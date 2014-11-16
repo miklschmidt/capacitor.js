@@ -89,21 +89,16 @@ define [
 
 		unregister: (store) ->
 			invariant store._id? and stores[store._id]?,
-				"dispatcher.unregister("
-				store
-				"):"
-				store
-				"is not registered with the dispatcher."
+				"dispatcher.unregister(...): Store is not registered with the dispatcher."
 			delete stores[store._id]
 
 		waitFor: (storeDependencies...) =>
 			# We can only wait for dependencies if the dispatcher is dispatching.
 			# In other words, waitFor() has to be called inside an action handler.
-			invariant dispatching,
-				'dispatcher.waitFor('
-				storeDependencies
-				"): It's not possible to wait for dependencies when the dispatcher isn't dispatching."
-				"waitFor() should be called in an action handler."
+			invariant dispatching, """
+				dispatcher.waitFor(): It's not possible to wait for dependencies when the dispatcher isn't dispatching.
+				waitFor() should be called in an action handler.
+				"""
 
 			# Find dependencies with an unhandled action.
 			for dependency in storeDependencies
@@ -111,20 +106,13 @@ define [
 
 				# The dependency should be registered with the dispatcher
 				invariant id? and stores[id]?,
-					"dispatcher.waitFor("
-					storeDependencies
-					"):"
-					dependency
-					"is not registered with the dispatcher."
+					'dispatcher.waitFor(...): dependency is not registered with the dispatcher.'
 
 				if isPending[id]
 					# if a dependency (B) of caller (A) is pending but not handled, that dependency (B) has a waitFor that depends 
 					# on the caller (A). In other words, there's a circular dependency.
 					invariant isHandled[id],
-						'dispatcher.waitFor: ('
-						storeDependencies
-						'): Circular dependency detected while waiting for'
-						dependency
+						'dispatcher.waitFor(...): Circular dependency detected.'
 
 					continue
 
@@ -136,9 +124,7 @@ define [
 			# immediately trigger another action, which leads to cascading 
 			# updates and possibly infinite loops. 
 			invariant !dispatching,
-				'dispatcher.dispatch(',
-				actionName, payload
-				'): Cannot dispatch in the middle of a dispatch.'
+				'dispatcher.dispatch(...): Cannot dispatch in the middle of a dispatch.'
 
 			currentAction = actionName
 			currentPayload = payload

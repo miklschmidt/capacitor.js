@@ -1,6 +1,4 @@
-define [
-	'logger'
-], (logger) ->
+define () ->
 
 	###
 	# Use invariant() to assert state which your program assumes to be true.
@@ -14,7 +12,7 @@ define [
 	# will remain to ensure logic does not differ in production.
 	###
 
-	(condition, args...) ->
+	(condition, message) ->
 		unless condition
 			unless args.length
 				error = new Error """
@@ -22,11 +20,7 @@ define [
 			        for the full error message and additional helpful warnings.
 				"""
 			else
-				if window?
-					logger.error args...
-					error = new Error "Invariant violation. See error message above (You are not supposed to catch these)."
-				else
-					error = new Error args.join(" ")
-					
+				error = new Error message
+
 			error.framesToPop = 1 # We don't care about invariant's own frame
 			throw error

@@ -43,9 +43,10 @@ define [
 				"Actions array should be an array of actions and handlers"
 			for action, i in @actions by 2
 				invariant action instanceof Action and typeof @actions[i+1] is "function",
-					"Action array is malformed: every second argument should be a function"
-					"and follow and instance of Action"
-					@actions
+					"""
+					Action array is malformed: every second argument should be a function
+					and follow and instance of Action.
+					"""
 
 				invariant !@_handlers[action]?,
 					"You can only define one handler pr action"
@@ -68,10 +69,7 @@ define [
 		###
 		_handleAction: (actionName, payload, waitFor) =>
 			invariant @_handlers[actionName], 
-				"No handler associated with"
-				actionName
-				"on"
-				@
+				"Store has no handler associated with #{actionName}"
 
 			# Call the handler with the context of this store instance
 			@_handlers[actionName].call @, payload, waitfor

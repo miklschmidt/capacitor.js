@@ -3,7 +3,6 @@ define [
 	'action-manager'
 	'store'
 	'invariant'
-	'logger'
 ], (dispatcher, actionManager, Store, invariant, logger) ->
 
 	return {
@@ -11,5 +10,4 @@ define [
 		actionManager
 		Store
 		invariant
-		logger
 	}

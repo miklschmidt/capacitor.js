@@ -10,10 +10,7 @@ define [
 
 		create: (name) ->
 			invariant !actions[name],
-				"Action names are unique.",
-				"An action with the name"
-				name,
-				"already exists."
+				"Action names are unique. An action with the name #{name} already exists."
 
 			actions[name] = new Action name
 			return actions[name]
