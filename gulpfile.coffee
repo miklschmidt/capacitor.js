@@ -47,7 +47,6 @@ gulp.task 'dist', ['build', 'test', 'change version'], () ->
 			capacitor: "main"
 			signals: "../node_modules/signals/dist/signals"
 		include: ["../vendor/almond", 'main']
-		nodeRequire: require
 		out: "capacitor.js"
 		wrap:
 			startFile: "build/wrap-start.js"
