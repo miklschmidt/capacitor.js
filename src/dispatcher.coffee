@@ -8,7 +8,7 @@ define [
 	class Dispatcher
 
 		###
-		# @var {boolean} dispatching Wether or not the dispatcher is currently dispatching
+		# @var {boolean} dispatching Wether or not the dispatcher is currently dispatching.
 		# @private
 		###
 		dispatching = no
@@ -19,38 +19,47 @@ define [
 		storeID = 0
 		
 		###
-		# @var {object} stores
+		# @var {object} stores Store registry.
 		# @private
 		###
 		stores = {}
 		###
+        # @var {object} isPending Object for tracking pending store callbacks.
 		# @private
 		###
 		isPending = {}
 		###
+        # @var {object} isPending Object for tracking handled store callbacks.
 		# @private
 		###
 		isHandled = {}
 
 		###
+        # @var {string} isPending The current action being dispatched, if any.
 		# @private
 		###
 		currentAction = null
 		###
+        # @var {mixed} isPending The current payload being dispatched, if any.
 		# @private
 		###
 		currentPayload = null
 
 		###
+        # @var {object} Signal triggered when the dispatcher is started.
 		# @public
 		###
 		started: new Signal()
 		###
+        # @var {object} Signal triggered when the dispatcher is stopped.
 		# @public
 		###
 		stopped: new Signal()
 
 		###
+        # Sets the dispatcher to a state where all stores are neither
+        # pending nor handled.
+        #
 		# @private
 		###
 		prepareForDispatching = () ->
@@ -63,6 +72,8 @@ define [
 			@started.dispatch()
 
 		###
+        # Resets the dispatcher state after dispatching.
+        #
 		# @private
 		###
 		finalizeDispatching = () ->
@@ -73,6 +84,10 @@ define [
 			@stopped.dispatch()
 
 		###
+        # Calls the action handler on a store with the current action and payload.
+        # This method is used when dispatching.
+        #
+        # @param {integer} id The ID of the store to notify
 		# @private
 		###
 		notifyStore = (id) ->
@@ -83,15 +98,35 @@ define [
 			stores[id]._handleAction.call stores[id], currentAction, currentPayload, @waitFor
 			isHandled[id] = yes
 
+        ###
+        # Registers a store with the dispatcher so that it's notified when actions
+        # are dispatched.
+        #
+        # @param {Object} store The store to register with the dispatcher
+        ###
 		register: (store) ->
 			stores[storeID] = store
 			store._id = storeID++;
 
+
+        ###
+        # Unregisters a store from the dispatcher so that it's no longer 
+        # notified when actions are dispatched.
+        #
+        # @param {Object} store The store to unregister from the dispatcher
+        ###
 		unregister: (store) ->
 			invariant store._id? and stores[store._id]?,
 				"dispatcher.unregister(...): Store is not registered with the dispatcher."
 			delete stores[store._id]
 
+        ###
+        # Method for waiting for other stores to complete their handling
+        # of actions. This method is passed along to the Stores when an action
+        # is dispatched.
+        #
+        # @see notifyStore
+        ###
 		waitFor: (storeDependencies...) =>
 			# We can only wait for dependencies if the dispatcher is dispatching.
 			# In other words, waitFor() has to be called inside an action handler.
@@ -119,6 +154,13 @@ define [
 				# Make the dependency handle the action.
 				notifyStore.call @, id
 
+        ###
+        # Method for dispatching in action. This method is used by the Action class
+        # when calling Action.dispatch().
+        #
+        # @param {string} actionName The name of the action to dispatch
+        # @param {mixed} payload The payload for the event.
+        ###
 		dispatch: (actionName, payload) =>
 			# The flux architecture dictates that an action cannot 
 			# immediately trigger another action, which leads to cascading 
