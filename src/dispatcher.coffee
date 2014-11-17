@@ -140,17 +140,3 @@ define [
 
 
 	return new Dispatcher()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
