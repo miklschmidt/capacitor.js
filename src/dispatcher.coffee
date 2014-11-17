@@ -98,7 +98,7 @@ define [
 			stores[id]._handleAction.call stores[id], currentAction, currentPayload, @waitFor
 			isHandled[id] = yes
 
-        ###
+		###
         # Registers a store with the dispatcher so that it's notified when actions
         # are dispatched.
         #
@@ -109,7 +109,7 @@ define [
 			store._id = storeID++;
 
 
-        ###
+		###
         # Unregisters a store from the dispatcher so that it's no longer 
         # notified when actions are dispatched.
         #
@@ -120,7 +120,7 @@ define [
 				"dispatcher.unregister(...): Store is not registered with the dispatcher."
 			delete stores[store._id]
 
-        ###
+		###
         # Method for waiting for other stores to complete their handling
         # of actions. This method is passed along to the Stores when an action
         # is dispatched.
@@ -154,7 +154,7 @@ define [
 				# Make the dependency handle the action.
 				notifyStore.call @, id
 
-        ###
+		###
         # Method for dispatching in action. This method is used by the Action class
         # when calling Action.dispatch().
         #
