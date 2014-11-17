@@ -10,6 +10,7 @@ path    = require 'path'
 
 gulp.task 'build', () ->
 	gulp.src 'src/**/*.coffee'
+	.pipe replace "\t", "  " # fix JSDoc output from coffee
 	.pipe coffee()
 	.pipe gulp.dest('lib')
 
