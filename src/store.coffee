@@ -18,18 +18,15 @@ define [
 	#
 	#		doStuff: () ->
 	#			# Do things..
-	#			@changed.dispatch()
 	#
 	#
 	#		doOtherStuff: () ->
 	#			# Do things..
-	#			@changed.dispatch()
 	#
 	#		profit: () ->
 	#			# Do things..
 	#			@changed.dispatch()
 	###
-
 
 	class Store
 
@@ -38,7 +35,7 @@ define [
 		###
 		constructor: () ->
 			dispatcher.register(@)
-			@handlers = []
+			@_handlers = []
 			invariant @actions?.length > 1,
 				"Actions array should be an array of actions and handlers"
 			for action, i in @actions by 2
@@ -54,7 +51,6 @@ define [
 				@_handlers[action] = @actions[i+1]
 
 			# Set up change event.
-
 			@changed = new Signal
 
 			# Call initialize, if it's there.
@@ -72,4 +68,4 @@ define [
 				"Store has no handler associated with #{actionName}"
 
 			# Call the handler with the context of this store instance
-			@_handlers[actionName].call @, payload, waitfor
+			@_handlers[actionName].call @, payload, waitFor

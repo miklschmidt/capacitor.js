@@ -1,5 +1,3 @@
-
-
 describe 'Dispatcher', () ->
 
 	storeA = null
