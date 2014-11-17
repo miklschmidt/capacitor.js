@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.0.2 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.0.3 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -450,15 +450,15 @@ define("../vendor/almond", function(){});
   define('invariant',[],function() {
 
     /*
-    	 * Use invariant() to assert state which your program assumes to be true.
-    	 *
-    	 * Provided arguments are automatically type checked and logged correctly to the console
-    	 * Chrome's console.log sprintf format.
-    	 *
-    	 * ex: invariant(!hasFired, "hasFired was expected to be true but was", hasFired)
-    	 *
-    	 * The invariant message will be stripped in production, but the invariant
-    	 * will remain to ensure logic does not differ in production.
+     * Use invariant() to assert state which your program assumes to be true.
+     *
+     * Provided arguments are automatically type checked and logged correctly to the console
+     * Chrome's console.log sprintf format.
+     *
+     * ex: invariant(!hasFired, "hasFired was expected to be true but was", hasFired)
+     *
+     * The invariant message will be stripped in production, but the invariant
+     * will remain to ensure logic does not differ in production.
      */
     return function(condition, message) {
       var error;
@@ -933,8 +933,8 @@ define("../vendor/almond", function(){});
     Dispatcher = (function() {
 
       /*
-      		 * @var {boolean} dispatching Wether or not the dispatcher is currently dispatching
-      		 * @private
+       * @var {boolean} dispatching Wether or not the dispatcher is currently dispatching.
+       * @private
        */
       var currentAction, currentPayload, dispatching, finalizeDispatching, isHandled, isPending, notifyStore, prepareForDispatching, storeID, stores;
 
@@ -947,65 +947,74 @@ define("../vendor/almond", function(){});
 
 
       /*
-      		 * @var {integer} storeID ID to use for the next store that gets registered. 
-      		 * @private
+       * @var {integer} storeID ID to use for the next store that gets registered. 
+       * @private
        */
 
       storeID = 0;
 
 
       /*
-      		 * @var {object} stores
-      		 * @private
+       * @var {object} stores Store registry.
+       * @private
        */
 
       stores = {};
 
 
       /*
-      		 * @private
+           * @var {object} isPending Object for tracking pending store callbacks.
+       * @private
        */
 
       isPending = {};
 
 
       /*
-      		 * @private
+           * @var {object} isPending Object for tracking handled store callbacks.
+       * @private
        */
 
       isHandled = {};
 
 
       /*
-      		 * @private
+           * @var {string} isPending The current action being dispatched, if any.
+       * @private
        */
 
       currentAction = null;
 
 
       /*
-      		 * @private
+           * @var {mixed} isPending The current payload being dispatched, if any.
+       * @private
        */
 
       currentPayload = null;
 
 
       /*
-      		 * @public
+           * @var {object} Signal triggered when the dispatcher is started.
+       * @public
        */
 
       Dispatcher.prototype.started = new Signal();
 
 
       /*
-      		 * @public
+           * @var {object} Signal triggered when the dispatcher is stopped.
+       * @public
        */
 
       Dispatcher.prototype.stopped = new Signal();
 
 
       /*
-      		 * @private
+           * Sets the dispatcher to a state where all stores are neither
+           * pending nor handled.
+           *
+       * @private
        */
 
       prepareForDispatching = function() {
@@ -1020,7 +1029,9 @@ define("../vendor/almond", function(){});
 
 
       /*
-      		 * @private
+           * Resets the dispatcher state after dispatching.
+           *
+       * @private
        */
 
       finalizeDispatching = function() {
@@ -1032,7 +1043,11 @@ define("../vendor/almond", function(){});
 
 
       /*
-      		 * @private
+           * Calls the action handler on a store with the current action and payload.
+           * This method is used when dispatching.
+           *
+           * @param {integer} id The ID of the store to notify
+       * @private
        */
 
       notifyStore = function(id) {
@@ -1042,15 +1057,40 @@ define("../vendor/almond", function(){});
         return isHandled[id] = true;
       };
 
+
+      /*
+           * Registers a store with the dispatcher so that it's notified when actions
+           * are dispatched.
+           *
+           * @param {Object} store The store to register with the dispatcher
+       */
+
       Dispatcher.prototype.register = function(store) {
         stores[storeID] = store;
         return store._id = storeID++;
       };
 
+
+      /*
+           * Unregisters a store from the dispatcher so that it's no longer 
+           * notified when actions are dispatched.
+           *
+           * @param {Object} store The store to unregister from the dispatcher
+       */
+
       Dispatcher.prototype.unregister = function(store) {
         invariant((store._id != null) && (stores[store._id] != null), "dispatcher.unregister(...): Store is not registered with the dispatcher.");
         return delete stores[store._id];
       };
+
+
+      /*
+           * Method for waiting for other stores to complete their handling
+           * of actions. This method is passed along to the Stores when an action
+           * is dispatched.
+           *
+           * @see notifyStore
+       */
 
       Dispatcher.prototype.waitFor = function() {
         var dependency, id, storeDependencies, _i, _len, _results;
@@ -1069,6 +1109,15 @@ define("../vendor/almond", function(){});
         }
         return _results;
       };
+
+
+      /*
+           * Method for dispatching in action. This method is used by the Action class
+           * when calling Action.dispatch().
+           *
+           * @param {string} actionName The name of the action to dispatch
+           * @param {mixed} payload The payload for the event.
+       */
 
       Dispatcher.prototype.dispatch = function(actionName, payload) {
         var id, _results;
@@ -1102,13 +1151,31 @@ define("../vendor/almond", function(){});
   define('action',['dispatcher'], function(dispatcher) {
     var Action;
     return Action = (function() {
+
+      /*
+       * Constructor
+       * 
+       * @param {string} The name of the action
+       */
       function Action(name) {
         this.name = name;
       }
 
+
+      /*
+       * Method for dispatching the action through the dispatcher
+       *
+       * @param {mixed} Payload for the action
+       */
+
       Action.prototype.dispatch = function(payload) {
         return dispatcher.dispatch(this.name, payload);
       };
+
+
+      /*
+       * Magic method for coercing an action to a string
+       */
 
       Action.prototype.toString = function() {
         return this.name;
@@ -1127,11 +1194,24 @@ define("../vendor/almond", function(){});
   define('action-manager',['invariant', 'dispatcher', 'action'], function(invariant, dispatcher, Action) {
     var ActionManager;
     ActionManager = (function() {
+
+      /*
+       * @var {Object} actions a list of all existing actions
+       * @private
+       */
       var actions;
 
       function ActionManager() {}
 
       actions = {};
+
+
+      /*
+       * Method for creating an action
+       *
+       * @param {string} name The (unique) name of the action.
+       * @return {Action} the created action.
+       */
 
       ActionManager.prototype.create = function(name) {
         invariant(!actions[name], "Action names are unique. An action with the name " + name + " already exists.");
@@ -1139,13 +1219,29 @@ define("../vendor/almond", function(){});
         return actions[name];
       };
 
+
+      /*
+       * Method for listing all existing actions
+       *
+       * @return {Array} list of existing actions
+       */
+
       ActionManager.prototype.list = function() {
-        var name;
+        var name, _results;
+        _results = [];
         for (name in actions) {
           if (!__hasProp.call(actions, name)) continue;
-          return name;
+          _results.push(name);
         }
+        return _results;
       };
+
+
+      /*
+       * Method to check if an action exists
+       *
+       * @return {boolean}
+       */
 
       ActionManager.prototype.exists = function(name) {
         return actions[name] != null;
@@ -1167,39 +1263,37 @@ define("../vendor/almond", function(){});
     Signal = _arg.Signal;
 
     /*
-    	 *	implementation example:
-    	 *
-    	 *	class TodoStore extends Store
-    	 *		actions: [
-    	 *			someAction, () ->
-    	 *				@doStuff()
-    	 *				@doOtherStuff()
-    	 *				@profit()
-    	 *		]
-    	 *
-    	 *		doStuff: () ->
-    	 *			# Do things..
-    	 *			@changed.dispatch()
-    	 *
-    	 *
-    	 *		doOtherStuff: () ->
-    	 *			# Do things..
-    	 *			@changed.dispatch()
-    	 *
-    	 *		profit: () ->
-    	 *			# Do things..
-    	 *			@changed.dispatch()
+     *  implementation example:
+     *
+     *  class TodoStore extends Store
+     *    actions: [
+     *      someAction, () ->
+     *        @doStuff()
+     *        @doOtherStuff()
+     *        @profit()
+     *    ]
+     *
+     *    doStuff: () ->
+     *      # Do things..
+     *
+     *
+     *    doOtherStuff: () ->
+     *      # Do things..
+     *
+     *    profit: () ->
+     *      # Do things..
+     *      @changed.dispatch()
      */
     return Store = (function() {
 
       /*
-      		 * Constructor function that sets up actions and events on the store
+       * Constructor function that sets up actions and events on the store
        */
       function Store() {
         this._handleAction = __bind(this._handleAction, this);
         var action, i, _i, _len, _ref, _ref1;
         dispatcher.register(this);
-        this.handlers = [];
+        this._handlers = [];
         invariant(((_ref = this.actions) != null ? _ref.length : void 0) > 1, "Actions array should be an array of actions and handlers");
         _ref1 = this.actions;
         for (i = _i = 0, _len = _ref1.length; _i < _len; i = _i += 2) {
@@ -1216,16 +1310,16 @@ define("../vendor/almond", function(){});
 
 
       /*
-      		 * Method for calling handlers on the store when an action is executed.
-      		 * 
-      		 * @param {string} actionName The name of the executed action
-      		 * @param {mixed} payload The payload passed to the handler
-      		 * @param {array} waitFor An array of other signals to wait for in this dispatcher run.
+       * Method for calling handlers on the store when an action is executed.
+       * 
+       * @param {string} actionName The name of the executed action
+       * @param {mixed} payload The payload passed to the handler
+       * @param {array} waitFor An array of other signals to wait for in this dispatcher run.
        */
 
       Store.prototype._handleAction = function(actionName, payload, waitFor) {
         invariant(this._handlers[actionName], "Store has no handler associated with " + actionName);
-        return this._handlers[actionName].call(this, payload, waitfor);
+        return this._handlers[actionName].call(this, payload, waitFor);
       };
 
       return Store;
