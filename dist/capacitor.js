@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.0.3 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.0.5 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -447,7 +447,28 @@ var requirejs, require, define;
 define("../vendor/almond", function(){});
 
 (function() {
-  define('invariant',[],function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  define('invariant-error',[],function() {
+    var InvariantError;
+    return InvariantError = (function(_super) {
+      __extends(InvariantError, _super);
+
+      function InvariantError(message) {
+        this.name = "Invariant Error";
+        this.message = message;
+      }
+
+      return InvariantError;
+
+    })(Error);
+  });
+
+}).call(this);
+
+(function() {
+  define('invariant',['invariant-error'], function(InvariantError) {
 
     /*
      * Use invariant() to assert state which your program assumes to be true.
@@ -463,10 +484,10 @@ define("../vendor/almond", function(){});
     return function(condition, message) {
       var error;
       if (!condition) {
-        if (!args.length) {
-          error = new Error("Minified exception occurred; use the non-minified dev environment\nfor the full error message and additional helpful warnings.");
+        if (message == null) {
+          error = new InvariantError("Minified exception occurred; use the non-minified dev environment\nfor the full error message and additional helpful warnings.");
         } else {
-          error = new Error(message);
+          error = new InvariantError(message);
         }
         error.framesToPop = 1;
         throw error;
@@ -1256,9 +1277,10 @@ define("../vendor/almond", function(){});
 }).call(this);
 
 (function() {
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty;
 
-  define('store',['signals', 'action', 'dispatcher', 'invariant'], function(_arg, Action, dispatcher, invariant) {
+  define('store',['lodash', 'signals', 'action', 'dispatcher', 'invariant'], function(_, _arg, Action, dispatcher, invariant) {
     var Signal, Store;
     Signal = _arg.Signal;
 
@@ -1266,12 +1288,10 @@ define("../vendor/almond", function(){});
      *  implementation example:
      *
      *  class TodoStore extends Store
-     *    actions: [
-     *      someAction, () ->
-     *        @doStuff()
-     *        @doOtherStuff()
-     *        @profit()
-     *    ]
+     *    @action someAction, () ->
+     *      @doStuff()
+     *      @doOtherStuff()
+     *      @profit()
      *
      *    doStuff: () ->
      *      # Do things..
@@ -1287,39 +1307,105 @@ define("../vendor/almond", function(){});
     return Store = (function() {
 
       /*
+       * @static
+       * @private
+       */
+      Store._handlers = null;
+
+
+      /*
+       * @private
+       */
+
+      Store.prototype._properties = null;
+
+
+      /*
+       * Static method for defining action handlers on a Store.
+       *
+       * @static
+       * @param {Action} action The Action to associated with the handler.
+       * @param {Function} fn The handler to call when Action is triggered.
+       */
+
+      Store.action = function(action, fn) {
+        var prop, _ref, _results;
+        if (this._handlers == null) {
+          this._handlers = {};
+        }
+        invariant(action instanceof Action && typeof fn === "function", "Store.action(...): Provided action should be created via the action manager and a handler must be given as a second parameter.\nIf you're trying to reference a prototype method, don't do that.");
+        invariant(this._handlers[action] == null, "Store.action(...): You can only define one handler pr action");
+        this._handlers[action] = fn;
+        _ref = this.prototype;
+        _results = [];
+        for (prop in _ref) {
+          if (!__hasProp.call(_ref, prop)) continue;
+          if (fn === this.prototype[prop]) {
+            _results.push(console.warn("Store.action(...): Action %s is referring to a method on the store prototype (%o).\nThis is bad practice and should be avoided.\nThe handler itself may call prototype methods,\nand is called with the store instance as context for that reason.", action, this));
+          }
+        }
+        return _results;
+      };
+
+
+      /*
        * Constructor function that sets up actions and events on the store
        */
+
       function Store() {
         this._handleAction = __bind(this._handleAction, this);
-        var action, i, _i, _len, _ref, _ref1;
         dispatcher.register(this);
-        this._handlers = [];
-        invariant(((_ref = this.actions) != null ? _ref.length : void 0) > 1, "Actions array should be an array of actions and handlers");
-        _ref1 = this.actions;
-        for (i = _i = 0, _len = _ref1.length; _i < _len; i = _i += 2) {
-          action = _ref1[i];
-          invariant(action instanceof Action && typeof this.actions[i + 1] === "function", "Action array is malformed: every second argument should be a function\nand follow and instance of Action.");
-          invariant(this._handlers[action] == null, "You can only define one handler pr action");
-          this._handlers[action] = this.actions[i + 1];
-        }
+        this._properties = {};
         this.changed = new Signal;
         if (typeof this.initialize === "function") {
           this.initialize();
         }
       }
 
+      Store.prototype.get = function(name) {
+        var val;
+        val = null;
+        if (name != null) {
+          invariant(_.isString(name) || _.isObject(name), "Store.get(...): first parameter should be undefined, a string, or an array of keys.");
+          val = _.pick(this._properties, name);
+          if (_.isObject(val)) {
+            val = _.cloneDeep(this._properties[name]);
+          }
+        } else {
+          val = _.cloneDeep(this._properties);
+        }
+        return val;
+      };
+
+      Store.prototype.set = function(name, val) {
+        var properties;
+        if (_.isString(name)) {
+          properties = {};
+          properties[name] = val;
+        }
+        if (_.isObject(name)) {
+          properties = name;
+        }
+        return _.assign(this._properties, _.deepClone(properties));
+      };
+
+      Store.prototype.unset = function(name) {
+        invariant(_.isString(name), "Store.unset(...): first parameter must be a string.");
+        return delete this._properties[name];
+      };
+
 
       /*
        * Method for calling handlers on the store when an action is executed.
-       * 
+       *
        * @param {string} actionName The name of the executed action
        * @param {mixed} payload The payload passed to the handler
        * @param {array} waitFor An array of other signals to wait for in this dispatcher run.
        */
 
       Store.prototype._handleAction = function(actionName, payload, waitFor) {
-        invariant(this._handlers[actionName], "Store has no handler associated with " + actionName);
-        return this._handlers[actionName].call(this, payload, waitFor);
+        invariant(this.constructor._handlers[actionName], "Store._handleAction(...): Store has no handler associated with " + actionName);
+        return this.constructor._handlers[actionName].call(this, payload, waitFor);
       };
 
       return Store;
