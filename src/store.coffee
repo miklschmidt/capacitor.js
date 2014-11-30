@@ -92,8 +92,22 @@ define [
 				val = _.cloneDeep val if _.isObject(val)
 			else
 				val = _.cloneDeep @_properties
-			val
+			return val
 
+
+		merge: (name, val) ->
+			if _.isString(name)
+				properties = {}
+				properties[name] = val
+			if _.isObject(name)
+				properties = name
+			newProps =  _.cloneDeep properties
+			_.merge @_properties, newProps
+
+			changedProps = _.pick @_properties, _.keys(newProps)
+			@changed.dispatch 'merge', changedProps
+
+			return @
 
 		set: (name, val) ->
 			if _.isString(name)
@@ -101,11 +115,18 @@ define [
 				properties[name] = val
 			if _.isObject(name)
 				properties = name
-			_.assign @_properties, _.cloneDeep properties
+			newProps =  _.cloneDeep properties
+			_.assign @_properties, newProps
+
+			@changed.dispatch 'set', newProps
+
+			return @
 
 		unset: (name) ->
 			invariant _.isString(name), "Store.unset(...): first parameter must be a string."
-			delete @_properties[name]
+			delete @_properties[name] if @_properties[name]?
+			@changed.dispatch 'unset', name
+			return @
 
 
 		###
