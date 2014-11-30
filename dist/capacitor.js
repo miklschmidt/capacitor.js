@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.0.6 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.0.7 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -1368,10 +1368,13 @@ define("../vendor/almond", function(){});
         var val;
         val = null;
         if (name != null) {
-          invariant(_.isString(name) || _.isObject(name), "Store.get(...): first parameter should be undefined, a string, or an array of keys.");
+          invariant(_.isString(name) || _.isArray(name), "Store.get(...): first parameter should be undefined, a string, or an array of keys.");
           val = _.pick(this._properties, name);
+          if (_.isString(name)) {
+            val = val[name];
+          }
           if (_.isObject(val)) {
-            val = _.cloneDeep(this._properties[name]);
+            val = _.cloneDeep(val);
           }
         } else {
           val = _.cloneDeep(this._properties);
@@ -1388,7 +1391,7 @@ define("../vendor/almond", function(){});
         if (_.isObject(name)) {
           properties = name;
         }
-        return _.assign(this._properties, _.deepClone(properties));
+        return _.assign(this._properties, _.cloneDeep(properties));
       };
 
       Store.prototype.unset = function(name) {
