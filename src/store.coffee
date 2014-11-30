@@ -63,7 +63,7 @@ define [
 			# Check if the function is a reference to a prototype method, and warn.
 			for own prop of (@::) when fn is @::[prop]
 				console.warn """
-					Store.action(...): Action %s is referring to a method on the store prototype (%o).
+					Store.action(...): Action %s is referring to a method on the store prototype (%O).
 					This is bad practice and should be avoided.
 					The handler itself may call prototype methods,
 					and is called with the store instance as context for that reason.
@@ -94,6 +94,23 @@ define [
 				val = _.cloneDeep @_properties
 			return val
 
+		set: (name, val) ->
+			invariant _.isObject(name) or _.isString(name) and val?,
+				"""
+					Store.set(...): You can only set an object or pass a string and a value.
+					Use Store.unset(#{name}) to unset the property.
+				"""
+			if _.isString(name)
+				properties = {}
+				properties[name] = val
+			if _.isObject(name)
+				properties = name
+			newProps =  _.cloneDeep properties
+			_.assign @_properties, newProps
+
+			@changed.dispatch 'set', newProps
+
+			return @
 
 		merge: (name, val) ->
 			if _.isString(name)
@@ -106,19 +123,6 @@ define [
 
 			changedProps = _.pick @_properties, _.keys(newProps)
 			@changed.dispatch 'merge', changedProps
-
-			return @
-
-		set: (name, val) ->
-			if _.isString(name)
-				properties = {}
-				properties[name] = val
-			if _.isObject(name)
-				properties = name
-			newProps =  _.cloneDeep properties
-			_.assign @_properties, newProps
-
-			@changed.dispatch 'set', newProps
 
 			return @
 
