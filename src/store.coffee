@@ -10,12 +10,10 @@ define [
 	#	implementation example:
 	#
 	#	class TodoStore extends Store
-	#		actions: [
-	#			someAction, () ->
-	#				@doStuff()
-	#				@doOtherStuff()
-	#				@profit()
-	#		]
+	#		@action someAction, () ->
+	#			@doStuff()
+	#			@doOtherStuff()
+	#			@profit()
 	#
 	#		doStuff: () ->
 	#			# Do things..
