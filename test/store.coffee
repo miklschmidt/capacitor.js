@@ -141,3 +141,62 @@ describe 'Store', () ->
 		expect instance.get('a').b.c
 		.to.be.equal "test"
 
+	it 'should be able to merge existing props with an object', () ->
+		class TestStore extends Store
+
+		nestedObject =
+			a:
+				b:
+					c: "test"
+			d: "test"
+			x: "test4"
+
+		mergeObject =
+			a:
+				b:
+					e: "test2"
+			d: "test3"
+			f: "another"
+
+		instance = new TestStore
+
+		instance.set nestedObject
+		instance.merge mergeObject
+
+		result = instance.get()
+
+		expect result
+		.to.have.keys ["a", "d", "f", "x"]
+
+		expect result.a
+		.to.have.keys ['b']
+
+		expect result.a.b
+		.to.have.keys ['c', 'e']
+
+		expect result.a.b.e
+		.to.equal 'test2'
+
+		expect result.a.b.c
+		.to.equal 'test'
+
+		expect result.d
+		.to.equal "test3"
+
+		expect result.f
+		.to.equal "another"
+
+		expect result.x
+		.to.equal "test4"
+
+	it 'should dispatch changed signal on set', () ->
+		class TestStore extends Store
+
+		instance = new TestStore
+
+		cb = sinon.spy()
+		instance.changed.add cb
+		instance.set 'test', 'test'
+
+
+
