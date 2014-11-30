@@ -1,2 +1,6 @@
 src
 test
+build
+vendor
+gulpfile.coffee
+gulpfile.js

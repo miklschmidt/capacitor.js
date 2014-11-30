@@ -6,4 +6,4 @@ requirejs.config({
 	nodeRequire: require
 });
 
-module.exports = requirejs("./lib/main");
+module.exports = requirejs("main");
