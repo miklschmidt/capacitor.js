@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.0.7 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.0.8 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -1343,7 +1343,7 @@ define("../vendor/almond", function(){});
         for (prop in _ref) {
           if (!__hasProp.call(_ref, prop)) continue;
           if (fn === this.prototype[prop]) {
-            _results.push(console.warn("Store.action(...): Action %s is referring to a method on the store prototype (%o).\nThis is bad practice and should be avoided.\nThe handler itself may call prototype methods,\nand is called with the store instance as context for that reason.", action, this));
+            _results.push(console.warn("Store.action(...): Action %s is referring to a method on the store prototype (%O).\nThis is bad practice and should be avoided.\nThe handler itself may call prototype methods,\nand is called with the store instance as context for that reason.", action, this));
           }
         }
         return _results;
@@ -1383,7 +1383,8 @@ define("../vendor/almond", function(){});
       };
 
       Store.prototype.set = function(name, val) {
-        var properties;
+        var newProps, properties;
+        invariant(_.isObject(name) || _.isString(name) && (val != null), "Store.set(...): You can only set an object or pass a string and a value.\nUse Store.unset(" + name + ") to unset the property.");
         if (_.isString(name)) {
           properties = {};
           properties[name] = val;
@@ -1391,12 +1392,35 @@ define("../vendor/almond", function(){});
         if (_.isObject(name)) {
           properties = name;
         }
-        return _.assign(this._properties, _.cloneDeep(properties));
+        newProps = _.cloneDeep(properties);
+        _.assign(this._properties, newProps);
+        this.changed.dispatch('set', newProps);
+        return this;
+      };
+
+      Store.prototype.merge = function(name, val) {
+        var changedProps, newProps, properties;
+        if (_.isString(name)) {
+          properties = {};
+          properties[name] = val;
+        }
+        if (_.isObject(name)) {
+          properties = name;
+        }
+        newProps = _.cloneDeep(properties);
+        _.merge(this._properties, newProps);
+        changedProps = _.pick(this._properties, _.keys(newProps));
+        this.changed.dispatch('merge', changedProps);
+        return this;
       };
 
       Store.prototype.unset = function(name) {
         invariant(_.isString(name), "Store.unset(...): first parameter must be a string.");
-        return delete this._properties[name];
+        if (this._properties[name] != null) {
+          delete this._properties[name];
+        }
+        this.changed.dispatch('unset', name);
+        return this;
       };
 
 
