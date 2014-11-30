@@ -1,10 +1,11 @@
 define [
+	'lodash'
 	'signals'
 	'action'
 	'dispatcher'
 	'invariant'
-], ({Signal}, Action, dispatcher, invariant) -> 
-	
+], (_, {Signal}, Action, dispatcher, invariant) ->
+
 	###
 	#	implementation example:
 	#
@@ -31,24 +32,51 @@ define [
 	class Store
 
 		###
+		# @static
+		# @private
+		###
+		@_handlers: null
+
+		###
+		# @private
+		###
+		_properties: null
+
+
+		###
+		# Static method for defining action handlers on a Store.
+		#
+		# @static
+		# @param {Action} action The Action to associated with the handler.
+		# @param {Function} fn The handler to call when Action is triggered.
+		###
+		@action: (action, fn) ->
+			@_handlers ?= {}
+			invariant action instanceof Action and typeof fn is "function",
+				"""
+				Store.action(...): Provided action should be created via the action manager and a handler must be given as a second parameter.
+				If you're trying to reference a prototype method, don't do that.
+				"""
+			invariant !@_handlers[action]?,
+				"Store.action(...): You can only define one handler pr action"
+
+			@_handlers[action] = fn
+
+			# Check if the function is a reference to a prototype method, and warn.
+			for own prop of (@::) when fn is @::[prop]
+				console.warn """
+					Store.action(...): Action %s is referring to a method on the store prototype (%o).
+					This is bad practice and should be avoided.
+					The handler itself may call prototype methods,
+					and is called with the store instance as context for that reason.
+					""", action, @
+
+		###
 		# Constructor function that sets up actions and events on the store
 		###
 		constructor: () ->
 			dispatcher.register(@)
-			@_handlers = []
-			invariant @actions?.length > 1,
-				"Actions array should be an array of actions and handlers"
-			for action, i in @actions by 2
-				invariant action instanceof Action and typeof @actions[i+1] is "function",
-					"""
-					Action array is malformed: every second argument should be a function
-					and follow and instance of Action.
-					"""
-
-				invariant !@_handlers[action]?,
-					"You can only define one handler pr action"
-
-				@_handlers[action] = @actions[i+1]
+			@_properties = {}
 
 			# Set up change event.
 			@changed = new Signal
@@ -56,16 +84,41 @@ define [
 			# Call initialize, if it's there.
 			@initialize?()
 
+
+		get: (name) ->
+			val = null
+			if name?
+				invariant _.isString(name) or _.isObject(name), "Store.get(...): first parameter should be undefined, a string, or an array of keys."
+				val = _.pick @_properties, name
+				val = _.cloneDeep @_properties[name] if _.isObject(val)
+			else
+				val = _.cloneDeep @_properties
+			val
+
+
+		set: (name, val) ->
+			if _.isString(name)
+				properties = {}
+				properties[name] = val
+			if _.isObject(name)
+				properties = name
+			_.assign @_properties, _.deepClone properties
+
+		unset: (name) ->
+			invariant _.isString(name), "Store.unset(...): first parameter must be a string."
+			delete @_properties[name]
+
+
 		###
 		# Method for calling handlers on the store when an action is executed.
-		# 
+		#
 		# @param {string} actionName The name of the executed action
 		# @param {mixed} payload The payload passed to the handler
 		# @param {array} waitFor An array of other signals to wait for in this dispatcher run.
 		###
 		_handleAction: (actionName, payload, waitFor) =>
-			invariant @_handlers[actionName], 
-				"Store has no handler associated with #{actionName}"
+			invariant @constructor._handlers[actionName],
+				"Store._handleAction(...): Store has no handler associated with #{actionName}"
 
 			# Call the handler with the context of this store instance
-			@_handlers[actionName].call @, payload, waitFor
+			@constructor._handlers[actionName].call @, payload, waitFor

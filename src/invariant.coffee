@@ -1,4 +1,4 @@
-define () ->
+define ['invariant-error'], (InvariantError) ->
 
 	###
 	# Use invariant() to assert state which your program assumes to be true.
@@ -14,13 +14,13 @@ define () ->
 
 	(condition, message) ->
 		unless condition
-			unless args.length
-				error = new Error """
+			unless message?
+				error = new InvariantError """
 			        Minified exception occurred; use the non-minified dev environment
 			        for the full error message and additional helpful warnings.
 				"""
 			else
-				error = new Error message
+				error = new InvariantError message
 
 			error.framesToPop = 1 # We don't care about invariant's own frame
 			throw error
