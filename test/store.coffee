@@ -74,3 +74,70 @@ describe 'Store', () ->
 		expect handler.callCount
 		.to.equal 1,
 			"action handler wasn't executed"
+
+	it 'should be able to set a single property', () ->
+		class TestStore extends Store
+
+		instance = new TestStore
+
+		instance.set 'test', 'test'
+		expect instance.get 'test'
+		.to.equal 'test'
+
+	it 'should be able to set an object', () ->
+		class TestStore extends Store
+
+		instance = new TestStore
+
+		instance.set {a: 'test', b: 'test2'}
+
+		expect instance.get 'a'
+		.to.equal 'test'
+
+		expect instance.get 'b'
+		.to.equal 'test2'
+
+	it 'should be able to get an array of values', () ->
+		class TestStore extends Store
+
+		instance = new TestStore
+
+		instance.set {a: 'test', b: 'test2'}
+
+		val = instance.get ['a', 'b']
+		expect val
+		.to.have.keys ['a', 'b']
+
+		expect val.a
+		.to.equal 'test'
+
+		expect val.b
+		.to.equal 'test2'
+
+
+	it 'should dereference objects in get/set', () ->
+		class TestStore extends Store
+
+		nestedObject =
+			a:
+				b:
+					c: "test"
+			d: "test"
+
+		instance = new TestStore
+
+		instance.set nestedObject
+		nestedObject.a.b.c = "shouldntchangestoreprops"
+		expect instance._properties.a.b.c
+		.to.be.equal "test"
+
+		obj = instance.get('a').b
+
+		expect obj.c
+		.to.be.equal "test"
+
+		obj.c = "shouldntchangestorepropseither"
+
+		expect instance.get('a').b.c
+		.to.be.equal "test"
+

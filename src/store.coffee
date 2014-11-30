@@ -86,9 +86,10 @@ define [
 		get: (name) ->
 			val = null
 			if name?
-				invariant _.isString(name) or _.isObject(name), "Store.get(...): first parameter should be undefined, a string, or an array of keys."
+				invariant _.isString(name) or _.isArray(name), "Store.get(...): first parameter should be undefined, a string, or an array of keys."
 				val = _.pick @_properties, name
-				val = _.cloneDeep @_properties[name] if _.isObject(val)
+				val = val[name] if _.isString(name)
+				val = _.cloneDeep val if _.isObject(val)
 			else
 				val = _.cloneDeep @_properties
 			val
@@ -100,7 +101,7 @@ define [
 				properties[name] = val
 			if _.isObject(name)
 				properties = name
-			_.assign @_properties, _.deepClone properties
+			_.assign @_properties, _.cloneDeep properties
 
 		unset: (name) ->
 			invariant _.isString(name), "Store.unset(...): first parameter must be a string."
