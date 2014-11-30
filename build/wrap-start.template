@@ -6,12 +6,13 @@
 (function (root, factory) {
 	if (typeof define === 'function' && define.amd) {
 		// AMD.
-		define(factory);
+		define(['lodash', factory);
 	else if (typeof module !== 'undefined' && module.exports) {
 		// CommonJS
-		module.exports = factory();
+		var _ = require('lodash');
+		module.exports = factory(_);
 	} else {
 		// Browser globals.
-		root.capacitor = factory();
+		root.capacitor = factory(root._);
 	}
-}(this, function($) {
+}(this, function(_) {

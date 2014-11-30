@@ -1,20 +1,22 @@
 /**
- * @license capacitor.js 0.0.5 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.0.6 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
 (function (root, factory) {
 	if (typeof define === 'function' && define.amd) {
 		// AMD.
-		define(factory);
+		define(['lodash', factory);
 	else if (typeof module !== 'undefined' && module.exports) {
 		// CommonJS
-		module.exports = factory();
+		var _ = require('lodash');
+		module.exports = factory(_);
 	} else {
 		// Browser globals.
-		root.capacitor = factory();
+		root.capacitor = factory(root._);
 	}
-}(this, function($) {
+}(this, function(_) {
+
 /**
  * @license almond 0.3.0 Copyright (c) 2011-2014, The Dojo Foundation All Rights Reserved.
  * Available via the MIT or new BSD license.
@@ -1426,5 +1428,9 @@ define("../vendor/almond", function(){});
   });
 
 }).call(this);
+
+	define('lodash', function() {
+		return _;
+	});
     return require('capacitor');
 }));

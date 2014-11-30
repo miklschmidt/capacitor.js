@@ -46,8 +46,9 @@ gulp.task 'dist', ['build', 'test', 'change version'], () ->
 		paths:
 			capacitor: "main"
 			signals: "../node_modules/signals/dist/signals"
-			lodash: "empty:"
+			lodash: "../node_modules/lodash/dist/lodash"
 		include: ["../vendor/almond", 'main']
+		exclude: ["lodash"]
 		out: "capacitor.js"
 		wrap:
 			startFile: "build/wrap-start.js"
