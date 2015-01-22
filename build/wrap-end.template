@@ -2,5 +2,5 @@
 	define('lodash', function() {
 		return _;
 	});
-    return require('capacitor');
+    return require('main');
 }));

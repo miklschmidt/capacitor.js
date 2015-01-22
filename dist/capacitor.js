@@ -1,13 +1,13 @@
 /**
- * @license capacitor.js 0.0.9 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.0.12 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
 (function (root, factory) {
 	if (typeof define === 'function' && define.amd) {
 		// AMD.
-		define(['lodash', factory);
-	else if (typeof module !== 'undefined' && module.exports) {
+		define(['lodash'], factory);
+	} else if (typeof module !== 'undefined' && module.exports) {
 		// CommonJS
 		var _ = require('lodash');
 		module.exports = factory(_);
@@ -1459,5 +1459,5 @@ define("../vendor/almond", function(){});
 	define('lodash', function() {
 		return _;
 	});
-    return require('capacitor');
+    return require('main');
 }));

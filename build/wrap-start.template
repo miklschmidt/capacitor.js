@@ -6,8 +6,8 @@
 (function (root, factory) {
 	if (typeof define === 'function' && define.amd) {
 		// AMD.
-		define(['lodash', factory);
-	else if (typeof module !== 'undefined' && module.exports) {
+		define(['lodash'], factory);
+	} else if (typeof module !== 'undefined' && module.exports) {
 		// CommonJS
 		var _ = require('lodash');
 		module.exports = factory(_);
