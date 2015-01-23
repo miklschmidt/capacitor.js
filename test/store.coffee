@@ -75,6 +75,22 @@ describe 'Store', () ->
 		.to.equal 1,
 			"action handler wasn't executed"
 
+	it 'should ignore unknown actions', () ->
+		firstAction = new Action('test')
+		secondAction = new Action('test2')
+		handler = sinon.spy()
+		class TestStore extends Store
+
+			@action secondAction, handler
+
+		instance = new TestStore
+
+		instance._handleAction 'test', {}, () -> true
+
+		expect handler.callCount
+		.to.equal 0,
+			"action handler for another action was executed, something is very wrong"
+
 	it 'should be able to set a single property', () ->
 		class TestStore extends Store
 

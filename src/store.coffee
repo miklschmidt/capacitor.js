@@ -141,8 +141,6 @@ define [
 		# @param {array} waitFor An array of other signals to wait for in this dispatcher run.
 		###
 		_handleAction: (actionName, payload, waitFor) =>
-			invariant @constructor._handlers[actionName],
-				"Store._handleAction(...): Store has no handler associated with #{actionName}"
-
+			return unless @constructor._handlers[actionName]?
 			# Call the handler with the context of this store instance
 			@constructor._handlers[actionName].call @, payload, waitFor
