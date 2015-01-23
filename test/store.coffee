@@ -91,6 +91,13 @@ describe 'Store', () ->
 		.to.equal 0,
 			"action handler for another action was executed, something is very wrong"
 
+	it 'should work without actions', () ->
+		class TestStore extends Store
+
+		instance = new TestStore
+
+		instance._handleAction 'test', {}, () -> true
+
 	it 'should be able to set a single property', () ->
 		class TestStore extends Store
 
