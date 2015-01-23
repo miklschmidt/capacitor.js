@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.0.13 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.0.14 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -1433,7 +1433,8 @@ define("../vendor/almond", function(){});
        */
 
       Store.prototype._handleAction = function(actionName, payload, waitFor) {
-        if (this.constructor._handlers[actionName] == null) {
+        var _ref;
+        if (((_ref = this.constructor._handlers) != null ? _ref[actionName] : void 0) == null) {
           return;
         }
         return this.constructor._handlers[actionName].call(this, payload, waitFor);
