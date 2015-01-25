@@ -1,6 +1,6 @@
 {
   "name": "capacitor",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "An implementation of the flux pattern, great Scott!",
   "keywords": [
     "flux",

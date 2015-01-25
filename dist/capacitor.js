@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.0.14 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.0.15 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -1362,6 +1362,9 @@ define("../vendor/almond", function(){});
         if (typeof this.initialize === "function") {
           this.initialize();
         }
+        return {
+          get: this.get.bind(this)
+        };
       }
 
       Store.prototype.get = function(name) {

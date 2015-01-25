@@ -82,6 +82,11 @@ define [
 			# Call initialize, if it's there.
 			@initialize?()
 
+			# Return proxy object used to interact with this store
+			return {
+				get: @get.bind(@)
+			}
+
 
 		get: (name) ->
 			val = null

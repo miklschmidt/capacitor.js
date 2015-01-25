@@ -30,12 +30,33 @@ describe 'Store', () ->
 
 		console.warn.restore()
 
+	it 'should call initialize on instantiation', () ->
+
+		init = sinon.spy()
+
+		class TestStore extends Store
+
+			initialize: init
+
+		new TestStore
+
+		expect init.calledOnce
+		.to.be.true
+
+
 	it 'should hook up action handlers correctly', () ->
 		testFunction = () -> true
+
 		class TestStore extends Store
 
 			@action new Action('test'), testFunction
 
+			initialize: () ->
+				expect @constructor._handlers['test']
+				.to.exist
+
+				expect @constructor._handlers['test']
+				.to.equal testFunction
 
 		expect TestStore._handlers['test']
 		.to.exist
@@ -45,11 +66,6 @@ describe 'Store', () ->
 
 		instance = new TestStore
 
-		expect instance.constructor._handlers['test']
-		.to.exist
-
-		expect instance.constructor._handlers['test']
-		.to.equal testFunction
 
 	it 'should throw when hooking up the same action twice', () ->
 		action = new Action('test')
@@ -67,9 +83,10 @@ describe 'Store', () ->
 
 			@action action, handler
 
-		instance = new TestStore
+			initialize: () ->
+				@_handleAction 'test', {}, () -> true
 
-		instance._handleAction 'test', {}, () -> true
+		instance = new TestStore
 
 		expect handler.callCount
 		.to.equal 1,
@@ -83,9 +100,11 @@ describe 'Store', () ->
 
 			@action secondAction, handler
 
-		instance = new TestStore
+			initialize: () ->
+				@_handleAction 'test', {}, () -> true
 
-		instance._handleAction 'test', {}, () -> true
+
+		instance = new TestStore
 
 		expect handler.callCount
 		.to.equal 0,
@@ -94,25 +113,30 @@ describe 'Store', () ->
 	it 'should work without actions', () ->
 		class TestStore extends Store
 
+			initialize: () ->
+				@_handleAction 'test', {}, () -> true
+
 		instance = new TestStore
 
-		instance._handleAction 'test', {}, () -> true
 
 	it 'should be able to set a single property', () ->
 		class TestStore extends Store
 
+			initialize: () ->
+				@set 'test', 'test'
+
 		instance = new TestStore
 
-		instance.set 'test', 'test'
 		expect instance.get 'test'
 		.to.equal 'test'
 
 	it 'should be able to set an object', () ->
 		class TestStore extends Store
 
-		instance = new TestStore
+			initialize: () ->
+				@set {a: 'test', b: 'test2'}
 
-		instance.set {a: 'test', b: 'test2'}
+		instance = new TestStore
 
 		expect instance.get 'a'
 		.to.equal 'test'
@@ -123,9 +147,11 @@ describe 'Store', () ->
 	it 'should be able to get an array of values', () ->
 		class TestStore extends Store
 
-		instance = new TestStore
+			initialize: () ->
+				@set {a: 'test', b: 'test2'}
 
-		instance.set {a: 'test', b: 'test2'}
+
+		instance = new TestStore
 
 		val = instance.get ['a', 'b']
 		expect val
@@ -139,20 +165,23 @@ describe 'Store', () ->
 
 
 	it 'should dereference objects in get/set', () ->
-		class TestStore extends Store
-
 		nestedObject =
 			a:
 				b:
 					c: "test"
 			d: "test"
 
-		instance = new TestStore
+		class TestStore extends Store
 
-		instance.set nestedObject
-		nestedObject.a.b.c = "shouldntchangestoreprops"
-		expect instance._properties.a.b.c
-		.to.be.equal "test"
+			initialize: () ->
+				@set nestedObject
+
+				nestedObject.a.b.c = "shouldntchangestoreprops"
+				expect @_properties.a.b.c
+				.to.be.equal "test"
+
+
+		instance = new TestStore
 
 		obj = instance.get('a').b
 
@@ -165,7 +194,6 @@ describe 'Store', () ->
 		.to.be.equal "test"
 
 	it 'should be able to merge existing props with an object', () ->
-		class TestStore extends Store
 
 		nestedObject =
 			a:
@@ -181,10 +209,14 @@ describe 'Store', () ->
 			d: "test3"
 			f: "another"
 
-		instance = new TestStore
+		class TestStore extends Store
 
-		instance.set nestedObject
-		instance.merge mergeObject
+			initialize: () ->
+				@set nestedObject
+				@merge mergeObject
+
+
+		instance = new TestStore
 
 		result = instance.get()
 
@@ -215,11 +247,14 @@ describe 'Store', () ->
 	it 'should dispatch changed signal on set', () ->
 		class TestStore extends Store
 
-		instance = new TestStore
+			initialize: () ->
+				cb = sinon.spy()
+				@changed.add cb
+				@set 'test', 'test'
 
-		cb = sinon.spy()
-		instance.changed.add cb
-		instance.set 'test', 'test'
+
+		new TestStore
+
 
 
 
