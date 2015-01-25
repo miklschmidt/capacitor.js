@@ -85,6 +85,7 @@ define [
 			# Return proxy object used to interact with this store
 			return {
 				get: @get.bind(@)
+				@changed
 			}
 
 

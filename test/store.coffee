@@ -245,16 +245,15 @@ describe 'Store', () ->
 		.to.equal "test4"
 
 	it 'should dispatch changed signal on set', () ->
+		that = null
 		class TestStore extends Store
 
 			initialize: () ->
-				cb = sinon.spy()
-				@changed.add cb
-				@set 'test', 'test'
+				that = @
 
-
-		new TestStore
-
-
+		instance = new TestStore
+		cb = sinon.spy()
+		instance.changed.add cb
+		that.set 'test', 'test'
 
 
