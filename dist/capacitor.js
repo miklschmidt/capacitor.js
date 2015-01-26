@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.0.15 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.0.17 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -970,7 +970,7 @@ define("../vendor/almond", function(){});
 
 
       /*
-       * @var {integer} storeID ID to use for the next store that gets registered. 
+       * @var {integer} storeID ID to use for the next store that gets registered.
        * @private
        */
 
@@ -1074,7 +1074,7 @@ define("../vendor/almond", function(){});
        */
 
       notifyStore = function(id) {
-        invariant((currentAction != null) && (currentPayload != null), "Cannot notify store without an action and a payload");
+        invariant(currentAction != null, "Cannot notify store without an action");
         isPending[id] = true;
         stores[id]._handleAction.call(stores[id], currentAction, currentPayload, this.waitFor);
         return isHandled[id] = true;
@@ -1095,7 +1095,7 @@ define("../vendor/almond", function(){});
 
 
       /*
-           * Unregisters a store from the dispatcher so that it's no longer 
+           * Unregisters a store from the dispatcher so that it's no longer
            * notified when actions are dispatched.
            *
            * @param {Object} store The store to unregister from the dispatcher
@@ -1146,7 +1146,9 @@ define("../vendor/almond", function(){});
         var id, _results;
         invariant(!dispatching, 'dispatcher.dispatch(...): Cannot dispatch in the middle of a dispatch.');
         currentAction = actionName;
-        currentPayload = payload;
+        if (payload != null) {
+          currentPayload = payload;
+        }
         prepareForDispatching.call(this);
         try {
           _results = [];
@@ -1362,10 +1364,21 @@ define("../vendor/almond", function(){});
         if (typeof this.initialize === "function") {
           this.initialize();
         }
-        return {
-          get: this.get.bind(this)
-        };
+        return this.getProxyObject();
       }
+
+
+      /*
+       * Override this to change which methods are available to consumers.
+       * NOTE: Remember that nothing but the store itself should be able to change the data in the store.
+       */
+
+      Store.prototype.getProxyObject = function() {
+        return {
+          get: this.get.bind(this),
+          changed: this.changed
+        };
+      };
 
       Store.prototype.get = function(name) {
         var val;
