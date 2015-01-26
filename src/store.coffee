@@ -83,11 +83,17 @@ define [
 			@initialize?()
 
 			# Return proxy object used to interact with this store
+			return @getProxyObject()
+
+		###
+		# Override this to change which methods are available to consumers.
+		# NOTE: Remember that nothing but the store itself should be able to change the data in the store.
+		###
+		getProxyObject: () ->
 			return {
 				get: @get.bind(@)
 				@changed
 			}
-
 
 		get: (name) ->
 			val = null
