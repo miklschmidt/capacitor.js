@@ -195,5 +195,7 @@ describe 'Dispatcher', () ->
 		.to.equal 1,
 			"storeB._handleAction wasn't only executed once"
 
+	it 'should allow dispatching actions without a payload', () ->
+		dispatcher.dispatch action
 
 

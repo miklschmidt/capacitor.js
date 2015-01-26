@@ -13,11 +13,11 @@ define [
 		###
 		dispatching = no
 		###
-		# @var {integer} storeID ID to use for the next store that gets registered. 
+		# @var {integer} storeID ID to use for the next store that gets registered.
 		# @private
 		###
 		storeID = 0
-		
+
 		###
 		# @var {object} stores Store registry.
 		# @private
@@ -63,7 +63,7 @@ define [
 		# @private
 		###
 		prepareForDispatching = () ->
-			dispatching = yes 
+			dispatching = yes
 
 			for id of stores
 				isPending[id] = no
@@ -91,8 +91,8 @@ define [
 		# @private
 		###
 		notifyStore = (id) ->
-			invariant currentAction? and currentPayload?,
-				"Cannot notify store without an action and a payload"
+			invariant currentAction?,
+				"Cannot notify store without an action"
 
 			isPending[id] = yes
 			stores[id]._handleAction.call stores[id], currentAction, currentPayload, @waitFor
@@ -110,7 +110,7 @@ define [
 
 
 		###
-        # Unregisters a store from the dispatcher so that it's no longer 
+        # Unregisters a store from the dispatcher so that it's no longer
         # notified when actions are dispatched.
         #
         # @param {Object} store The store to unregister from the dispatcher
@@ -144,7 +144,7 @@ define [
 					'dispatcher.waitFor(...): dependency is not registered with the dispatcher.'
 
 				if isPending[id]
-					# if a dependency (B) of caller (A) is pending but not handled, that dependency (B) has a waitFor that depends 
+					# if a dependency (B) of caller (A) is pending but not handled, that dependency (B) has a waitFor that depends
 					# on the caller (A). In other words, there's a circular dependency.
 					invariant isHandled[id],
 						'dispatcher.waitFor(...): Circular dependency detected.'
@@ -162,14 +162,14 @@ define [
         # @param {mixed} payload The payload for the event.
         ###
 		dispatch: (actionName, payload) =>
-			# The flux architecture dictates that an action cannot 
-			# immediately trigger another action, which leads to cascading 
-			# updates and possibly infinite loops. 
+			# The flux architecture dictates that an action cannot
+			# immediately trigger another action, which leads to cascading
+			# updates and possibly infinite loops.
 			invariant !dispatching,
 				'dispatcher.dispatch(...): Cannot dispatch in the middle of a dispatch.'
 
 			currentAction = actionName
-			currentPayload = payload
+			currentPayload = payload if payload?
 
 			prepareForDispatching.call @
 
