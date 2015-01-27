@@ -3,11 +3,13 @@ define [
 	'action-manager'
 	'store'
 	'invariant'
-], (dispatcher, actionManager, Store, invariant, logger) ->
+	'signals'
+], (dispatcher, actionManager, Store, invariant, logger, {Signal}) ->
 
 	return {
 		dispatcher
 		actionManager
 		Store
 		invariant
+		Signal
 	}
