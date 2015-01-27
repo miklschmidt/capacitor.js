@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.0.19 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.0.20 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -1074,9 +1074,15 @@ define("../vendor/almond", function(){});
        */
 
       notifyStore = function(id) {
+        var args;
         invariant(currentAction != null, "Cannot notify store without an action");
         isPending[id] = true;
-        stores[id]._handleAction.call(stores[id], currentAction, currentPayload, this.waitFor);
+        args = [currentAction];
+        if (currentPayload != null) {
+          args.push(currentPayload);
+        }
+        args.push(this.waitFor);
+        stores[id]._handleAction.apply(stores[id], args);
         return isHandled[id] = true;
       };
 
@@ -1376,7 +1382,8 @@ define("../vendor/almond", function(){});
       Store.prototype.getProxyObject = function() {
         return {
           get: this.get.bind(this),
-          changed: this.changed
+          changed: this.changed,
+          _id: this._id
         };
       };
 
