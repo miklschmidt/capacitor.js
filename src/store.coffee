@@ -93,6 +93,7 @@ define [
 			return {
 				get: @get.bind(@)
 				@changed
+				_id: @_id
 			}
 
 		get: (name) ->

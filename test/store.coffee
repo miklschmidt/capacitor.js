@@ -256,4 +256,22 @@ describe 'Store', () ->
 		instance.changed.add cb
 		that.set 'test', 'test'
 
+	it 'should be able to wait for another store', () ->
+		action = new Action("test")
+
+		works = no
+
+		class TestStore extends Store
+			@action action, (waitFor) ->
+				waitFor(instanceB)
+				expect works
+				.to.be.true
+
+		class TestStoreB extends Store
+			@action action, (waitFor) -> works = yes
+
+		instance = new TestStore
+		instanceB = new TestStoreB
+
+		action.dispatch()
 

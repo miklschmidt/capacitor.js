@@ -95,7 +95,10 @@ define [
 				"Cannot notify store without an action"
 
 			isPending[id] = yes
-			stores[id]._handleAction.call stores[id], currentAction, currentPayload, @waitFor
+			args = [currentAction]
+			args.push currentPayload if currentPayload?
+			args.push @waitFor
+			stores[id]._handleAction.apply stores[id], args
 			isHandled[id] = yes
 
 		###

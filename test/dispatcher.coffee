@@ -199,3 +199,19 @@ describe 'Dispatcher', () ->
 		dispatcher.dispatch action
 
 
+	it 'should not send other arguments than waitFor if no data is dispatched', () ->
+		called = false
+		storeA = _handleAction: () ->
+			called = true
+			expect arguments.length
+			.to.be.equal 2
+			expect arguments[0]
+			.to.be.equal action.toString()
+			expect arguments[1]
+			.to.be.equal dispatcher.waitFor
+
+		dispatcher.register storeA
+		dispatcher.dispatch action
+
+		expect called
+		.to.be.true """Store's action handler wasn't called"""
