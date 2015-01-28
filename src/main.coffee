@@ -4,12 +4,11 @@ define [
 	'store'
 	'invariant'
 	'signals'
-], (dispatcher, actionManager, Store, invariant, {Signal}) ->
+], (dispatcher, actionManager, Store, invariant) ->
 
 	return {
 		dispatcher
 		actionManager
 		Store
 		invariant
-		Signal
 	}
