@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.0.20 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.0.22 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -1471,15 +1471,12 @@ define("../vendor/almond", function(){});
 }).call(this);
 
 (function() {
-  define('main',['dispatcher', 'action-manager', 'store', 'invariant', 'signals'], function(dispatcher, actionManager, Store, invariant, _arg) {
-    var Signal;
-    Signal = _arg.Signal;
+  define('main',['dispatcher', 'action-manager', 'store', 'invariant', 'signals'], function(dispatcher, actionManager, Store, invariant) {
     return {
       dispatcher: dispatcher,
       actionManager: actionManager,
       Store: Store,
-      invariant: invariant,
-      Signal: Signal
+      invariant: invariant
     };
   });
 

@@ -1,6 +1,6 @@
 {
   "name": "capacitor",
-  "version": "0.0.20",
+  "version": "0.0.22",
   "description": "An implementation of the flux pattern, great Scott!",
   "keywords": [
     "flux",
@@ -8,6 +8,7 @@
     "facebook",
     "react"
   ],
+  "browser": "./dist/capacitor.js",
   "homepage": "",
   "author": {
     "name": "Mikkel Schmidt",
