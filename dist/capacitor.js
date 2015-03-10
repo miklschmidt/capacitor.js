@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.0.23 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.0.24 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -1320,7 +1320,7 @@ define("../vendor/almond", function(){});
         return obj;
       }
       newObj = null;
-      if (_.isObject(obj)) {
+      if (_.isObject(obj) && !_.isArray(obj)) {
         newObj = {};
         if ((obj.clone != null) && typeof obj.clone === 'function') {
           newObj = obj.clone();
