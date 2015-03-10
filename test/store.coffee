@@ -272,6 +272,9 @@ describe 'Store', () ->
 		instance.changed.add cb
 		that.set 'test', 'test'
 
+		expect cb.calledOnce
+		.to.be.true
+
 	it 'should be able to wait for another store', () ->
 		action = new Action("test")
 
@@ -291,3 +294,19 @@ describe 'Store', () ->
 
 		action.dispatch()
 
+	it 'should be able to get action id within an action handler', () ->
+		action = new Action("test")
+		currentID = null
+
+		class TestStore extends Store
+
+			@action action, (payload, waitFor) ->
+				reportedID = @getCurrentActionID
+
+				expect reportedID
+				.to.be.equal currentID
+
+				expect reporedID
+				.to.not.be null
+
+		currentID = action.dispatch().actionID

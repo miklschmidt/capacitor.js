@@ -110,18 +110,24 @@ define [
 			@initialize?()
 
 			# Return proxy object used to interact with this store
-			return @getProxyObject()
+			return @getInterface()
 
 		###
 		# Override this to change which methods are available to consumers.
 		# NOTE: Remember that nothing but the store itself should be able to change the data in the store.
 		###
-		getProxyObject: () ->
+		getInterface: () ->
+			if @getProxyObject? and @getProxyObject isnt Store::getProxyObject
+				console.warn "Store.getProxyObject() is deprecated use Store.getInterface()"
 			return {
 				get: @get.bind(@)
 				@changed
 				_id: @_id
 			}
+
+		getProxyObject: () ->
+			return @getInterface()
+
 
 		get: (name) ->
 			val = null
