@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.0.24 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.0.26 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -959,7 +959,7 @@ define("../vendor/almond", function(){});
        * @var {boolean} dispatching Wether or not the dispatcher is currently dispatching.
        * @private
        */
-      var currentAction, currentPayload, dispatching, finalizeDispatching, isHandled, isPending, notifyStore, prepareForDispatching, storeID, stores;
+      var currentAction, dispatching, finalizeDispatching, isHandled, isPending, notifyStore, prepareForDispatching, storeID, stores;
 
       function Dispatcher() {
         this.dispatch = __bind(this.dispatch, this);
@@ -1010,14 +1010,6 @@ define("../vendor/almond", function(){});
 
 
       /*
-           * @var {mixed} isPending The current payload being dispatched, if any.
-       * @private
-       */
-
-      currentPayload = null;
-
-
-      /*
            * @var {object} Signal triggered when the dispatcher is started.
        * @public
        */
@@ -1059,7 +1051,6 @@ define("../vendor/almond", function(){});
 
       finalizeDispatching = function() {
         currentAction = null;
-        currentPayload = null;
         dispatching = false;
         return this.stopped.dispatch();
       };
@@ -1074,15 +1065,9 @@ define("../vendor/almond", function(){});
        */
 
       notifyStore = function(id) {
-        var args;
         invariant(currentAction != null, "Cannot notify store without an action");
         isPending[id] = true;
-        args = [currentAction];
-        if (currentPayload != null) {
-          args.push(currentPayload);
-        }
-        args.push(this.waitFor);
-        stores[id]._handleAction.apply(stores[id], args);
+        stores[id]._handleAction.call(stores[id], currentAction, this.waitFor);
         return isHandled[id] = true;
       };
 
@@ -1148,13 +1133,10 @@ define("../vendor/almond", function(){});
            * @param {mixed} payload The payload for the event.
        */
 
-      Dispatcher.prototype.dispatch = function(actionName, payload) {
+      Dispatcher.prototype.dispatch = function(actionInstance) {
         var id, _results;
         invariant(!dispatching, 'dispatcher.dispatch(...): Cannot dispatch in the middle of a dispatch.');
-        currentAction = actionName;
-        if (payload != null) {
-          currentPayload = payload;
-        }
+        currentAction = actionInstance;
         prepareForDispatching.call(this);
         try {
           _results = [];
@@ -1180,16 +1162,36 @@ define("../vendor/almond", function(){});
 
 (function() {
   define('action',['dispatcher'], function(dispatcher) {
-    var Action;
+    var Action, ActionInstance, _id;
+    _id = 0;
+    ActionInstance = (function() {
+      function ActionInstance(type, payload) {
+        this.type = type;
+        this.payload = payload;
+        this.actionID = _id++;
+        Object.freeze(this);
+      }
+
+      ActionInstance.prototype.valueOf = function() {
+        return this.payload;
+      };
+
+      ActionInstance.prototype.getActionID = function() {
+        return this.actionID;
+      };
+
+      return ActionInstance;
+
+    })();
     return Action = (function() {
 
       /*
        * Constructor
-       * 
+       *
        * @param {string} The name of the action
        */
-      function Action(name) {
-        this.name = name;
+      function Action(type) {
+        this.type = type;
       }
 
 
@@ -1200,7 +1202,14 @@ define("../vendor/almond", function(){});
        */
 
       Action.prototype.dispatch = function(payload) {
-        return dispatcher.dispatch(this.name, payload);
+        var actionInstance;
+        actionInstance = this.createActionInstance(payload);
+        dispatcher.dispatch(actionInstance);
+        return actionInstance;
+      };
+
+      Action.prototype.createActionInstance = function(payload) {
+        return new ActionInstance(this.type, payload);
       };
 
 
@@ -1209,7 +1218,7 @@ define("../vendor/almond", function(){});
        */
 
       Action.prototype.toString = function() {
-        return this.name;
+        return this.type;
       };
 
       return Action;
@@ -1315,9 +1324,14 @@ define("../vendor/almond", function(){});
      *      @changed.dispatch()
      */
     cloneDeep = function(obj) {
-      var arrVal, key, newObj, val, _i, _j, _len, _len1;
+      var key, newObj, val, _i, _len;
       if (!(_.isObject(obj) || _.isArray(obj))) {
         return obj;
+      }
+      if (typeof window !== "undefined" && window !== null) {
+        if (obj instanceof window.Element) {
+          return obj;
+        }
       }
       newObj = null;
       if (_.isObject(obj) && !_.isArray(obj)) {
@@ -1328,14 +1342,8 @@ define("../vendor/almond", function(){});
           for (key in obj) {
             if (!__hasProp.call(obj, key)) continue;
             val = obj[key];
-            if (_.isObject(val)) {
+            if (_.isObject(val) || _.isArray(val)) {
               newObj[key] = cloneDeep(val);
-            } else if (_.isArray(val)) {
-              newObj[key] = [];
-              for (_i = 0, _len = val.length; _i < _len; _i++) {
-                arrVal = val[_i];
-                newObj[key].push(cloneDeep(val));
-              }
             } else {
               newObj[key] = val;
             }
@@ -1346,8 +1354,8 @@ define("../vendor/almond", function(){});
         if ((obj.clone != null) && typeof obj.clone === 'function') {
           newObj = obj.clone();
         } else {
-          for (_j = 0, _len1 = obj.length; _j < _len1; _j++) {
-            val = obj[_j];
+          for (_i = 0, _len = obj.length; _i < _len; _i++) {
+            val = obj[_i];
             newObj.push(cloneDeep(val));
           }
         }
@@ -1368,6 +1376,13 @@ define("../vendor/almond", function(){});
        */
 
       Store.prototype._properties = null;
+
+
+      /*
+       * @private
+       */
+
+      Store.prototype._currentActionInstance = null;
 
 
       /*
@@ -1410,7 +1425,7 @@ define("../vendor/almond", function(){});
         if (typeof this.initialize === "function") {
           this.initialize();
         }
-        return this.getProxyObject();
+        return this.getInterface();
       }
 
 
@@ -1419,12 +1434,19 @@ define("../vendor/almond", function(){});
        * NOTE: Remember that nothing but the store itself should be able to change the data in the store.
        */
 
-      Store.prototype.getProxyObject = function() {
+      Store.prototype.getInterface = function() {
+        if ((this.getProxyObject != null) && this.getProxyObject !== Store.prototype.getProxyObject) {
+          console.warn("Store.getProxyObject() is deprecated use Store.getInterface()");
+        }
         return {
           get: this.get.bind(this),
           changed: this.changed,
           _id: this._id
         };
+      };
+
+      Store.prototype.getProxyObject = function() {
+        return this.getInterface();
       };
 
       Store.prototype.get = function(name) {
@@ -1486,6 +1508,11 @@ define("../vendor/almond", function(){});
         return this;
       };
 
+      Store.prototype.getCurrentActionID = function() {
+        invariant(this._currentActionInstance != null, "Action id is only available inside an action handler, in the current event loop iteration.\nIf you need to, you can call this function before you do any asynchronous work.");
+        return this._currentActionInstance.actionID;
+      };
+
 
       /*
        * Method for calling handlers on the store when an action is executed.
@@ -1495,12 +1522,14 @@ define("../vendor/almond", function(){});
        * @param {array} waitFor An array of other signals to wait for in this dispatcher run.
        */
 
-      Store.prototype._handleAction = function(actionName, payload, waitFor) {
+      Store.prototype._handleAction = function(actionInstance, waitFor) {
         var _ref;
-        if (((_ref = this.constructor._handlers) != null ? _ref[actionName] : void 0) == null) {
+        if (((_ref = this.constructor._handlers) != null ? _ref[actionInstance.type] : void 0) == null) {
           return;
         }
-        return this.constructor._handlers[actionName].call(this, payload, waitFor);
+        this._currentActionInstance = actionInstance;
+        this.constructor._handlers[actionInstance.type].call(this, actionInstance.payload, waitFor);
+        return this._currentActionInstance = null;
       };
 
       return Store;
