@@ -30,7 +30,7 @@ define [
 	cloneDeep = (obj) ->
 		return obj unless _.isObject(obj) or _.isArray(obj)
 		newObj = null
-		if _.isObject(obj)
+		if _.isObject(obj) and not _.isArray(obj)
 			newObj = {}
 			if obj.clone? and typeof obj.clone is 'function'
 				newObj = obj.clone()

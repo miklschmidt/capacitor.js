@@ -1,6 +1,7 @@
 Store = requirejs('store')
 Action = requirejs('action')
 InvariantError = requirejs('invariant-error')
+_ = requirejs('lodash')
 
 describe 'Store', () ->
 
@@ -143,6 +144,21 @@ describe 'Store', () ->
 
 		expect instance.get 'b'
 		.to.equal 'test2'
+
+	it 'should be able to get a single property', () ->
+
+		class TestStore extends Store
+
+			initialize: () ->
+				@set {items: [], a: 'test'}
+
+		instance = new TestStore
+
+		expect _.isArray(instance.get('items'))
+		.to.be.true
+
+		expect instance.get 'a'
+		.to.equal 'test'
 
 	it 'should be able to get an array of values', () ->
 		class TestStore extends Store
