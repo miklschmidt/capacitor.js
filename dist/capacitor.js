@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.0.22 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.0.23 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -1287,11 +1287,11 @@ define("../vendor/almond", function(){});
 }).call(this);
 
 (function() {
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = {}.hasOwnProperty;
+  var __hasProp = {}.hasOwnProperty,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   define('store',['lodash', 'signals', 'action', 'dispatcher', 'invariant'], function(_, _arg, Action, dispatcher, invariant) {
-    var Signal, Store;
+    var Signal, Store, cloneDeep;
     Signal = _arg.Signal;
 
     /*
@@ -1314,6 +1314,46 @@ define("../vendor/almond", function(){});
      *      # Do things..
      *      @changed.dispatch()
      */
+    cloneDeep = function(obj) {
+      var arrVal, key, newObj, val, _i, _j, _len, _len1;
+      if (!(_.isObject(obj) || _.isArray(obj))) {
+        return obj;
+      }
+      newObj = null;
+      if (_.isObject(obj)) {
+        newObj = {};
+        if ((obj.clone != null) && typeof obj.clone === 'function') {
+          newObj = obj.clone();
+        } else {
+          for (key in obj) {
+            if (!__hasProp.call(obj, key)) continue;
+            val = obj[key];
+            if (_.isObject(val)) {
+              newObj[key] = cloneDeep(val);
+            } else if (_.isArray(val)) {
+              newObj[key] = [];
+              for (_i = 0, _len = val.length; _i < _len; _i++) {
+                arrVal = val[_i];
+                newObj[key].push(cloneDeep(val));
+              }
+            } else {
+              newObj[key] = val;
+            }
+          }
+        }
+      } else {
+        newObj = [];
+        if ((obj.clone != null) && typeof obj.clone === 'function') {
+          newObj = obj.clone();
+        } else {
+          for (_j = 0, _len1 = obj.length; _j < _len1; _j++) {
+            val = obj[_j];
+            newObj.push(cloneDeep(val));
+          }
+        }
+      }
+      return newObj;
+    };
     return Store = (function() {
 
       /*
@@ -1397,10 +1437,10 @@ define("../vendor/almond", function(){});
             val = val[name];
           }
           if (_.isObject(val)) {
-            val = _.cloneDeep(val);
+            val = cloneDeep(val);
           }
         } else {
-          val = _.cloneDeep(this._properties);
+          val = cloneDeep(this._properties);
         }
         return val;
       };
@@ -1410,12 +1450,12 @@ define("../vendor/almond", function(){});
         invariant(_.isObject(name) || _.isString(name) && (val != null), "Store.set(...): You can only set an object or pass a string and a value.\nUse Store.unset(" + name + ") to unset the property.");
         if (_.isString(name)) {
           properties = {};
-          properties[name] = val;
+          properties[name] = cloneDeep(val);
         }
         if (_.isObject(name)) {
           properties = name;
         }
-        newProps = _.cloneDeep(properties);
+        newProps = cloneDeep(properties);
         _.assign(this._properties, newProps);
         this.changed.dispatch('set', newProps);
         return this;
@@ -1430,7 +1470,7 @@ define("../vendor/almond", function(){});
         if (_.isObject(name)) {
           properties = name;
         }
-        newProps = _.cloneDeep(properties);
+        newProps = cloneDeep(properties);
         _.merge(this._properties, newProps);
         changedProps = _.pick(this._properties, _.keys(newProps));
         this.changed.dispatch('merge', changedProps);
