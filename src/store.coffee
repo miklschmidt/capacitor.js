@@ -65,6 +65,10 @@ define [
 
 
 		###
+		# @private
+		###
+		_currentActionInstance: null
+		###
 		# Static method for defining action handlers on a Store.
 		#
 		# @static
@@ -168,6 +172,13 @@ define [
 			@changed.dispatch 'unset', name
 			return @
 
+		getCurrentActionID: () ->
+			invariant @_currentActionInstance?, """
+				Action id is only available inside an action handler, in the current event loop iteration.
+				If you need to, you can call this function before you do any asynchronous work.
+			"""
+			@_currentActionInstance.actionID
+
 
 		###
 		# Method for calling handlers on the store when an action is executed.
@@ -176,7 +187,9 @@ define [
 		# @param {mixed} payload The payload passed to the handler
 		# @param {array} waitFor An array of other signals to wait for in this dispatcher run.
 		###
-		_handleAction: (actionName, payload, waitFor) =>
-			return unless @constructor._handlers?[actionName]?
+		_handleAction: (actionInstance, waitFor) =>
+			return unless @constructor._handlers?[actionInstance.type]?
 			# Call the handler with the context of this store instance
-			@constructor._handlers[actionName].call @, payload, waitFor
+			@_currentActionInstance = actionInstance
+			@constructor._handlers[actionInstance.type].call @, actionInstance.payload, waitFor
+			@_currentActionInstance = null

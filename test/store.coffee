@@ -85,7 +85,7 @@ describe 'Store', () ->
 			@action action, handler
 
 			initialize: () ->
-				@_handleAction 'test', {}, () -> true
+				@_handleAction action.createActionInstance(), () -> true
 
 		instance = new TestStore
 
@@ -102,7 +102,7 @@ describe 'Store', () ->
 			@action secondAction, handler
 
 			initialize: () ->
-				@_handleAction 'test', {}, () -> true
+				@_handleAction firstAction.createActionInstance(), () -> true
 
 
 		instance = new TestStore
@@ -115,7 +115,7 @@ describe 'Store', () ->
 		class TestStore extends Store
 
 			initialize: () ->
-				@_handleAction 'test', {}, () -> true
+				@_handleAction (new Action('test')).createActionInstance(), () -> true
 
 		instance = new TestStore
 
@@ -278,13 +278,13 @@ describe 'Store', () ->
 		works = no
 
 		class TestStore extends Store
-			@action action, (waitFor) ->
+			@action action, (payload, waitFor) ->
 				waitFor(instanceB)
 				expect works
 				.to.be.true
 
 		class TestStoreB extends Store
-			@action action, (waitFor) -> works = yes
+			@action action, (payload, waitFor) -> works = yes
 
 		instance = new TestStore
 		instanceB = new TestStoreB

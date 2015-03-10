@@ -39,11 +39,6 @@ define [
 		# @private
 		###
 		currentAction = null
-		###
-        # @var {mixed} isPending The current payload being dispatched, if any.
-		# @private
-		###
-		currentPayload = null
 
 		###
         # @var {object} Signal triggered when the dispatcher is started.
@@ -78,7 +73,6 @@ define [
 		###
 		finalizeDispatching = () ->
 			currentAction = null
-			currentPayload = null
 			dispatching = no
 
 			@stopped.dispatch()
@@ -95,10 +89,7 @@ define [
 				"Cannot notify store without an action"
 
 			isPending[id] = yes
-			args = [currentAction]
-			args.push currentPayload if currentPayload?
-			args.push @waitFor
-			stores[id]._handleAction.apply stores[id], args
+			stores[id]._handleAction.call stores[id], currentAction, @waitFor
 			isHandled[id] = yes
 
 		###
@@ -164,15 +155,14 @@ define [
         # @param {string} actionName The name of the action to dispatch
         # @param {mixed} payload The payload for the event.
         ###
-		dispatch: (actionName, payload) =>
+		dispatch: (actionInstance) =>
 			# The flux architecture dictates that an action cannot
 			# immediately trigger another action, which leads to cascading
 			# updates and possibly infinite loops.
 			invariant !dispatching,
 				'dispatcher.dispatch(...): Cannot dispatch in the middle of a dispatch.'
 
-			currentAction = actionName
-			currentPayload = payload if payload?
+			currentAction = actionInstance
 
 			prepareForDispatching.call @
 
