@@ -27,6 +27,31 @@ define [
 	#			@changed.dispatch()
 	###
 
+	cloneDeep = (obj) ->
+		return obj unless _.isObject(obj) or _.isArray(obj)
+		newObj = null
+		if _.isObject(obj)
+			newObj = {}
+			if obj.clone? and typeof obj.clone is 'function'
+				newObj = obj.clone()
+			else
+				for own key, val of obj
+					if _.isObject(val)
+						newObj[key] = cloneDeep(val)
+					else if _.isArray(val)
+						newObj[key] = []
+						for arrVal in val
+							newObj[key].push cloneDeep(val)
+					else
+						newObj[key] = val
+		else
+			newObj = []
+			if obj.clone? and typeof obj.clone is 'function'
+				newObj = obj.clone()
+			else
+				newObj.push cloneDeep(val) for val in obj
+		return newObj
+
 	class Store
 
 		###
@@ -102,9 +127,9 @@ define [
 				invariant _.isString(name) or _.isArray(name), "Store.get(...): first parameter should be undefined, a string, or an array of keys."
 				val = _.pick @_properties, name
 				val = val[name] if _.isString(name)
-				val = _.cloneDeep val if _.isObject(val)
+				val = cloneDeep val if _.isObject(val)
 			else
-				val = _.cloneDeep @_properties
+				val = cloneDeep @_properties
 			return val
 
 		set: (name, val) ->
@@ -115,10 +140,10 @@ define [
 				"""
 			if _.isString(name)
 				properties = {}
-				properties[name] = val
+				properties[name] = cloneDeep(val)
 			if _.isObject(name)
 				properties = name
-			newProps =  _.cloneDeep properties
+			newProps = cloneDeep properties
 			_.assign @_properties, newProps
 
 			@changed.dispatch 'set', newProps
@@ -131,7 +156,7 @@ define [
 				properties[name] = val
 			if _.isObject(name)
 				properties = name
-			newProps =  _.cloneDeep properties
+			newProps =  cloneDeep properties
 			_.merge @_properties, newProps
 
 			changedProps = _.pick @_properties, _.keys(newProps)
