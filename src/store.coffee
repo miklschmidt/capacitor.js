@@ -29,6 +29,8 @@ define [
 
 	cloneDeep = (obj) ->
 		return obj unless _.isObject(obj) or _.isArray(obj)
+		if window?
+			return obj if obj instanceof window.Element # Don't clone DOMnodes
 		newObj = null
 		if _.isObject(obj) and not _.isArray(obj)
 			newObj = {}
@@ -36,12 +38,8 @@ define [
 				newObj = obj.clone()
 			else
 				for own key, val of obj
-					if _.isObject(val)
+					if _.isObject(val) or _.isArray(val)
 						newObj[key] = cloneDeep(val)
-					else if _.isArray(val)
-						newObj[key] = []
-						for arrVal in val
-							newObj[key].push cloneDeep(val)
 					else
 						newObj[key] = val
 		else

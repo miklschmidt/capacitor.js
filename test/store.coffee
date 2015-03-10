@@ -179,12 +179,12 @@ describe 'Store', () ->
 		expect val.b
 		.to.equal 'test2'
 
-
 	it 'should dereference objects in get/set', () ->
 		nestedObject =
 			a:
 				b:
 					c: "test"
+				d: ['test', 'test', 'test']
 			d: "test"
 
 		class TestStore extends Store
