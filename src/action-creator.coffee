@@ -2,12 +2,13 @@ dispatcher = require './dispatcher'
 invariant = require './invariant'
 Action = require './action'
 
-_id = 0
+_actionID = 0
+_requestID = 0
 
 class ActionInstance
 
 	constructor: (@type, @payload) ->
-		@actionID = _id++
+		@actionID = _actionID++
 		Object.freeze @
 
 	valueOf: () ->
@@ -19,7 +20,7 @@ class ActionInstance
 module.exports = class ActionCreator
 
 	###
-	# Method for dispatching an action through the dispatcher
+	# Dispatches an action through the dispatcher
 	#
 	# @param {Action} action The action to dispatch
 	# @param {mixed} payload Payload for the action
@@ -29,7 +30,19 @@ module.exports = class ActionCreator
 		dispatcher.dispatch actionInstance
 		return actionInstance
 
+	###
+	# Creates an action instance for dispatching
+	#
+	# @param {Action} action The action to dispatch
+	# @param {mixed} payload Payload for the action
+	###
 	createActionInstance: (action, payload) ->
 		invariant action instanceof Action and action?.type?, 
 			"The action you dispatched does not seem to be an instance of capacitor.Action"
 		new ActionInstance action.type, payload
+
+	###
+	# Generates a request id. Useful for tracking specific requests in components.
+	###
+	generateRequestID: () ->
+		return _requestID++
