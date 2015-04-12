@@ -1,5 +1,4 @@
 gulp    = require 'gulp'
-coffee  = require 'gulp-coffee'
 mocha   = require 'gulp-mocha'
 replace = require 'gulp-replace'
 rename  = require 'gulp-rename'
@@ -8,18 +7,10 @@ fs      = require 'fs'
 path    = require 'path'
 webpack = require 'webpack'
 
-gulp.task 'build', () ->
-	gulp.src 'src/**/*.coffee'
-	.pipe replace "\t", "  " # fix JSDoc output from coffee
-	.pipe coffee()
-	.pipe gulp.dest('lib')
-
-gulp.task 'test', ['build'], () ->
+gulp.task 'test', () ->
 	# Load and run the test files.
 	gulp.src 'test/*.coffee'
 	.pipe mocha	reporter: 'spec'
-
-gulp.task 'default', ['build']
 
 gulp.task 'change version', () ->
 	throw new Error("Version parameter is required") unless gutil.env.version?
@@ -38,7 +29,7 @@ gulp.task 'change version', () ->
 	.pipe rename extname: ".js"
 	.pipe gulp.dest "build/"
 
-gulp.task 'dist', ['build', 'test', 'change version'], (callback) ->
+gulp.task 'dist', ['test', 'change version'], (callback) ->
 
 	compiler = webpack require('./webpack.config')
 	.run (err, stats) ->

@@ -18,7 +18,7 @@
     "type": "git",
     "url": "https://github.com/miklschmidt/capacitor.js.git"
   },
-  "main": "./bootstrap",
+  "main": "./dist/capacitor.js",
   "dependencies": {
     "lodash": "^2.4.1",
     "signals": "=1.0.0"
