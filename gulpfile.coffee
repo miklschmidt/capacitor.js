@@ -32,7 +32,7 @@ gulp.task 'change version', () ->
 	pkg = JSON.stringify pkg, null, 2
 	fs.writeFileSync path.join(__dirname, "package.json"), pkg
 
-	# Replace version in r.js wrap files
+	# Replace version in wrap files
 	gulp.src 'build/*.template'
 	.pipe replace "{CAPACITOR_VERSION}", version
 	.pipe rename extname: ".js"
