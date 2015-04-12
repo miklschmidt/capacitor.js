@@ -262,21 +262,6 @@ describe 'Store', () ->
 		expect result.x
 		.to.equal "test4"
 
-	it 'should dispatch changed signal on set', () ->
-		that = null
-		class TestStore extends Store
-
-			initialize: () ->
-				that = @
-
-		instance = new TestStore
-		cb = sinon.spy()
-		instance.changed.add cb
-		that.set 'test', 'test'
-
-		expect cb.calledOnce
-		.to.be.true
-
 	it 'should be able to wait for another store', () ->
 		action = new Action("test")
 
