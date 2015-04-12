@@ -1,6 +1,5 @@
-define () ->
-	class InvariantError extends Error
+module.exports = class InvariantError extends Error
 
-		constructor: (message) ->
-			this.name = "Invariant Error"
-			this.message = message
+	constructor: (message) ->
+		this.name = "Invariant Error"
+		this.message = message

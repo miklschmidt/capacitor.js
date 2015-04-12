@@ -1,14 +1,9 @@
-define [
-	'dispatcher'
-	'action-manager'
-	'store'
-	'invariant'
-	'signals'
-], (dispatcher, actionManager, Store, invariant) ->
+actionManager = require './action-manager'
+Store         = require './store'
+invariant     = require './invariant'
 
-	return {
-		dispatcher
-		actionManager
-		Store
-		invariant
-	}
+module.exports = {
+	actionManager
+	Store
+	invariant
+}

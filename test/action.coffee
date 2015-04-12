@@ -1,5 +1,7 @@
-Action = requirejs('action')
-dispatcher = requirejs('dispatcher')
+Action     = require('../src/action')
+dispatcher = require('../src/dispatcher')
+{expect}   = require 'chai'
+sinon      = require 'sinon'
 
 describe 'Action', () ->
 

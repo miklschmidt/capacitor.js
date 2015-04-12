@@ -1,11 +1,14 @@
-Action = requirejs('action')
+Action   = require('../src/action')
+{expect} = require 'chai'
+
 describe 'ActionManager', () ->
 
 	actionManager = null
 
 	beforeEach () ->
-		requirejs.undef('action-manager')
-		actionManager = requirejs('action-manager')
+		if require.cache[require.resolve('../src/action-manager')]?
+			delete require.cache[require.resolve('../src/action-manager')]
+		actionManager = require('../src/action-manager')
 
 	it 'should create an action when calling create', () ->
 		action = actionManager.create 'test'

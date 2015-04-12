@@ -3,16 +3,4 @@
  * Available via the MIT license.
  */
 
-(function (root, factory) {
-	if (typeof define === 'function' && define.amd) {
-		// AMD.
-		define(['lodash'], factory);
-	} else if (typeof module !== 'undefined' && module.exports) {
-		// CommonJS
-		var _ = require('lodash');
-		module.exports = factory(_);
-	} else {
-		// Browser globals.
-		root.capacitor = factory(root._);
-	}
-}(this, function(_) {
+ 

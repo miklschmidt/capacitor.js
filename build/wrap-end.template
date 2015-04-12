@@ -1,6 +1,0 @@
-
-	define('lodash', function() {
-		return _;
-	});
-    return require('main');
-}));

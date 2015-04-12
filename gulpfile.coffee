@@ -4,9 +4,9 @@ mocha   = require 'gulp-mocha'
 replace = require 'gulp-replace'
 rename  = require 'gulp-rename'
 gutil   = require 'gulp-util'
-rjs     = require 'gulp-requirejs'
 fs      = require 'fs'
 path    = require 'path'
+webpack = require 'webpack'
 
 gulp.task 'build', () ->
 	gulp.src 'src/**/*.coffee'
@@ -15,9 +15,7 @@ gulp.task 'build', () ->
 	.pipe gulp.dest('lib')
 
 gulp.task 'test', ['build'], () ->
-	# Bootstrap test environment (mainly require.js)
-	require('./test/main.coffee')
-	# Load rest of the test files.
+	# Load and run the test files.
 	gulp.src 'test/*.coffee'
 	.pipe mocha	reporter: 'spec'
 
@@ -40,20 +38,20 @@ gulp.task 'change version', () ->
 	.pipe rename extname: ".js"
 	.pipe gulp.dest "build/"
 
-gulp.task 'dist', ['build', 'test', 'change version'], () ->
-	opts =
-		baseUrl: "lib"
-		paths:
-			capacitor: "main"
-			signals: "../node_modules/signals/dist/signals"
-			lodash: "../node_modules/lodash/dist/lodash"
-		include: ["../vendor/almond", 'main']
-		exclude: ["lodash"]
-		out: "capacitor.js"
-		wrap:
-			startFile: "build/wrap-start.js"
-			endFile: "build/wrap-end.js"
+gulp.task 'dist', ['build', 'test', 'change version'], (callback) ->
 
-	rjs opts
-	.pipe gulp.dest 'dist/'
+	compiler = webpack require('./webpack.config')
+	.run (err, stats) ->
+		if err
+			gutil.beep()
+			gutil.log err
+			return
+		fileStart = fs.readFileSync path.join __dirname, 'build', 'wrap-start.js'
+		file = fs.readFileSync path.join __dirname, 'dist', 'capacitor.js'
+		content = fileStart + file
+		fs.writeFileSync path.join(__dirname, 'dist', 'capacitor.js'), content
+		gutil.log 'compilation complete :)'
+		callback()
+
+	null
 

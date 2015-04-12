@@ -1,7 +1,9 @@
-Store = requirejs('store')
-Action = requirejs('action')
-InvariantError = requirejs('invariant-error')
-_ = requirejs('lodash')
+Store          = require('../src/store')
+Action         = require('../src/action')
+InvariantError = require('../src/invariant-error')
+_              = require('lodash')
+{expect}       = require 'chai'
+sinon          = require 'sinon'
 
 describe 'Store', () ->
 

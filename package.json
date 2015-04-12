@@ -1,6 +1,6 @@
 {
   "name": "capacitor",
-  "version": "0.0.26",
+  "version": "0.0.27",
   "description": "An implementation of facebook's flux architecture, great Scott!",
   "keywords": [
     "flux",
@@ -21,11 +21,11 @@
   "main": "./bootstrap",
   "dependencies": {
     "lodash": "^2.4.1",
-    "requirejs": "=2.1.15",
     "signals": "=1.0.0"
   },
   "devDependencies": {
     "chai": "^1.10.0",
+    "coffee-loader": "^0.7.2",
     "coffee-script": "^1.8.0",
     "gulp": "^3.8.10",
     "gulp-coffee": "^2.2.0",
@@ -35,6 +35,7 @@
     "gulp-requirejs": "^0.1.3",
     "gulp-util": "^3.0.1",
     "mocha": "^2.0.1",
-    "sinon": "^1.11.1"
+    "sinon": "^1.11.1",
+    "webpack": "^1.8.4"
   }
 }

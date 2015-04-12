@@ -1,4 +1,7 @@
-InvariantError = requirejs('invariant-error')
+InvariantError = require('../src/invariant-error')
+Action         = require('../src/action')
+{expect}       = require 'chai'
+sinon          = require 'sinon'
 
 describe 'Dispatcher', () ->
 
@@ -36,9 +39,9 @@ describe 'Dispatcher', () ->
 		.to.be.true
 
 	beforeEach () ->
-		requirejs.undef('dispatcher')
-		dispatcher = requirejs('dispatcher')
-		Action = requirejs('action')
+		if require.cache[require.resolve('../src/dispatcher')]
+			delete require.cache[require.resolve('../src/dispatcher')]
+		dispatcher = require('../src/dispatcher')
 		storeA = _handleAction: sinon.spy()
 		storeB = _handleAction: sinon.spy()
 		action = new Action("test-action")
