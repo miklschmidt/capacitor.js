@@ -1,5 +1,6 @@
 Store          = require('../src/store')
 Action         = require('../src/action')
+ActionCreator  = require('../src/action-creator')
 InvariantError = require('../src/invariant-error')
 _              = require('lodash')
 {expect}       = require 'chai'
@@ -81,13 +82,14 @@ describe 'Store', () ->
 
 	it 'should execute action handlers when actions are dispatched', () ->
 		action = new Action('test')
+		actionCreator = new ActionCreator
 		handler = sinon.spy()
 		class TestStore extends Store
 
 			@action action, handler
 
 			initialize: () ->
-				@_handleAction action.createActionInstance(), () -> true
+				@_handleAction actionCreator.createActionInstance(action), () -> true
 
 		instance = new TestStore
 
@@ -98,13 +100,14 @@ describe 'Store', () ->
 	it 'should ignore unknown actions', () ->
 		firstAction = new Action('test')
 		secondAction = new Action('test2')
+		actionCreator = new ActionCreator
 		handler = sinon.spy()
 		class TestStore extends Store
 
 			@action secondAction, handler
 
 			initialize: () ->
-				@_handleAction firstAction.createActionInstance(), () -> true
+				@_handleAction actionCreator.createActionInstance(firstAction), () -> true
 
 
 		instance = new TestStore
@@ -117,7 +120,7 @@ describe 'Store', () ->
 		class TestStore extends Store
 
 			initialize: () ->
-				@_handleAction (new Action('test')).createActionInstance(), () -> true
+				@_handleAction (new ActionCreator).createActionInstance(new Action('test')), () -> true
 
 		instance = new TestStore
 
@@ -264,7 +267,7 @@ describe 'Store', () ->
 
 	it 'should be able to wait for another store', () ->
 		action = new Action("test")
-
+		actionCreator = new ActionCreator
 		works = no
 
 		class TestStore extends Store
@@ -279,10 +282,11 @@ describe 'Store', () ->
 		instance = new TestStore
 		instanceB = new TestStoreB
 
-		action.dispatch()
+		actionCreator.dispatch action
 
 	it 'should be able to get action id within an action handler', () ->
 		action = new Action("test")
+		actionCreator = new ActionCreator
 		currentID = null
 
 		class TestStore extends Store
@@ -296,4 +300,4 @@ describe 'Store', () ->
 				expect reporedID
 				.to.not.be null
 
-		currentID = action.dispatch().actionID
+		currentID = actionCreator.dispatch(action).actionID

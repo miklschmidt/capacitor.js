@@ -1,5 +1,6 @@
 InvariantError = require('../src/invariant-error')
 Action         = require('../src/action')
+ActionCreator  = require('../src/action-creator')
 {expect}       = require 'chai'
 sinon          = require 'sinon'
 
@@ -9,6 +10,7 @@ describe 'Dispatcher', () ->
 	storeB = null
 	dispatcher = null
 	action = null
+	actionCreator = null
 	payload = null
 
 	expectBothStoreCalls = (actionInstance, waitFor) ->
@@ -45,13 +47,14 @@ describe 'Dispatcher', () ->
 		storeA = _handleAction: sinon.spy()
 		storeB = _handleAction: sinon.spy()
 		action = new Action("test-action")
+		actionCreator = new ActionCreator
 		payload = {test: true}
 
 	it 'should execute all subscriber callbacks', () ->
 		dispatcher.register storeA
 		dispatcher.register storeB
 
-		actionInstance = action.createActionInstance(payload)
+		actionInstance = actionCreator.createActionInstance(action, payload)
 		dispatcher.dispatch actionInstance
 		expectBothStoreCalls actionInstance, dispatcher.waitFor
 
@@ -71,7 +74,7 @@ describe 'Dispatcher', () ->
 
 			storeB._handleAction arguments...
 
-		actionInstance = action.createActionInstance(payload)
+		actionInstance = actionCreator.createActionInstance(action, payload)
 		dispatcher.dispatch actionInstance
 		expectBothStoreCalls actionInstance, dispatcher.waitFor
 
@@ -93,17 +96,17 @@ describe 'Dispatcher', () ->
 
 		dispatcher.register storeA
 
-		actionInstance = action.createActionInstance(payload)
+		actionInstance = actionCreator.createActionInstance(action, payload)
 		dispatcher.dispatch actionInstance
 		expectBothStoreCalls actionInstance, dispatcher.waitFor
 
 	it 'should throw if dispatch is executed while dispatching', () ->
 
 		dispatcher.register _handleAction: (actionInstance, waitFor) ->
-			dispatcher.dispatch action.createActionInstance(payload)
+			dispatcher.dispatch actionCreator.createActionInstance(action, payload)
 			storeA._handleAction arguments...
 
-		expect () -> dispatcher.dispatch action.createActionInstance(payload)
+		expect () -> dispatcher.dispatch actionCreator.createActionInstance(action, payload)
 		.to.throw InvariantError
 
 	it 'should throw if waitFor is called while not dispatching', () ->
@@ -123,7 +126,7 @@ describe 'Dispatcher', () ->
 			waitFor storeB
 			storeA._handleAction()
 
-		expect () -> dispatcher.dispatch action.createActionInstance(payload)
+		expect () -> dispatcher.dispatch actionCreator.createActionInstance(action, payload)
 		.to.throw InvariantError
 
 		expect storeA._handleAction.callCount
@@ -137,7 +140,7 @@ describe 'Dispatcher', () ->
 
 		dispatcher.register storeA
 
-		expect () -> dispatcher.dispatch action.createActionInstance(payload)
+		expect () -> dispatcher.dispatch actionCreator.createActionInstance(action, payload)
 		.to.throw InvariantError
 
 	it 'should throw on multi-circular dependencies', () ->
@@ -150,7 +153,7 @@ describe 'Dispatcher', () ->
 		dispatcher.register storeA
 		dispatcher.register storeB
 
-		expect () -> dispatcher.dispatch action.createActionInstance(payload)
+		expect () -> dispatcher.dispatch actionCreator.createActionInstance(action, payload)
 		.to.throw InvariantError
 
 	it 'should remain in a consistent state after a failed dispatch', () ->
@@ -161,12 +164,12 @@ describe 'Dispatcher', () ->
 			storeB._handleAction arguments...
 
 		expect () ->
-			dispatcher.dispatch action.createActionInstance(shouldThrow: yes)
+			dispatcher.dispatch actionCreator.createActionInstance(action, shouldThrow: yes)
 		.to.throw Error
 
 		storeACallbackCount = storeA._handleAction.callCount
 
-		dispatcher.dispatch action.createActionInstance(shouldThrow: no)
+		dispatcher.dispatch actionCreator.createActionInstance(action, shouldThrow: no)
 
 		expect storeA._handleAction.callCount
 		.to.be.equal storeACallbackCount + 1
@@ -177,13 +180,13 @@ describe 'Dispatcher', () ->
 		dispatcher.register storeA
 		dispatcher.register storeB
 
-		actionInstance = action.createActionInstance(payload)
+		actionInstance = actionCreator.createActionInstance(action, payload)
 		dispatcher.dispatch actionInstance
 		expectBothStoreCalls actionInstance, dispatcher.waitFor
 
 		dispatcher.unregister storeB
 
-		actionInstance = action.createActionInstance(payload)
+		actionInstance = actionCreator.createActionInstance(action, payload)
 		dispatcher.dispatch actionInstance
 
 		expect storeA._handleAction.callCount
@@ -200,7 +203,7 @@ describe 'Dispatcher', () ->
 			"storeB._handleAction wasn't only executed once"
 
 	it 'should allow dispatching actions without a payload', () ->
-		dispatcher.dispatch action.createActionInstance()
+		dispatcher.dispatch actionCreator.createActionInstance(action)
 
 
 	it 'should not send other arguments than waitFor if no data is dispatched', () ->
@@ -215,7 +218,7 @@ describe 'Dispatcher', () ->
 			.to.be.equal dispatcher.waitFor
 
 		dispatcher.register storeA
-		dispatcher.dispatch action.createActionInstance()
+		dispatcher.dispatch actionCreator.createActionInstance action
 
 		expect called
 		.to.be.true """Store's action handler wasn't called"""
