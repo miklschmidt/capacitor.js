@@ -1,11 +1,10 @@
 webpack = require 'webpack'
 
-module.exports = 
-	devtool: 'eval'
+module.exports =
 	entry: [
 		'./src/main'
 	]
-	debug: true
+	debug: false
 	output:
 		path: __dirname + '/dist/'
 		filename: 'capacitor.js'
