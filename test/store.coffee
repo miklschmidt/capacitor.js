@@ -214,6 +214,24 @@ describe 'Store', () ->
 		expect instance.get('a').b.c
 		.to.be.equal "test"
 
+	it 'should properly clone date objects', () ->
+		data = date: new Date()
+
+		class TestStore extends Store
+
+			initialize: () ->
+				@set data
+				expect (@get 'date').getTime
+				.to.exist
+
+		instance = new TestStore
+
+		data.date = new Date()
+
+		expect data.date
+		.to.not.be.equal instance.get('date')
+
+
 	it 'should be able to merge existing props with an object', () ->
 
 		nestedObject =

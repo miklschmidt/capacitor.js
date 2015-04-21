@@ -29,6 +29,8 @@ cloneDeep = (obj) ->
 	return obj unless _.isObject(obj) or _.isArray(obj)
 	if window?
 		return obj if obj instanceof window.Element # Don't clone DOMnodes
+	if obj instanceof Date
+		return new Date(obj.getTime())
 	newObj = null
 	if _.isObject(obj) and not _.isArray(obj)
 		newObj = {}
