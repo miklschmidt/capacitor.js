@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.1.3 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.1.4 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -286,6 +286,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (obj instanceof window.Element) {
 	      return obj;
 	    }
+	  }
+	  if (obj instanceof Date) {
+	    return new Date(obj.getTime());
 	  }
 	  newObj = null;
 	  if (_.isObject(obj) && !_.isArray(obj)) {
