@@ -6,8 +6,8 @@ Stores now use immutable js for the data. The API is still the same but the data
 Another Flux implentation. More to come.
 
 # Dependencies
-lodash
-immutable-js
+* lodash
+* immutable-js
 
 ## Credits
 Action concept from https://github.com/AlexGalays/fluxx
