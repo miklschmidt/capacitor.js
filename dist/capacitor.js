@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.2.0 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.2.1 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -438,19 +438,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var value;
 	    invariant(_.isObject(name) || _.isString(name) && (val != null), "Store.set(...): You can only set an object or pass a string and a value.\nUse Store.unset(" + name + ") to unset the property.");
 	    if (_.isString(name)) {
-	      if (Immutable.Iterable.isIterable(val)) {
-	        value = val;
-	      } else {
-	        value = Immutable.fromJS(val);
-	      }
+	      value = Immutable.fromJS(val);
 	      this._properties = this._properties.set(name, Immutable.fromJS(value));
 	    }
 	    if (_.isObject(name)) {
-	      if (Immutable.Iterable.isIterable(name)) {
-	        value = name;
-	      } else {
-	        value = Immutable.fromJS(name);
-	      }
+	      value = Immutable.fromJS(name);
 	      this._properties = Immutable.fromJS(name);
 	    }
 	    return this;
