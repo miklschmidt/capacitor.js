@@ -108,10 +108,12 @@ module.exports = class Store
 		@changed = new Signal
 
 		# Call initialize, if it's there.
-		@initialize?()
+		@initialize()
 
 		# Return proxy object used to interact with this store
 		return @getInterface()
+
+	initialize: () ->
 
 	###
 	# Override this to change which methods are available to consumers.
