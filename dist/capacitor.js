@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.2.1 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.2.2 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -383,11 +383,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    dispatcher.register(this);
 	    this._properties = Immutable.Map();
 	    this.changed = new Signal;
-	    if (typeof this.initialize === "function") {
-	      this.initialize();
-	    }
+	    this.initialize();
 	    return this.getInterface();
 	  }
+
+	  Store.prototype.initialize = function() {};
 
 
 	  /*
