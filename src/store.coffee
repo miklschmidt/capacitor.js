@@ -156,12 +156,12 @@ module.exports = class Store
 			"""
 
 		if _.isString(name)
-			value = Immutable.fromJS val
-			@_properties = @_properties.set name, Immutable.fromJS(value)
+			obj = {}
+			obj[name] = Immutable.fromJS(val)
+			@_properties = @_properties.merge Immutable.Map obj
 
 		if _.isObject(name)
-			value = Immutable.fromJS name
-			@_properties = Immutable.fromJS(name)
+			@_properties = @_properties.merge Immutable.fromJS name
 
 		return @
 
