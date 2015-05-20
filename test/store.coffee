@@ -159,7 +159,7 @@ describe 'Store', () ->
 
 		instance = new TestStore
 
-		expect _.isArray(instance.get('items'))
+		expect _.isArray(instance.get('items').toJS())
 		.to.be.true
 
 		expect instance.get 'a'
@@ -175,13 +175,13 @@ describe 'Store', () ->
 		instance = new TestStore
 
 		val = instance.get ['a', 'b']
-		expect val
+		expect val.toJS()
 		.to.have.keys ['a', 'b']
 
-		expect val.a
+		expect val.get 'a'
 		.to.equal 'test'
 
-		expect val.b
+		expect val.get 'b'
 		.to.equal 'test2'
 
 	it 'should dereference objects in get/set', () ->
@@ -198,20 +198,15 @@ describe 'Store', () ->
 				@set nestedObject
 
 				nestedObject.a.b.c = "shouldntchangestoreprops"
-				expect @_properties.a.b.c
+				expect @_properties.getIn(['a', 'b', 'c'])
 				.to.be.equal "test"
 
 
 		instance = new TestStore
 
-		obj = instance.get('a').b
+		obj = instance.getIn(['a', 'b'])
 
-		expect obj.c
-		.to.be.equal "test"
-
-		obj.c = "shouldntchangestorepropseither"
-
-		expect instance.get('a').b.c
+		expect obj.get('c')
 		.to.be.equal "test"
 
 	it 'should properly clone date objects', () ->
@@ -259,28 +254,28 @@ describe 'Store', () ->
 
 		result = instance.get()
 
-		expect result
+		expect result.toJS()
 		.to.have.keys ["a", "d", "f", "x"]
 
-		expect result.a
+		expect result.get('a').toJS()
 		.to.have.keys ['b']
 
-		expect result.a.b
+		expect result.getIn(['a', 'b']).toJS()
 		.to.have.keys ['c', 'e']
 
-		expect result.a.b.e
+		expect result.getIn(['a', 'b', 'e'])
 		.to.equal 'test2'
 
-		expect result.a.b.c
+		expect result.getIn(['a', 'b', 'c'])
 		.to.equal 'test'
 
-		expect result.d
+		expect result.get('d')
 		.to.equal "test3"
 
-		expect result.f
+		expect result.get('f')
 		.to.equal "another"
 
-		expect result.x
+		expect result.get('x')
 		.to.equal "test4"
 
 	it 'should be able to wait for another store', () ->

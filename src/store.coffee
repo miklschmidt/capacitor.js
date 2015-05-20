@@ -3,6 +3,7 @@ _          = require 'lodash'
 Action     = require './action'
 dispatcher = require './dispatcher'
 invariant  = require './invariant'
+Immutable  = require 'immutable'
 
 ###
 #	implementation example:
@@ -101,7 +102,7 @@ module.exports = class Store
 	###
 	constructor: () ->
 		dispatcher.register(@)
-		@_properties = {}
+		@_properties = Immutable.Map()
 
 		# Set up change event.
 		@changed = new Signal
@@ -121,6 +122,7 @@ module.exports = class Store
 			console.warn "Store.getProxyObject() is deprecated use Store.getInterface()"
 		return {
 			get: @get.bind(@)
+			getIn: @getIn.bind(@)
 			@changed
 			_id: @_id
 		}
@@ -128,15 +130,20 @@ module.exports = class Store
 	getProxyObject: () ->
 		return @getInterface()
 
+	getIn: () ->
+		return @_properties.getIn arguments...
+
 	get: (name) ->
 		val = null
 		if name?
 			invariant _.isString(name) or _.isArray(name), "Store.get(...): first parameter should be undefined, a string, or an array of keys."
-			val = _.pick @_properties, name
-			val = val[name] if _.isString(name)
-			val = cloneDeep val if _.isObject(val)
+
+			if _.isArray(name)
+				val = @_properties.filter (val, key) -> key in name
+			else if _.isString(name)
+				val = @_properties.get name
 		else
-			val = cloneDeep @_properties
+			val = @_properties
 		return val
 
 	set: (name, val) ->
@@ -145,32 +152,36 @@ module.exports = class Store
 				Store.set(...): You can only set an object or pass a string and a value.
 				Use Store.unset(#{name}) to unset the property.
 			"""
+
 		if _.isString(name)
-			properties = {}
-			properties[name] = cloneDeep(val)
+			if Immutable.Iterable.isIterable val
+				# Already immutable
+				value = val
+			else
+				value = Immutable.fromJS val
+			@_properties = @_properties.set name, Immutable.fromJS(value)
+
 		if _.isObject(name)
-			properties = name
-		newProps = cloneDeep properties
-		_.assign @_properties, newProps
+			if Immutable.Iterable.isIterable name
+				# Already immutable
+				value = name
+			else
+				value = Immutable.fromJS name
+			@_properties = Immutable.fromJS(name)
 
 		return @
 
 	merge: (name, val) ->
 		if _.isString(name)
-			properties = {}
-			properties[name] = val
+			@_properties = @_properties.mergeDeep val
 		if _.isObject(name)
-			properties = name
-		newProps =  cloneDeep properties
-		_.merge @_properties, newProps
-
-		changedProps = _.pick @_properties, _.keys(newProps)
+			@_properties = @_properties.mergeDeep name
 
 		return @
 
 	unset: (name) ->
 		invariant _.isString(name), "Store.unset(...): first parameter must be a string."
-		delete @_properties[name] if @_properties[name]?
+		delete @_properties = @_properties.remove name if @_properties[name]?
 		return @
 
 	getCurrentActionID: () ->

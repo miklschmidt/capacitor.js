@@ -10,7 +10,7 @@ module.exports =
 		filename: 'capacitor.js'
 		libraryTarget: 'umd'
 		library: 'capacitor'
-	externals: 'lodash'
+	externals: ['lodash', 'immutable']
 	plugins: [
 		new webpack.NoErrorsPlugin()
 	]
