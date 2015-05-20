@@ -1,18 +1,18 @@
 /**
- * @license capacitor.js 0.1.4 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.2.0 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
  (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("lodash"));
+		module.exports = factory(require("lodash"), require("immutable"));
 	else if(typeof define === 'function' && define.amd)
-		define(["lodash"], factory);
+		define(["lodash", "immutable"], factory);
 	else if(typeof exports === 'object')
-		exports["capacitor"] = factory(require("lodash"));
+		exports["capacitor"] = factory(require("lodash"), require("immutable"));
 	else
-		root["capacitor"] = factory(root["lodash"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_6__) {
+		root["capacitor"] = factory(root["lodash"], root["immutable"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_6__, __WEBPACK_EXTERNAL_MODULE_7__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -93,9 +93,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	invariant = __webpack_require__(5);
 
-	dispatcher = __webpack_require__(7);
+	dispatcher = __webpack_require__(8);
 
-	Action = __webpack_require__(8);
+	Action = __webpack_require__(9);
 
 	module.exports = new (ActionManager = (function() {
 
@@ -162,11 +162,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Action, ActionCreator, ActionInstance, dispatcher, invariant, _actionID, _requestID;
 
-	dispatcher = __webpack_require__(7);
+	dispatcher = __webpack_require__(8);
 
 	invariant = __webpack_require__(5);
 
-	Action = __webpack_require__(8);
+	Action = __webpack_require__(9);
 
 	_actionID = 0;
 
@@ -241,19 +241,22 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Action, Signal, Store, cloneDeep, dispatcher, invariant, _,
+	var Action, Immutable, Signal, Store, cloneDeep, dispatcher, invariant, _,
 	  __hasProp = {}.hasOwnProperty,
-	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+	  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 	_ = __webpack_require__(6);
 
-	Signal = __webpack_require__(10).Signal;
+	Signal = __webpack_require__(11).Signal;
 
-	Action = __webpack_require__(8);
+	Action = __webpack_require__(9);
 
-	dispatcher = __webpack_require__(7);
+	dispatcher = __webpack_require__(8);
 
 	invariant = __webpack_require__(5);
+
+	Immutable = __webpack_require__(7);
 
 
 	/*
@@ -378,7 +381,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function Store() {
 	    this._handleAction = __bind(this._handleAction, this);
 	    dispatcher.register(this);
-	    this._properties = {};
+	    this._properties = Immutable.Map();
 	    this.changed = new Signal;
 	    if (typeof this.initialize === "function") {
 	      this.initialize();
@@ -398,6 +401,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    return {
 	      get: this.get.bind(this),
+	      getIn: this.getIn.bind(this),
 	      changed: this.changed,
 	      _id: this._id
 	    };
@@ -407,58 +411,65 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return this.getInterface();
 	  };
 
+	  Store.prototype.getIn = function() {
+	    var _ref;
+	    return (_ref = this._properties).getIn.apply(_ref, arguments);
+	  };
+
 	  Store.prototype.get = function(name) {
 	    var val;
 	    val = null;
 	    if (name != null) {
 	      invariant(_.isString(name) || _.isArray(name), "Store.get(...): first parameter should be undefined, a string, or an array of keys.");
-	      val = _.pick(this._properties, name);
-	      if (_.isString(name)) {
-	        val = val[name];
-	      }
-	      if (_.isObject(val)) {
-	        val = cloneDeep(val);
+	      if (_.isArray(name)) {
+	        val = this._properties.filter(function(val, key) {
+	          return __indexOf.call(name, key) >= 0;
+	        });
+	      } else if (_.isString(name)) {
+	        val = this._properties.get(name);
 	      }
 	    } else {
-	      val = cloneDeep(this._properties);
+	      val = this._properties;
 	    }
 	    return val;
 	  };
 
 	  Store.prototype.set = function(name, val) {
-	    var newProps, properties;
+	    var value;
 	    invariant(_.isObject(name) || _.isString(name) && (val != null), "Store.set(...): You can only set an object or pass a string and a value.\nUse Store.unset(" + name + ") to unset the property.");
 	    if (_.isString(name)) {
-	      properties = {};
-	      properties[name] = cloneDeep(val);
+	      if (Immutable.Iterable.isIterable(val)) {
+	        value = val;
+	      } else {
+	        value = Immutable.fromJS(val);
+	      }
+	      this._properties = this._properties.set(name, Immutable.fromJS(value));
 	    }
 	    if (_.isObject(name)) {
-	      properties = name;
+	      if (Immutable.Iterable.isIterable(name)) {
+	        value = name;
+	      } else {
+	        value = Immutable.fromJS(name);
+	      }
+	      this._properties = Immutable.fromJS(name);
 	    }
-	    newProps = cloneDeep(properties);
-	    _.assign(this._properties, newProps);
 	    return this;
 	  };
 
 	  Store.prototype.merge = function(name, val) {
-	    var changedProps, newProps, properties;
 	    if (_.isString(name)) {
-	      properties = {};
-	      properties[name] = val;
+	      this._properties = this._properties.mergeDeep(val);
 	    }
 	    if (_.isObject(name)) {
-	      properties = name;
+	      this._properties = this._properties.mergeDeep(name);
 	    }
-	    newProps = cloneDeep(properties);
-	    _.merge(this._properties, newProps);
-	    changedProps = _.pick(this._properties, _.keys(newProps));
 	    return this;
 	  };
 
 	  Store.prototype.unset = function(name) {
 	    invariant(_.isString(name), "Store.unset(...): first parameter must be a string.");
 	    if (this._properties[name] != null) {
-	      delete this._properties[name];
+	      delete (this._properties = this._properties.remove(name));
 	    }
 	    return this;
 	  };
@@ -498,7 +509,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var InvariantError;
 
-	InvariantError = __webpack_require__(9);
+	InvariantError = __webpack_require__(10);
 
 
 	/*
@@ -537,13 +548,19 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
+	module.exports = __WEBPACK_EXTERNAL_MODULE_7__;
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var Dispatcher, Signal, invariant,
 	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
 	  __slice = [].slice;
 
 	invariant = __webpack_require__(5);
 
-	Signal = __webpack_require__(10).Signal;
+	Signal = __webpack_require__(11).Signal;
 
 	'use strict';
 
@@ -752,12 +769,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Action, dispatcher;
 
-	dispatcher = __webpack_require__(7);
+	dispatcher = __webpack_require__(8);
 
 	Action = (function() {
 
@@ -787,7 +804,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var InvariantError,
@@ -808,7 +825,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*jslint onevar:true, undef:true, newcap:true, regexp:true, bitwise:true, maxerr:50, indent:4, white:false, nomen:false, plusplus:false */
