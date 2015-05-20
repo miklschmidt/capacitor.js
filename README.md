@@ -7,6 +7,7 @@ Another Flux implentation. More to come.
 
 # Dependencies
 lodash
+immutable-js
 
 ## Credits
 Action concept from https://github.com/AlexGalays/fluxx
