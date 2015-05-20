@@ -5,6 +5,7 @@ InvariantError = require('../src/invariant-error')
 _              = require('lodash')
 {expect}       = require 'chai'
 sinon          = require 'sinon'
+Immutable      = require 'immutable'
 
 describe 'Store', () ->
 
@@ -149,6 +150,20 @@ describe 'Store', () ->
 
 		expect instance.get 'b'
 		.to.equal 'test2'
+
+	it 'should be able to use an existing immutable object when setting', () ->
+		obj = Immutable.fromJS({a: 'test'})
+		class TestStore extends Store
+
+			initialize: () ->
+				@set {a: 'test', b: obj}
+
+		instance = new TestStore
+
+		testObj = instance.get 'b'
+
+		expect testObj
+		.to.equal obj
 
 	it 'should be able to get a single property', () ->
 

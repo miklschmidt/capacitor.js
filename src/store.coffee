@@ -154,19 +154,11 @@ module.exports = class Store
 			"""
 
 		if _.isString(name)
-			if Immutable.Iterable.isIterable val
-				# Already immutable
-				value = val
-			else
-				value = Immutable.fromJS val
+			value = Immutable.fromJS val
 			@_properties = @_properties.set name, Immutable.fromJS(value)
 
 		if _.isObject(name)
-			if Immutable.Iterable.isIterable name
-				# Already immutable
-				value = name
-			else
-				value = Immutable.fromJS name
+			value = Immutable.fromJS name
 			@_properties = Immutable.fromJS(name)
 
 		return @
