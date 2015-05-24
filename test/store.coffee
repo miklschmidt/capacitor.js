@@ -180,25 +180,6 @@ describe 'Store', () ->
 		expect instance.get 'a'
 		.to.equal 'test'
 
-	it 'should be able to get an array of values', () ->
-		class TestStore extends Store
-
-			initialize: () ->
-				@set {a: 'test', b: 'test2'}
-
-
-		instance = new TestStore
-
-		val = instance.get ['a', 'b']
-		expect val.toJS()
-		.to.have.keys ['a', 'b']
-
-		expect val.get 'a'
-		.to.equal 'test'
-
-		expect val.get 'b'
-		.to.equal 'test2'
-
 	it 'should dereference objects in get/set', () ->
 		nestedObject =
 			a:
@@ -213,7 +194,7 @@ describe 'Store', () ->
 				@set nestedObject
 
 				nestedObject.a.b.c = "shouldntchangestoreprops"
-				expect @_properties.getIn(['a', 'b', 'c'])
+				expect @getIn(['a', 'b', 'c'])
 				.to.be.equal "test"
 
 
