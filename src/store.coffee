@@ -26,31 +26,6 @@ Immutable  = require 'immutable'
 #			@changed.dispatch()
 ###
 
-cloneDeep = (obj) ->
-	return obj unless _.isObject(obj) or _.isArray(obj)
-	if window?
-		return obj if obj instanceof window.Element # Don't clone DOMnodes
-	if obj instanceof Date
-		return new Date(obj.getTime())
-	newObj = null
-	if _.isObject(obj) and not _.isArray(obj)
-		newObj = {}
-		if obj.clone? and typeof obj.clone is 'function'
-			newObj = obj.clone()
-		else
-			for own key, val of obj
-				if _.isObject(val) or _.isArray(val)
-					newObj[key] = cloneDeep(val)
-				else
-					newObj[key] = val
-	else
-		newObj = []
-		if obj.clone? and typeof obj.clone is 'function'
-			newObj = obj.clone()
-		else
-			newObj.push cloneDeep(val) for val in obj
-	return newObj
-
 module.exports = class Store
 
 	###
