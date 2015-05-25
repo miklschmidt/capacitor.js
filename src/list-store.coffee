@@ -16,7 +16,7 @@ module.exports = class ListStore extends Store
 		"""
 
 	# Defines which entities the list contains
-	entityStore: null
+	containsEntity: null
 
 	getInterface: () ->
 		interfaceObj = super
@@ -25,12 +25,14 @@ module.exports = class ListStore extends Store
 		return interfaceObj
 
 	initialize: () ->
-		invariant @entityStore?, """
-			ListStore.initialize(...): You need to define a content store to use the list store
+		super
+		invariant @containsEntity?, """
+			ListStore.initialize(...): Missing @containsEntity property. 
+			You need to define an entity store to use the list store.
 		"""
 		@set 'ids', Immutable.List()
-		# This store has effictively changed if it's content store has changed.
-		@entityStore.changed.add () => @changed.dispatch()
+		# This store has effictively changed if it's entity store has changed.
+		@containsEntity.changed.add () => @changed.dispatch()
 
 	add: (ids) ->
 		if Immutable.Iterable.isIterable(ids)
@@ -69,9 +71,9 @@ module.exports = class ListStore extends Store
 
 	getItems: () ->
 		ids = @get 'ids'
-		items = @entityStore.getItemsWithIds ids
+		items = @containsEntity.getItemsWithIds ids
 		return @cache 'ids_items', items
 
 	getItem: (id) ->
-		return @entityStore.getItem id if @get('ids').includes id
+		return @containsEntity.getItem id if @get('ids').includes id
 		return null

@@ -16,7 +16,7 @@ module.exports = class IndexedListStore extends Store
 		"""
 
 	# Defines which entities the lists contain
-	entityStore: null
+	containsEntity: null
 
 	getInterface: () ->
 		interfaceObj = super
@@ -25,12 +25,14 @@ module.exports = class IndexedListStore extends Store
 		return interfaceObj
 
 	initialize: () ->
-		invariant @entityStore?, """
-			IndexedListStore.initialize(...): You need to define a content store to use the IndexedIndexedListStore.
+		super
+		invariant @containsEntity?, """
+			IndexedListStore.initialize(...): Missing @containsEntity property. 
+			You need to define an entity store to use the IndexedIndexedListStore.
 		"""
 		@set 'map', Immutable.Map {}
-		# This store has effictively changed if it's content store has changed.
-		@entityStore.changed.add () => @changed.dispatch()
+		# This store has effictively changed if it's entity store has changed.
+		@containsEntity.changed.add () => @changed.dispatch()
 
 	add: (index, ids) ->
 		invariant _.isNumber(index) or _.isString(index), """
@@ -106,11 +108,11 @@ module.exports = class IndexedListStore extends Store
 
 	getItems: (index) ->
 		ids = @getIds(index)
-		items = @entityStore.getItemsWithIds ids
+		items = @containsEntity.getItemsWithIds ids
 
 		return @cache('cached_list_' + index, items)
 
 	getItem: (index, id) ->
 		ids = @getIds(index)
-		return @entityStore.getItem(id) if ids.includes id
+		return @containsEntity.getItem(id) if ids.includes id
 		return null
