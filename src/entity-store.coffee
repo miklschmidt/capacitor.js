@@ -93,6 +93,9 @@ module.exports = class EntityStore extends Store
 		@set 'items', items
 
 	getItem: (id) ->
+		invariant _.isString(id) or _.isNumber(id), """
+			#{@constructor.name}.addItem(...): id has to be either a string or a number.
+		"""
 		@dereferenceItem @get('items').get(id)
 
 	getItems: () ->
