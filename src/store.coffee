@@ -179,10 +179,11 @@ module.exports = class Store
 		reference = @constructor._references?[key]
 		invariant reference?.store?, """#{@constructor.name}.dereference(...): There's no reference store for the key #{key}"""
 
-		if reference.type is 'entity'
-			id = @_properties.get key
+		id = @_properties.get key
+		result = null
+		if reference.type is 'entity' and id?
 			invariant _.isString(id) or _.isNumber(id), """#{@constructor.name}.dereference(...): The value for #{key} was neither a string nor a number.
-				The value of #{key} should be the id of the item that {key} is a reference to.
+				The value of #{key} should be the id of the item that #{key} is a reference to.
 			"""
 			result = reference.store.getItem id
 

@@ -7,7 +7,7 @@ module.exports = class EntityStore extends Store
 
 	@hasMany: (key, listStore) ->
 		if arguments.length is 1
-			return through: (indexedListStore) ->
+			return through: (indexedListStore) =>
 				invariant indexedListStore?.getItems, """
 					#{@constructor.name}.hasMany(...).through(...): the indexed list store specified for the key #{key} is invalid.
 					You must specify an indexed list store with a 'getItems' method
@@ -31,8 +31,9 @@ module.exports = class EntityStore extends Store
 			#{@constructor.name}.dereference(...): There's no reference store for the key #{key}
 		"""
 
-		if reference.type is 'entity'
-			id = item.get key
+		id = item.get key
+		result = null
+		if reference.type is 'entity' and id?
 			invariant _.isString(id) or _.isNumber(id), """
 				#{@constructor.name}.dereference(...): The value for #{key} was neither a string nor a number.
 				The value of #{key} should be the id of the item that {key} is a reference to.
@@ -56,9 +57,10 @@ module.exports = class EntityStore extends Store
 		# Handle dereferencing
 		references = @constructor._references
 		if references?
+			that = this
 			dereferencedProperties = item.withMutations (map) -> 
 				for key of references
-					map.set key, @dereference(item, key)
+					map.set key, that.dereference(item, key)
 			val = @cache "dereffed-item-#{item.get('id')}", dereferencedProperties
 		else
 			# No references defined, just return the item.
