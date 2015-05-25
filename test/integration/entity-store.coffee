@@ -28,7 +28,7 @@ describe 'EntityStore', () ->
 		expect UserStore._references.profile.store
 		.to.be.equal profile
 
-	it 'should be able to define a one to many relationship through an indexed list store', () ->
+	it 'should be able to define a many to many relationship through an indexed list store', () ->
 
 		article = new class ArticleStore extends EntityStore
 
