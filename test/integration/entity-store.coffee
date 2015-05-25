@@ -1,7 +1,10 @@
 EntityStore = require '../../src/entity-store'
 IndexedListStore = require '../../src/indexed-list-store'
+ListStore = require '../../src/list-store'
+Store = require '../../src/store'
 
 invariant = require '../../src/invariant'
+InvariantError = require '../../src/invariant-error'
 {expect} = require 'chai'
 Immutable = require 'immutable'
 
@@ -27,6 +30,14 @@ describe 'EntityStore', () ->
 
 		expect UserStore._references.profile.store
 		.to.be.equal profile
+
+	it 'should throw when trying to define a one to one relationship without an EntityStore', () ->
+		profile = new class ProfileStore extends Store
+
+		user = new class UserStore extends EntityStore
+
+			expect () => @hasOne 'profile', profile
+			.to.throw InvariantError
 
 	it 'should be able to define a many to many relationship through an indexed list store', () ->
 
@@ -59,6 +70,17 @@ describe 'EntityStore', () ->
 
 		expect UserStore._references.articles.store
 		.to.be.equal usersArticles
+
+	it 'should throw when trying to define a many to many relationship without an IndexedListStore', () ->
+		article = new class ArticleStore extends EntityStore
+
+		randomArticles = new class ArticleListStore extends ListStore
+			containsEntity: article
+
+		user = new class UserStore extends EntityStore
+
+			expect () => @hasMany('articles').through(randomArticles)
+			.to.throw InvariantError
 
 	it 'should be able to define several relationships', () ->
 
