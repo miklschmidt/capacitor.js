@@ -15,6 +15,9 @@ module.exports = class ListStore extends Store
 			#{@constructor.name}.hasMany(...): You can't define relationships on a list store
 		"""
 
+	@_getStoreType: () ->
+		return 'list'
+
 	# Defines which entities the list contains
 	containsEntity: null
 

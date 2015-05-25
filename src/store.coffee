@@ -93,9 +93,9 @@ module.exports = class Store
 	# @param {EntityStore} entityStore the entity store that is referenced from this store
 	###
 	@hasOne: (key, entityStore) ->
-		invariant entityStore?.getItem, """
+		invariant entityStore._type is 'entity', """
 			#{@constructor.name}.entityReference(...): the entity store specified for the key #{key} is invalid. 
-			You must specify a store with a 'getItem' method.
+			You must specify a store that is a descendant of Capacitor.EntityStore.
 		"""
 		@_references ?= {}
 		@_references[key] = {store: entityStore, type: 'entity'}
@@ -109,13 +109,20 @@ module.exports = class Store
 	# @param {ListStore} listStore the list store that is referenced from this store
 	###
 	@hasMany: (key, listStore) ->
-		invariant listStore?.getItems, """
+		invariant listStore._type is 'list', """
 			#{@constructor.name}.listReference(...): the list store specified for the key #{key} is invalid. 
-			You must specify a list store with a 'getItems' method.
+			You must specify a store that is a descendant of Capacitor.ListStore.
 		"""
 		@_references ?= {}
 		@_references[key] = {store: listStore, type: 'list'}
 		return null
+
+	@_makeInterfaceImmutable: (interfaceObj) ->
+		interfaceObj._type = @_getStoreType()
+		return Object.freeze(interfaceObj)
+
+	@_getStoreType: () ->
+		return 'store'
 
 	###
 	# Constructor function that sets up actions and events on the store
@@ -137,7 +144,8 @@ module.exports = class Store
 		"""
 
 		# Return proxy object used to interact with this store
-		return @getInterface()
+		that = @
+		return @constructor._makeInterfaceImmutable @getInterface()
 
 	initialize: () ->
 		@_baseInitialized = yes

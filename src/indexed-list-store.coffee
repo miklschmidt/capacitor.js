@@ -15,6 +15,9 @@ module.exports = class IndexedListStore extends Store
 			#{@constructor.name}.hasMany(...): You can't define relationships on an indexed list store
 		"""
 
+	@_getStoreType: () ->
+		return 'indexed-list'
+
 	# Defines which entities the lists contain
 	containsEntity: null
 
