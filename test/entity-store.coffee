@@ -18,7 +18,7 @@ describe 'EntityStore', () ->
 		expect instance.get 'test'
 		.to.equal 'test'
 
-	it 'be able to set and get an item', () ->
+	it 'should be able to set and get an item', () ->
 
 		instance = new class TestEntityStore extends EntityStore
 			initialize: () ->
@@ -140,7 +140,7 @@ describe 'EntityStore', () ->
 		expect instance.getItems()
 		.to.be.equal instance.getItems()
 
-	it 'should return another map when an item changed', () ->
+	it 'should return a new map when an item changed', () ->
 
 		instance = new class TestEntityStore extends EntityStore
 			initialize: () ->
