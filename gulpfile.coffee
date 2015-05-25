@@ -9,7 +9,7 @@ webpack = require 'webpack'
 
 gulp.task 'test', () ->
 	# Load and run the test files.
-	gulp.src 'test/*.coffee'
+	gulp.src ['test/!(integration).coffee', 'test/integration.coffee']
 	.pipe mocha	reporter: 'spec'
 
 gulp.task 'change version', () ->
