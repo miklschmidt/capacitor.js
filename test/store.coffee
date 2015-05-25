@@ -35,7 +35,7 @@ describe 'Store', () ->
 
 		console.warn.restore()
 
-	it 'should call initialize on instantiation', () ->
+	it 'should call initialize on instantiation and throw when super was not called', () ->
 
 		init = sinon.spy()
 
@@ -43,7 +43,8 @@ describe 'Store', () ->
 
 			initialize: init
 
-		new TestStore
+		expect () -> new TestStore
+		.to.throw InvariantError
 
 		expect init.calledOnce
 		.to.be.true
@@ -57,6 +58,7 @@ describe 'Store', () ->
 			@action new Action('test'), testFunction
 
 			initialize: () ->
+				super
 				expect @constructor._handlers['test']
 				.to.exist
 
@@ -90,6 +92,7 @@ describe 'Store', () ->
 			@action action, handler
 
 			initialize: () ->
+				super
 				@_handleAction actionCreator.createActionInstance(action), () -> true
 
 		instance = new TestStore
@@ -108,6 +111,7 @@ describe 'Store', () ->
 			@action secondAction, handler
 
 			initialize: () ->
+				super
 				@_handleAction actionCreator.createActionInstance(firstAction), () -> true
 
 
@@ -121,6 +125,7 @@ describe 'Store', () ->
 		class TestStore extends Store
 
 			initialize: () ->
+				super
 				@_handleAction (new ActionCreator).createActionInstance(new Action('test')), () -> true
 
 		instance = new TestStore
@@ -130,6 +135,7 @@ describe 'Store', () ->
 		class TestStore extends Store
 
 			initialize: () ->
+				super
 				@set 'test', 'test'
 
 		instance = new TestStore
@@ -141,6 +147,7 @@ describe 'Store', () ->
 		class TestStore extends Store
 
 			initialize: () ->
+				super
 				@set {a: 'test', b: 'test2'}
 
 		instance = new TestStore
@@ -156,6 +163,7 @@ describe 'Store', () ->
 		class TestStore extends Store
 
 			initialize: () ->
+				super
 				@set {a: 'test', b: obj}
 
 		instance = new TestStore
@@ -170,6 +178,7 @@ describe 'Store', () ->
 		class TestStore extends Store
 
 			initialize: () ->
+				super
 				@set {items: [], a: 'test'}
 
 		instance = new TestStore
@@ -191,6 +200,7 @@ describe 'Store', () ->
 		class TestStore extends Store
 
 			initialize: () ->
+				super
 				@set nestedObject
 
 				nestedObject.a.b.c = "shouldntchangestoreprops"
@@ -211,6 +221,7 @@ describe 'Store', () ->
 		class TestStore extends Store
 
 			initialize: () ->
+				super
 				@set data
 				expect (@get 'date').getTime
 				.to.exist
@@ -242,6 +253,7 @@ describe 'Store', () ->
 		class TestStore extends Store
 
 			initialize: () ->
+				super
 				@set nestedObject
 				@merge mergeObject
 

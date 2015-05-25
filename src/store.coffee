@@ -128,13 +128,19 @@ module.exports = class Store
 		# Set up change event.
 		@changed = new Signal
 
-		# Call initialize, if it's there.
+		# Initialize the store.
+		@_baseInitialized = no
 		@initialize()
+
+		invariant !!@_baseInitialized, """
+			Initialize on the base store wasn't called. You are probably missing a super call on #{@constructor.name}.
+		"""
 
 		# Return proxy object used to interact with this store
 		return @getInterface()
 
 	initialize: () ->
+		@_baseInitialized = yes
 
 	###
 	# Override this to change which methods are available to consumers.
@@ -158,9 +164,9 @@ module.exports = class Store
 	cache: (name, value) ->
 		last = @_cache.get name
 
-		if !Immutable.Iterable.isIterable(last) or !Immutable.is(last, item)
-			@_cache = @_cache.set name, item
-			return item
+		if !Immutable.Iterable.isIterable(last) or !Immutable.is(last, value)
+			@_cache = @_cache.set name, value
+			return value
 
 		return last
 

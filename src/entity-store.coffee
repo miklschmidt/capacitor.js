@@ -1,9 +1,9 @@
-Store = require 'store'
-invariant = require 'invariant'
+Store = require './store'
+invariant = require './invariant'
 Immutable = require 'immutable'
 _ = require 'lodash'
 
-module.exports = class ContentStore extends Store
+module.exports = class EntityStore extends Store
 
 	@hasMany: (key, listStore) ->
 		if arguments.length is 1
@@ -79,18 +79,22 @@ module.exports = class ContentStore extends Store
 		if !Immutable.Iterable.isIterable(item)
 			item = Immutable.fromJS(item)
 		invariant item.get('id')?, """
-			ContentStore.addItem(...): Can't add an item with no id (item.id is missing).
+			#{@constructor.name}.addItem(...): Can't add an item with no id (item.id is missing).
 		"""
 		@setItems @get('items').set(item.get('id'), item)
 
+
 	setItems: (items) ->
+		invariant Immutable.Map.isMap(items), """
+			#{@constructor.name}.addItem(...): items has to be an immutable map.
+		"""
 		@set 'items', items
 
 	getItem: (id) ->
-		@derefenceItem @get('items').get(id)
+		@dereferenceItem @get('items').get(id)
 
 	getItems: () ->
-		@get('items').map (item) => @dereferenceItem item
+		@cache 'items',  @get('items').map (item) => @dereferenceItem item
 		
 
 	###
@@ -99,7 +103,7 @@ module.exports = class ContentStore extends Store
 	#
 	# @overrides Store::get 
 	###
-	get: () ->
+	get: (key) ->
 		val = null
 		if key?
 			invariant _.isString(key), "#{@constructor.name}.get(...): first parameter should be undefined or a string"

@@ -1,5 +1,5 @@
-Store     = require 'store'
-invariant = require 'invariant'
+Store     = require './store'
+invariant = require './invariant'
 Immutable = require 'immutable'
 _         = require 'lodash'
 
