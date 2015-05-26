@@ -217,9 +217,10 @@ module.exports = class Store
 			# Handle dereferencing
 			references = @constructor._references
 			if references?
+				that = this
 				dereferencedProperties = @_properties.withMutations (map) -> 
 					for key of references
-						map.set key, @dereference(key)
+						map.set key, that.dereference(key)
 				val = @cache 'dereffed_props', dereferencedProperties
 			else
 				# No references defined, just return the props.
@@ -229,15 +230,15 @@ module.exports = class Store
 	validateReferenceOnSet: (type, key, value) ->
 		switch type
 			when 'entity'
-				invariant _.isString(values[key]) or _.isNumber(values[key]), """
-					#{@constructor.name}.set(...): #{key} must be an id for an entity on #{references[key].store.constructor.name}.
+				invariant _.isString(value) or _.isNumber(value), """
+					#{@constructor.name}.set(...): #{key} must be an id for an entity on the referenced store.
 					Ie. either a string or a number.
 				"""
 				return value
 			when 'list'
 				# One should never set a value for a list reference, warn.
 				console.warn """
-					#{@constructor.name}.set(...): #{key} is a reference to the list store #{references[key].store.constructor.name}.
+					#{@constructor.name}.set(...): #{key} is a reference to a list store.
 					You can't set a value for a reference to a list store. Defaulting to null.
 				"""
 				return null
@@ -260,7 +261,7 @@ module.exports = class Store
 			references = @constructor._references
 			for key of keys 
 				if key in _.keys(references)
-					values[key] = @validateReferenceOnSet type, key, keys[key]
+					values[key] = @validateReferenceOnSet references[key].type, key, keys[key]
 				else
 					values[key] = keys[key]
 
