@@ -218,6 +218,42 @@ describe 'EntityStore', () ->
 		expect user.getItem(1).get('articles').get(0) # First entry in the list
 		.to.be.equal article.getItem(1)
 
+	it 'should return the same immutable for a dereferenced item if the item did not change', () ->
+		profile = new class ProfileStore extends EntityStore
+
+			initialize: () ->
+				super
+				@setItem {id: 1, name: 'John Doe'}
+
+		article = new class ArticleStore extends EntityStore
+
+			initialize: () ->
+				super
+				@setItem {id: 1, title: 'test article'}
+
+		usersArticles = new class UserArticleStore extends IndexedListStore
+
+			containsEntity: article
+			initialize: () ->
+				super
+				# User with id 1 has article with id 1
+				@add 1, 1
+
+		user = new class UserStore extends EntityStore
+
+			@hasOne 'profile', profile
+			@hasMany('articles').through(usersArticles)
+			
+			initialize: () ->
+				super
+				@setItem {id: 1, profile: 1, articles: 1}
+
+		first = user.getItem(1)
+		second = user.getItem(1)
+
+		expect first
+		.to.be.equal second
+
 
 
 

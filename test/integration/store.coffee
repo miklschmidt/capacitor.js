@@ -196,5 +196,36 @@ describe 'Store', () ->
 		.to.be.equal entity.getItem(1)
 
 
+	it 'should return the same immutable for a dereferenced item if the item did not change', () ->
+
+		entity = new class TestEntityStore extends EntityStore
+
+			initialize: () ->
+				super
+				@setItem {id: 1, value: 'test'}
+
+		list = new class TestListStore extends ListStore
+
+			containsEntity: entity
+			initialize: () ->
+				super
+				@add 1
+
+		store = new class TestStore extends Store
+
+			@hasMany 'testEntities', list
+			@hasOne 'testEntity', entity
+
+			initialize: () ->
+				super
+				@set id: 1, testEntity: 1
+
+		first = store.get()
+		second = store.get()
+
+		expect first
+		.to.equal second
+
+
 
 
