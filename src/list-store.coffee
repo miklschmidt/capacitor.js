@@ -33,7 +33,7 @@ module.exports = class ListStore extends Store
 			ListStore.initialize(...): Missing @containsEntity property. 
 			You need to define an entity store to use the list store.
 		"""
-		@set 'ids', Immutable.List()
+		@setIds Immutable.List()
 		# This store has effictively changed if it's entity store has changed.
 		@containsEntity.changed.add () => @changed.dispatch()
 
@@ -46,19 +46,19 @@ module.exports = class ListStore extends Store
 
 		ids = [ids] unless _.isArray(ids)
 
-		currentIds = @get 'ids'
+		currentIds = @getIds()
 		for id in ids when not currentIds.includes(id)
 			currentIds = currentIds.push id
-		@set 'ids', currentIds
+		@setIds currentIds
 
 	remove: (id) ->
-		currentIds = @get 'ids'
-		index = currentIds.indexOf id
-		invariant currentIds.indexOf isnt -1, """
+		currentIds = @getIds()
+		indexOf = currentIds.indexOf id
+		invariant indexOf isnt -1, """
 			ListStore.remove(...): Id #{id} was not found in the store
 		"""
 		currentIds = currentIds.remove(indexOf)
-		@set 'ids', currentIds
+		@setIds currentIds
 
 	reset: (ids) ->
 		if Immutable.Iterable.isIterable(ids)
@@ -70,10 +70,16 @@ module.exports = class ListStore extends Store
 			ids = [ids] unless _.isArray(ids)
 		else
 			ids = []
-		@set 'ids', Immutable.List(ids)
+		@setIds Immutable.List(ids)
+
+	getIds: () ->
+		@get 'ids'
+
+	setIds: (ids) ->
+		@set 'ids', ids
 
 	getItems: () ->
-		ids = @get 'ids'
+		ids = @getIds()
 		items = @containsEntity.getItemsWithIds ids
 		return @cache 'ids_items', items
 

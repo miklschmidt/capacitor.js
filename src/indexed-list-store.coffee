@@ -78,13 +78,13 @@ module.exports = class IndexedListStore extends Store
 		map = map.set index, ids
 		@set 'map', map
 
-	remove: (index, idToRemove) ->
-		currentIds = @getIds index
-		index = currentIds.indexOf idToRemove
-		invariant index isnt -1, """
-			IndexedListStore.reset(...): Id #{idToRemove} was not found in the list for id #{id}.
+	remove: (index, id) ->
+		currentIds = @getIds(index)
+		indexOf = currentIds.indexOf id
+		invariant indexOf isnt -1, """
+			ListStore.remove(...): Id #{id} was not found in the store
 		"""
-		currentIds.splice indexOf, 1
+		currentIds = currentIds.remove(indexOf)
 		@setIds index, currentIds
 
 	removeIndex: (index) ->
@@ -97,10 +97,10 @@ module.exports = class IndexedListStore extends Store
 		@set 'map', Immutable.Map({})
 
 	reset: (index, ids) ->
-		invariant not index?, """
+		invariant index?, """
 			IndexedListStore.reset(...): No index was provided.
 		"""
-		invariant not ids? or _.isNumber(ids) or _.isString(ids) or _.isArray(ids), """
+		invariant not ids? or (_.isNumber(ids) or _.isString(ids) or _.isArray(ids)), """
 			IndexedListStore.reset(...): Reset only accepts an id, an array of ids or nothing as the second parameter.
 		"""
 		if ids?
