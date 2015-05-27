@@ -201,8 +201,27 @@ module.exports = class Store
 		return result
 
 	getIn: (path) ->
+		invariant _.isArray(path), """
+			#{@constructor.name}.getIn(...): Path should be an array.
+		"""
 		result = @get()
-		result = result.get(key) for key in path when result?
+		for key in path
+			if result?.get
+				result = result.get(key)
+			else
+				result = undefined
+		return result
+
+	getRawIn: (path) ->
+		invariant _.isArray(path), """
+			#{@constructor.name}.getIn(...): Path should be an array.
+		"""
+		result = @getRaw()
+		for key in path
+			if result?.get
+				result = result.get(key)
+			else
+				result = undefined
 		return result
 
 	get: (key) ->
@@ -225,6 +244,15 @@ module.exports = class Store
 			else
 				# No references defined, just return the props.
 				val = @_properties
+		return val
+
+	getRaw: (key) ->
+		val = null
+		if key?
+			invariant _.isString(key), "#{@constructor.name}.get(...): first parameter should be undefined or a string"
+			val = @_properties.get key
+		else
+			val = @_properties
 		return val
 
 	validateReferenceOnSet: (type, key, value) ->

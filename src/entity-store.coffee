@@ -101,9 +101,14 @@ module.exports = class EntityStore extends Store
 		"""
 		@dereferenceItem @get('items').get(id)
 
+	getRawItem: (id) ->
+		@getRawItems().get(id)
+
 	getItems: () ->
 		@cache 'items',  @get('items').map (item) => @dereferenceItem item
 		
+	getRawItems: () ->
+		@get('items')
 
 	###
 	# Method for getting values from this store, with dereferencing disabled.
@@ -136,6 +141,16 @@ module.exports = class EntityStore extends Store
 		for id in ids
 			if items.has(id)
 				result.push @getItem(id)
+		return Immutable.List result
+
+	getRawItemsWithIds: (ids) ->
+		if Immutable.Iterable.isIterable(ids)
+			ids = ids.toJS()
+		result = []
+		items = @get 'items'
+		for id in ids
+			if items.has(id)
+				result.push @getRawItem(id)
 		return Immutable.List result
 
 	removeItem: (id) ->

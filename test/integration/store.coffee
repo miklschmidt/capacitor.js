@@ -1,12 +1,13 @@
-Store = require '../../src/store'
-EntityStore = require '../../src/entity-store'
-ListStore = require '../../src/list-store'
+Store            = require '../../src/store'
+EntityStore      = require '../../src/entity-store'
+ListStore        = require '../../src/list-store'
 IndexedListStore = require '../../src/indexed-list-store'
-invariant = require '../../src/invariant'
-InvariantError = require '../../src/invariant-error'
+invariant        = require '../../src/invariant'
+InvariantError   = require '../../src/invariant-error'
 
-{expect} = require 'chai'
-Immutable = require 'immutable'
+{expect}         = require 'chai'
+Immutable        = require 'immutable'
+sinon            = require 'sinon'
 
 describe 'Store', () ->
 
@@ -226,6 +227,40 @@ describe 'Store', () ->
 		expect first
 		.to.equal second
 
+	it 'should not dereference when using Raw methods', () ->
 
+		entity = new class TestEntityStore extends EntityStore
 
+			initialize: () ->
+				super
+				@setItem {id: 1, value: 'test'}
 
+		list = new class TestListStore extends ListStore
+
+			containsEntity: entity
+			initialize: () ->
+				super
+				@add 1
+
+		store = new class TestStore extends Store
+
+			@hasMany 'testEntities', list
+			@hasOne 'testEntity', entity
+
+			dereference: sinon.spy()
+
+			initialize: () ->
+				super
+				@set id: 1, testEntity: 1
+
+				expect @getRaw('testEntity')
+				.to.equal 1
+
+				expect @getRaw('testEntities')
+
+				expect @getRawIn(['testEntity', 'value'])
+
+				expect @getRawIn(['testEntities', 0, 'value'])
+
+				expect @dereference.called
+				.to.equal false
