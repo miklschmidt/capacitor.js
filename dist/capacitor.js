@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.3.0 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.3.1 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -765,8 +765,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  EntityStore.prototype.getItem = function(id) {
+	    var item, result;
 	    invariant(_.isString(id) || _.isNumber(id), "" + this.constructor.name + ".addItem(...): id has to be either a string or a number.");
-	    return this.dereferenceItem(this.get('items').get(id));
+	    result = null;
+	    item = this.get('items').get(id);
+	    if (item != null) {
+	      result = this.dereferenceItem(item);
+	    }
+	    return result;
 	  };
 
 	  EntityStore.prototype.getRawItem = function(id) {
