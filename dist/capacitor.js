@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.3.1 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.3.3 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -340,7 +340,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (this._handlers == null) {
 	      this._handlers = {};
 	    }
-	    invariant(action instanceof Action && typeof fn === "function", "" + this.constructor.name + ".action(...): Provided action should be created via the action \nmanager and a handler must be given as a second parameter.\nIf you're trying to reference a prototype method, don't do that.");
+	    invariant(action instanceof Action && typeof fn === "function", "" + this.constructor.name + ".action(...): Provided action should be created via the action\nmanager and a handler must be given as a second parameter.\nIf you're trying to reference a prototype method, don't do that.");
 	    invariant(this._handlers[action] == null, "" + this.constructor.name + ".action(...): You can only define one handler pr action");
 	    this._handlers[action] = fn;
 	    _ref = this.prototype;
@@ -363,7 +363,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 
 	  Store.hasOne = function(key, entityStore) {
-	    invariant(entityStore._type === 'entity', "" + this.constructor.name + ".entityReference(...): the entity store specified for the key " + key + " is invalid. \nYou must specify a store that is a descendant of Capacitor.EntityStore.");
+	    invariant(entityStore._type === 'entity', "" + this.constructor.name + ".entityReference(...): the entity store specified for the key " + key + " is invalid.\nYou must specify a store that is a descendant of Capacitor.EntityStore.");
 	    if (this._references == null) {
 	      this._references = {};
 	    }
@@ -384,7 +384,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 
 	  Store.hasMany = function(key, listStore) {
-	    invariant(listStore._type === 'list', "" + this.constructor.name + ".listReference(...): the list store specified for the key " + key + " is invalid. \nYou must specify a store that is a descendant of Capacitor.ListStore.");
+	    invariant(listStore._type === 'list', "" + this.constructor.name + ".listReference(...): the list store specified for the key " + key + " is invalid.\nYou must specify a store that is a descendant of Capacitor.ListStore.");
 	    if (this._references == null) {
 	      this._references = {};
 	    }
@@ -411,7 +411,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  function Store() {
 	    this._handleAction = __bind(this._handleAction, this);
-	    var that;
+	    var key, reference, that, _ref;
 	    dispatcher.register(this);
 	    this._properties = Immutable.Map();
 	    this._cache = Immutable.Map();
@@ -419,6 +419,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._baseInitialized = false;
 	    this.initialize();
 	    invariant(!!this._baseInitialized, "Initialize on the base store wasn't called. You are probably missing a super call on " + this.constructor.name + ".");
+	    if (this.constructor._references != null) {
+	      _ref = this.constructor._references;
+	      for (key in _ref) {
+	        reference = _ref[key];
+	        reference.store.changed.add((function(_this) {
+	          return function() {
+	            return _this.changed.dispatch();
+	          };
+	        })(this));
+	      }
+	    }
 	    that = this;
 	    return this.constructor._makeInterfaceImmutable(this.getInterface());
 	  }
