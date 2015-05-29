@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.2.3 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.3.0 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -12,7 +12,7 @@
 		exports["capacitor"] = factory(require("lodash"), require("immutable"));
 	else
 		root["capacitor"] = factory(root["lodash"], root["immutable"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_6__, __WEBPACK_EXTERNAL_MODULE_7__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_9__, __WEBPACK_EXTERNAL_MODULE_10__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -66,7 +66,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ActionCreator, Store, actionManager, invariant;
+	var ActionCreator, EntityStore, IndexedListStore, ListStore, Store, actionManager, invariant;
 
 	actionManager = __webpack_require__(2);
 
@@ -74,12 +74,21 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Store = __webpack_require__(4);
 
-	invariant = __webpack_require__(5);
+	EntityStore = __webpack_require__(5);
+
+	ListStore = __webpack_require__(6);
+
+	IndexedListStore = __webpack_require__(7);
+
+	invariant = __webpack_require__(8);
 
 	module.exports = {
 	  actionManager: actionManager,
 	  ActionCreator: ActionCreator,
 	  Store: Store,
+	  EntityStore: EntityStore,
+	  ListStore: ListStore,
+	  IndexedListStore: IndexedListStore,
 	  invariant: invariant
 	};
 
@@ -91,11 +100,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Action, ActionManager, dispatcher, invariant,
 	  __hasProp = {}.hasOwnProperty;
 
-	invariant = __webpack_require__(5);
+	invariant = __webpack_require__(8);
 
-	dispatcher = __webpack_require__(8);
+	dispatcher = __webpack_require__(11);
 
-	Action = __webpack_require__(9);
+	Action = __webpack_require__(12);
 
 	module.exports = new (ActionManager = (function() {
 
@@ -162,11 +171,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Action, ActionCreator, ActionInstance, dispatcher, invariant, _actionID, _requestID;
 
-	dispatcher = __webpack_require__(8);
+	dispatcher = __webpack_require__(11);
 
-	invariant = __webpack_require__(5);
+	invariant = __webpack_require__(8);
 
-	Action = __webpack_require__(9);
+	Action = __webpack_require__(12);
 
 	_actionID = 0;
 
@@ -241,22 +250,22 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Action, Immutable, Signal, Store, cloneDeep, dispatcher, invariant, _,
-	  __hasProp = {}.hasOwnProperty,
+	var Action, Immutable, Signal, Store, dispatcher, invariant, _,
 	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+	  __hasProp = {}.hasOwnProperty,
 	  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-	_ = __webpack_require__(6);
+	_ = __webpack_require__(9);
 
-	Signal = __webpack_require__(11).Signal;
+	Signal = __webpack_require__(14).Signal;
 
-	Action = __webpack_require__(9);
+	Action = __webpack_require__(12);
 
-	dispatcher = __webpack_require__(8);
+	dispatcher = __webpack_require__(11);
 
-	invariant = __webpack_require__(5);
+	invariant = __webpack_require__(8);
 
-	Immutable = __webpack_require__(7);
+	Immutable = __webpack_require__(10);
 
 
 	/*
@@ -280,49 +289,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *			@changed.dispatch()
 	 */
 
-	cloneDeep = function(obj) {
-	  var key, newObj, val, _i, _len;
-	  if (!(_.isObject(obj) || _.isArray(obj))) {
-	    return obj;
-	  }
-	  if (typeof window !== "undefined" && window !== null) {
-	    if (obj instanceof window.Element) {
-	      return obj;
-	    }
-	  }
-	  if (obj instanceof Date) {
-	    return new Date(obj.getTime());
-	  }
-	  newObj = null;
-	  if (_.isObject(obj) && !_.isArray(obj)) {
-	    newObj = {};
-	    if ((obj.clone != null) && typeof obj.clone === 'function') {
-	      newObj = obj.clone();
-	    } else {
-	      for (key in obj) {
-	        if (!__hasProp.call(obj, key)) continue;
-	        val = obj[key];
-	        if (_.isObject(val) || _.isArray(val)) {
-	          newObj[key] = cloneDeep(val);
-	        } else {
-	          newObj[key] = val;
-	        }
-	      }
-	    }
-	  } else {
-	    newObj = [];
-	    if ((obj.clone != null) && typeof obj.clone === 'function') {
-	      newObj = obj.clone();
-	    } else {
-	      for (_i = 0, _len = obj.length; _i < _len; _i++) {
-	        val = obj[_i];
-	        newObj.push(cloneDeep(val));
-	      }
-	    }
-	  }
-	  return newObj;
-	};
-
 	module.exports = Store = (function() {
 
 	  /*
@@ -333,10 +299,25 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 	  /*
+	  	 * @static
+	  	 * @private
+	   */
+
+	  Store._references = null;
+
+
+	  /*
 	  	 * @private
 	   */
 
 	  Store.prototype._properties = null;
+
+
+	  /*
+	  	 * @private
+	   */
+
+	  Store.prototype._cache = null;
 
 
 	  /*
@@ -355,22 +336,72 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 
 	  Store.action = function(action, fn) {
-	    var prop, _ref, _results;
+	    var prop, _ref;
 	    if (this._handlers == null) {
 	      this._handlers = {};
 	    }
-	    invariant(action instanceof Action && typeof fn === "function", "Store.action(...): Provided action should be created via the action manager and a handler must be given as a second parameter.\nIf you're trying to reference a prototype method, don't do that.");
-	    invariant(this._handlers[action] == null, "Store.action(...): You can only define one handler pr action");
+	    invariant(action instanceof Action && typeof fn === "function", "" + this.constructor.name + ".action(...): Provided action should be created via the action \nmanager and a handler must be given as a second parameter.\nIf you're trying to reference a prototype method, don't do that.");
+	    invariant(this._handlers[action] == null, "" + this.constructor.name + ".action(...): You can only define one handler pr action");
 	    this._handlers[action] = fn;
 	    _ref = this.prototype;
-	    _results = [];
 	    for (prop in _ref) {
 	      if (!__hasProp.call(_ref, prop)) continue;
 	      if (fn === this.prototype[prop]) {
-	        _results.push(console.warn("Store.action(...): Action %s is referring to a method on the store prototype (%O).\nThis is bad practice and should be avoided.\nThe handler itself may call prototype methods,\nand is called with the store instance as context for that reason.", action, this));
+	        console.warn("" + this.constructor.name + ".action(...): Action %s is referring to a method on the store prototype (%O).\nThis is bad practice and should be avoided.\nThe handler itself may call prototype methods,\nand is called with the store instance as context for that reason.", action, this);
 	      }
 	    }
-	    return _results;
+	    return null;
+	  };
+
+
+	  /*
+	  	 * Static method for defining a one to one relationship to another store.
+	  	 *
+	  	 * @static
+	  	 * @param {String} key The key that should reference another store
+	  	 * @param {EntityStore} entityStore the entity store that is referenced from this store
+	   */
+
+	  Store.hasOne = function(key, entityStore) {
+	    invariant(entityStore._type === 'entity', "" + this.constructor.name + ".entityReference(...): the entity store specified for the key " + key + " is invalid. \nYou must specify a store that is a descendant of Capacitor.EntityStore.");
+	    if (this._references == null) {
+	      this._references = {};
+	    }
+	    this._references[key] = {
+	      store: entityStore,
+	      type: 'entity'
+	    };
+	    return null;
+	  };
+
+
+	  /*
+	  	 * Static method for defining a one to many relationship to another store.
+	  	 *
+	  	 * @static
+	  	 * @param {String} key The key that should reference another store
+	  	 * @param {ListStore} listStore the list store that is referenced from this store
+	   */
+
+	  Store.hasMany = function(key, listStore) {
+	    invariant(listStore._type === 'list', "" + this.constructor.name + ".listReference(...): the list store specified for the key " + key + " is invalid. \nYou must specify a store that is a descendant of Capacitor.ListStore.");
+	    if (this._references == null) {
+	      this._references = {};
+	    }
+	    this._references[key] = {
+	      store: listStore,
+	      type: 'list'
+	    };
+	    return null;
+	  };
+
+	  Store._makeInterfaceImmutable = function(interfaceObj) {
+	    interfaceObj._type = this._getStoreType();
+	    return Object.freeze(interfaceObj);
+	  };
+
+	  Store._getStoreType = function() {
+	    return 'store';
 	  };
 
 
@@ -380,14 +411,21 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  function Store() {
 	    this._handleAction = __bind(this._handleAction, this);
+	    var that;
 	    dispatcher.register(this);
 	    this._properties = Immutable.Map();
+	    this._cache = Immutable.Map();
 	    this.changed = new Signal;
+	    this._baseInitialized = false;
 	    this.initialize();
-	    return this.getInterface();
+	    invariant(!!this._baseInitialized, "Initialize on the base store wasn't called. You are probably missing a super call on " + this.constructor.name + ".");
+	    that = this;
+	    return this.constructor._makeInterfaceImmutable(this.getInterface());
 	  }
 
-	  Store.prototype.initialize = function() {};
+	  Store.prototype.initialize = function() {
+	    return this._baseInitialized = true;
+	  };
 
 
 	  /*
@@ -396,9 +434,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 
 	  Store.prototype.getInterface = function() {
-	    if ((this.getProxyObject != null) && this.getProxyObject !== Store.prototype.getProxyObject) {
-	      console.warn("Store.getProxyObject() is deprecated use Store.getInterface()");
-	    }
 	    return {
 	      get: this.get.bind(this),
 	      getIn: this.getIn.bind(this),
@@ -407,43 +442,150 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	  };
 
-	  Store.prototype.getProxyObject = function() {
-	    return this.getInterface();
+
+	  /*
+	  	 * Method for caching results, this is used when dereferencing to make sure the same immutable is
+	  	 * returned if the references haven't changed.
+	  	 *
+	  	 * @param {String} name The name for the cache
+	  	 * @param {value} name The value that is written to the cache if it's different from the previous value.
+	   */
+
+	  Store.prototype.cache = function(name, value) {
+	    var last;
+	    last = this._cache.get(name);
+	    if (!Immutable.Iterable.isIterable(last) || !Immutable.is(last, value)) {
+	      this._cache = this._cache.set(name, value);
+	      return value;
+	    }
+	    return last;
 	  };
 
-	  Store.prototype.getIn = function() {
-	    var _ref;
-	    return (_ref = this._properties).getIn.apply(_ref, arguments);
+
+	  /*
+	  	 * Method for dereferencing a value by using the key's related store.
+	  	 *
+	  	 * @param {String} key The key for the value to dereference
+	   */
+
+	  Store.prototype.dereference = function(key) {
+	    var id, reference, result, _ref;
+	    reference = (_ref = this.constructor._references) != null ? _ref[key] : void 0;
+	    invariant((reference != null ? reference.store : void 0) != null, "" + this.constructor.name + ".dereference(...): There's no reference store for the key " + key);
+	    id = this._properties.get(key);
+	    result = null;
+	    if (reference.type === 'entity' && (id != null)) {
+	      invariant(_.isString(id) || _.isNumber(id), "" + this.constructor.name + ".dereference(...): The value for " + key + " was neither a string nor a number.\nThe value of " + key + " should be the id of the item that " + key + " is a reference to.");
+	      result = reference.store.getItem(id);
+	    } else if (reference.type === 'list') {
+	      result = reference.store.getItems();
+	    }
+	    return result;
 	  };
 
-	  Store.prototype.get = function(name) {
+	  Store.prototype.getIn = function(path) {
+	    var key, result, _i, _len;
+	    invariant(_.isArray(path), "" + this.constructor.name + ".getIn(...): Path should be an array.");
+	    result = this.get();
+	    for (_i = 0, _len = path.length; _i < _len; _i++) {
+	      key = path[_i];
+	      if (result != null ? result.get : void 0) {
+	        result = result.get(key);
+	      } else {
+	        result = void 0;
+	      }
+	    }
+	    return result;
+	  };
+
+	  Store.prototype.getRawIn = function(path) {
+	    var key, result, _i, _len;
+	    invariant(_.isArray(path), "" + this.constructor.name + ".getIn(...): Path should be an array.");
+	    result = this.getRaw();
+	    for (_i = 0, _len = path.length; _i < _len; _i++) {
+	      key = path[_i];
+	      if (result != null ? result.get : void 0) {
+	        result = result.get(key);
+	      } else {
+	        result = void 0;
+	      }
+	    }
+	    return result;
+	  };
+
+	  Store.prototype.get = function(key) {
+	    var dereferencedProperties, references, that, val, _ref;
+	    val = null;
+	    if (key != null) {
+	      invariant(_.isString(key), "" + this.constructor.name + ".get(...): first parameter should be undefined or a string");
+	      if (((_ref = this.constructor._references) != null ? _ref[key] : void 0) != null) {
+	        val = this.dereference(key);
+	      } else {
+	        val = this._properties.get(key);
+	      }
+	    } else {
+	      references = this.constructor._references;
+	      if (references != null) {
+	        that = this;
+	        dereferencedProperties = this._properties.withMutations(function(map) {
+	          var _results;
+	          _results = [];
+	          for (key in references) {
+	            _results.push(map.set(key, that.dereference(key)));
+	          }
+	          return _results;
+	        });
+	        val = this.cache('dereffed_props', dereferencedProperties);
+	      } else {
+	        val = this._properties;
+	      }
+	    }
+	    return val;
+	  };
+
+	  Store.prototype.getRaw = function(key) {
 	    var val;
 	    val = null;
-	    if (name != null) {
-	      invariant(_.isString(name) || _.isArray(name), "Store.get(...): first parameter should be undefined, a string, or an array of keys.");
-	      if (_.isArray(name)) {
-	        val = this._properties.filter(function(val, key) {
-	          return __indexOf.call(name, key) >= 0;
-	        });
-	      } else if (_.isString(name)) {
-	        val = this._properties.get(name);
-	      }
+	    if (key != null) {
+	      invariant(_.isString(key), "" + this.constructor.name + ".get(...): first parameter should be undefined or a string");
+	      val = this._properties.get(key);
 	    } else {
 	      val = this._properties;
 	    }
 	    return val;
 	  };
 
-	  Store.prototype.set = function(name, val) {
-	    var obj;
-	    invariant(_.isObject(name) || _.isString(name) && (val != null), "Store.set(...): You can only set an object or pass a string and a value.\nUse Store.unset(" + name + ") to unset the property.");
-	    if (_.isString(name)) {
+	  Store.prototype.validateReferenceOnSet = function(type, key, value) {
+	    switch (type) {
+	      case 'entity':
+	        invariant(_.isString(value) || _.isNumber(value), "" + this.constructor.name + ".set(...): " + key + " must be an id for an entity on the referenced store.\nIe. either a string or a number.");
+	        return value;
+	      case 'list':
+	        console.warn("" + this.constructor.name + ".set(...): " + key + " is a reference to a list store.\nYou can't set a value for a reference to a list store. Defaulting to null.");
+	        return null;
+	    }
+	  };
+
+	  Store.prototype.set = function(key, val) {
+	    var keys, obj, references, values;
+	    invariant(_.isObject(key) || _.isString(key) && (val != null), "" + this.constructor.name + ".set(...): You can only set an object or pass a string and a value.\nUse " + this.constructor.name + ".unset(" + key + ") to unset the property.");
+	    if (_.isString(key)) {
 	      obj = {};
-	      obj[name] = Immutable.fromJS(val);
+	      obj[key] = Immutable.fromJS(val);
 	      this._properties = this._properties.merge(Immutable.Map(obj));
 	    }
-	    if (_.isObject(name)) {
-	      this._properties = this._properties.merge(Immutable.fromJS(name));
+	    if (_.isObject(key)) {
+	      keys = key;
+	      values = {};
+	      references = this.constructor._references;
+	      for (key in keys) {
+	        if (__indexOf.call(_.keys(references), key) >= 0) {
+	          values[key] = this.validateReferenceOnSet(references[key].type, key, keys[key]);
+	        } else {
+	          values[key] = keys[key];
+	        }
+	      }
+	      this._properties = this._properties.merge(Immutable.fromJS(values));
 	    }
 	    return this;
 	  };
@@ -459,7 +601,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Store.prototype.unset = function(name) {
-	    invariant(_.isString(name), "Store.unset(...): first parameter must be a string.");
+	    invariant(_.isString(name), "" + this.constructor.name + ".unset(...): first parameter must be a string.");
 	    if (this._properties[name] != null) {
 	      delete (this._properties = this._properties.remove(name));
 	    }
@@ -467,7 +609,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Store.prototype.getCurrentActionID = function() {
-	    invariant(this._currentActionInstance != null, "Action id is only available inside an action handler, in the current event loop iteration.\nIf you need to, you can call this function before you do any asynchronous work.");
+	    invariant(this._currentActionInstance != null, "Action id is only available inside an action handler, in the current event loop iteration.");
 	    return this._currentActionInstance.actionID;
 	  };
 
@@ -499,9 +641,512 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var EntityStore, Immutable, Store, invariant, _,
+	  __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+	Store = __webpack_require__(4);
+
+	invariant = __webpack_require__(8);
+
+	Immutable = __webpack_require__(10);
+
+	_ = __webpack_require__(9);
+
+	module.exports = EntityStore = (function(_super) {
+	  __extends(EntityStore, _super);
+
+	  function EntityStore() {
+	    return EntityStore.__super__.constructor.apply(this, arguments);
+	  }
+
+	  EntityStore.hasMany = function(key, listStore) {
+	    if (arguments.length === 1) {
+	      return {
+	        through: (function(_this) {
+	          return function(indexedListStore) {
+	            invariant(indexedListStore._type === 'indexed-list', "" + _this.constructor.name + ".hasMany(...).through(...): the indexed list store specified for the key " + key + " is invalid.\nYou must specify a store that is a descendant of Capacitor.IndexedListStore.");
+	            if (_this._references == null) {
+	              _this._references = {};
+	            }
+	            _this._references[key] = {
+	              store: indexedListStore,
+	              type: 'indexed-list'
+	            };
+	            return null;
+	          };
+	        })(this)
+	      };
+	    }
+	    return EntityStore.__super__.constructor.hasMany.apply(this, arguments);
+	  };
+
+	  EntityStore._getStoreType = function() {
+	    return 'entity';
+	  };
+
+
+	  /*
+	  	 * Dereferences a specific key on an item, similar to Store.dereference.
+	  	 *
+	  	 * @overrides Store::dereference
+	  	 * @param {Immutable.Map} item The item that will be dereferenced
+	  	 * @param {String} key The key on the item to dereference
+	   */
+
+	  EntityStore.prototype.dereference = function(item, key) {
+	    var id, reference, result, _ref;
+	    reference = (_ref = this.constructor._references) != null ? _ref[key] : void 0;
+	    invariant((reference != null ? reference.store : void 0) != null, "" + this.constructor.name + ".dereference(...): There's no reference store for the key " + key);
+	    id = item.get(key);
+	    result = null;
+	    if (reference.type === 'entity' && (id != null)) {
+	      invariant(_.isString(id) || _.isNumber(id), "" + this.constructor.name + ".dereference(...): The value for " + key + " was neither a string nor a number.\nThe value of " + key + " should be the id of the item that {key} is a reference to.");
+	      result = reference.store.getItem(id);
+	    } else if (reference.type === 'list') {
+	      result = reference.store.getItems();
+	    } else if (reference.type === 'indexed-list') {
+	      result = reference.store.getItems(item.get('id'));
+	    }
+	    return result;
+	  };
+
+
+	  /*
+	  	 * Dereferences all defined relationships on an item
+	  	 *
+	  	 * @param {Immutable.Map} item The item to dereference
+	   */
+
+	  EntityStore.prototype.dereferenceItem = function(item) {
+	    var dereferencedProperties, references, that, val;
+	    references = this.constructor._references;
+	    if (references != null) {
+	      that = this;
+	      dereferencedProperties = item.withMutations(function(map) {
+	        var key, _results;
+	        _results = [];
+	        for (key in references) {
+	          _results.push(map.set(key, that.dereference(item, key)));
+	        }
+	        return _results;
+	      });
+	      return val = this.cache("dereffed-item-" + (item.get('id')), dereferencedProperties);
+	    } else {
+	      return val = item;
+	    }
+	  };
+
+	  EntityStore.prototype.initialize = function() {
+	    EntityStore.__super__.initialize.apply(this, arguments);
+	    return this.set('items', Immutable.Map());
+	  };
+
+	  EntityStore.prototype.getInterface = function() {
+	    var interfaceObj;
+	    interfaceObj = EntityStore.__super__.getInterface.apply(this, arguments);
+	    interfaceObj.getItem = this.getItem.bind(this);
+	    interfaceObj.getItemsWithIds = this.getItemsWithIds.bind(this);
+	    interfaceObj.getItems = this.getItems.bind(this);
+	    return interfaceObj;
+	  };
+
+	  EntityStore.prototype.setItem = function(item) {
+	    if (!Immutable.Iterable.isIterable(item)) {
+	      item = Immutable.fromJS(item);
+	    }
+	    invariant(item.get('id') != null, "" + this.constructor.name + ".addItem(...): Can't add an item with no id (item.id is missing).");
+	    return this.setItems(this.get('items').set(item.get('id'), item));
+	  };
+
+	  EntityStore.prototype.setItems = function(items) {
+	    invariant(Immutable.Map.isMap(items), "" + this.constructor.name + ".addItem(...): items has to be an immutable map.");
+	    return this.set('items', items);
+	  };
+
+	  EntityStore.prototype.getItem = function(id) {
+	    invariant(_.isString(id) || _.isNumber(id), "" + this.constructor.name + ".addItem(...): id has to be either a string or a number.");
+	    return this.dereferenceItem(this.get('items').get(id));
+	  };
+
+	  EntityStore.prototype.getRawItem = function(id) {
+	    return this.getRawItems().get(id);
+	  };
+
+	  EntityStore.prototype.getItems = function() {
+	    return this.cache('items', this.get('items').map((function(_this) {
+	      return function(item) {
+	        return _this.dereferenceItem(item);
+	      };
+	    })(this)));
+	  };
+
+	  EntityStore.prototype.getRawItems = function() {
+	    return this.get('items');
+	  };
+
+
+	  /*
+	  	 * Method for getting values from this store, with dereferencing disabled.
+	  	 * References for an entity store is defined for the items not for the store itself.
+	  	 *
+	  	 * @overrides Store::get
+	   */
+
+	  EntityStore.prototype.get = function(key) {
+	    var val;
+	    val = null;
+	    if (key != null) {
+	      invariant(_.isString(key), "" + this.constructor.name + ".get(...): first parameter should be undefined or a string");
+	      val = this._properties.get(key);
+	    } else {
+	      val = this._properties;
+	    }
+	    return val;
+	  };
+
+
+	  /*
+	  	 * This method does not guarantee the same list to be returned for the same set of ids.
+	  	 * That said, the items contained in the list are gauranteed to be equal to the items in other lists.
+	  	 * If you require getting the same List instance on every call, you must cache the results yourself.
+	  	 * Use Store::cache for this.
+	  	 *
+	  	 * @return The items with the given ids, in the same order as specified in ids
+	   */
+
+	  EntityStore.prototype.getItemsWithIds = function(ids) {
+	    var id, items, result, _i, _len;
+	    if (Immutable.Iterable.isIterable(ids)) {
+	      ids = ids.toJS();
+	    }
+	    result = [];
+	    items = this.get('items');
+	    for (_i = 0, _len = ids.length; _i < _len; _i++) {
+	      id = ids[_i];
+	      if (items.has(id)) {
+	        result.push(this.getItem(id));
+	      }
+	    }
+	    return Immutable.List(result);
+	  };
+
+	  EntityStore.prototype.getRawItemsWithIds = function(ids) {
+	    var id, items, result, _i, _len;
+	    if (Immutable.Iterable.isIterable(ids)) {
+	      ids = ids.toJS();
+	    }
+	    result = [];
+	    items = this.get('items');
+	    for (_i = 0, _len = ids.length; _i < _len; _i++) {
+	      id = ids[_i];
+	      if (items.has(id)) {
+	        result.push(this.getRawItem(id));
+	      }
+	    }
+	    return Immutable.List(result);
+	  };
+
+	  EntityStore.prototype.removeItem = function(id) {
+	    var items;
+	    items = this.get('items');
+	    return this.set('items', items.remove(id));
+	  };
+
+	  return EntityStore;
+
+	})(Store);
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Immutable, ListStore, Store, invariant, _,
+	  __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+	Store = __webpack_require__(4);
+
+	invariant = __webpack_require__(8);
+
+	Immutable = __webpack_require__(10);
+
+	_ = __webpack_require__(9);
+
+	module.exports = ListStore = (function(_super) {
+	  __extends(ListStore, _super);
+
+	  function ListStore() {
+	    return ListStore.__super__.constructor.apply(this, arguments);
+	  }
+
+	  ListStore.hasOne = function() {
+	    throw new Error("" + this.constructor.name + ".hasOne(...): You can't define relationships on a list store");
+	  };
+
+	  ListStore.hasMany = function() {
+	    throw new Error("" + this.constructor.name + ".hasMany(...): You can't define relationships on a list store");
+	  };
+
+	  ListStore._getStoreType = function() {
+	    return 'list';
+	  };
+
+	  ListStore.prototype.containsEntity = null;
+
+	  ListStore.prototype.getInterface = function() {
+	    var interfaceObj;
+	    interfaceObj = ListStore.__super__.getInterface.apply(this, arguments);
+	    interfaceObj.getItems = this.getItems.bind(this);
+	    interfaceObj.getItem = this.getItem.bind(this);
+	    return interfaceObj;
+	  };
+
+	  ListStore.prototype.initialize = function() {
+	    ListStore.__super__.initialize.apply(this, arguments);
+	    invariant(this.containsEntity != null, "ListStore.initialize(...): Missing @containsEntity property. \nYou need to define an entity store to use the list store.");
+	    this.setIds(Immutable.List());
+	    return this.containsEntity.changed.add((function(_this) {
+	      return function() {
+	        return _this.changed.dispatch();
+	      };
+	    })(this));
+	  };
+
+	  ListStore.prototype.add = function(ids) {
+	    var currentIds, id, _i, _len;
+	    if (Immutable.Iterable.isIterable(ids)) {
+	      ids = ids.toJS();
+	    }
+	    invariant(_.isNumber(ids) || _.isString(ids) || _.isArray(ids), "ListStore.add(...): Add only accepts an id or an array of ids.");
+	    if (!_.isArray(ids)) {
+	      ids = [ids];
+	    }
+	    currentIds = this.getIds();
+	    for (_i = 0, _len = ids.length; _i < _len; _i++) {
+	      id = ids[_i];
+	      if (!currentIds.includes(id)) {
+	        currentIds = currentIds.push(id);
+	      }
+	    }
+	    return this.setIds(currentIds);
+	  };
+
+	  ListStore.prototype.remove = function(id) {
+	    var currentIds, indexOf;
+	    currentIds = this.getIds();
+	    indexOf = currentIds.indexOf(id);
+	    invariant(indexOf !== -1, "ListStore.remove(...): Id " + id + " was not found in the store");
+	    currentIds = currentIds.remove(indexOf);
+	    return this.setIds(currentIds);
+	  };
+
+	  ListStore.prototype.reset = function(ids) {
+	    if (Immutable.Iterable.isIterable(ids)) {
+	      ids = ids.toJS();
+	    }
+	    invariant((ids == null) || _.isNumber(ids) || _.isString(ids) || _.isArray(ids), "ListStore.reset(...): Reset only accepts an id, an array of ids or nothing.");
+	    if (ids != null) {
+	      if (!_.isArray(ids)) {
+	        ids = [ids];
+	      }
+	    } else {
+	      ids = [];
+	    }
+	    return this.setIds(Immutable.List(ids));
+	  };
+
+	  ListStore.prototype.getIds = function() {
+	    return this.get('ids');
+	  };
+
+	  ListStore.prototype.setIds = function(ids) {
+	    return this.set('ids', ids);
+	  };
+
+	  ListStore.prototype.getItems = function() {
+	    var ids, items;
+	    ids = this.getIds();
+	    items = this.containsEntity.getItemsWithIds(ids);
+	    return this.cache('ids_items', items);
+	  };
+
+	  ListStore.prototype.getItem = function(id) {
+	    if (this.get('ids').includes(id)) {
+	      return this.containsEntity.getItem(id);
+	    }
+	    return null;
+	  };
+
+	  return ListStore;
+
+	})(Store);
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Immutable, IndexedListStore, Store, invariant, _,
+	  __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+	Store = __webpack_require__(4);
+
+	invariant = __webpack_require__(8);
+
+	Immutable = __webpack_require__(10);
+
+	_ = __webpack_require__(9);
+
+	module.exports = IndexedListStore = (function(_super) {
+	  __extends(IndexedListStore, _super);
+
+	  function IndexedListStore() {
+	    return IndexedListStore.__super__.constructor.apply(this, arguments);
+	  }
+
+	  IndexedListStore.hasOne = function() {
+	    throw new Error("" + this.constructor.name + ".hasOne(...): You can't define relationships on an indexed list store");
+	  };
+
+	  IndexedListStore.hasMany = function() {
+	    throw new Error("" + this.constructor.name + ".hasMany(...): You can't define relationships on an indexed list store");
+	  };
+
+	  IndexedListStore._getStoreType = function() {
+	    return 'indexed-list';
+	  };
+
+	  IndexedListStore.prototype.containsEntity = null;
+
+	  IndexedListStore.prototype.getInterface = function() {
+	    var interfaceObj;
+	    interfaceObj = IndexedListStore.__super__.getInterface.apply(this, arguments);
+	    interfaceObj.getItems = this.getItems.bind(this);
+	    interfaceObj.getItem = this.getItem.bind(this);
+	    return interfaceObj;
+	  };
+
+	  IndexedListStore.prototype.initialize = function() {
+	    IndexedListStore.__super__.initialize.apply(this, arguments);
+	    invariant(this.containsEntity != null, "IndexedListStore.initialize(...): Missing @containsEntity property. \nYou need to define an entity store to use the IndexedIndexedListStore.");
+	    this.set('map', Immutable.Map({}));
+	    return this.containsEntity.changed.add((function(_this) {
+	      return function() {
+	        return _this.changed.dispatch();
+	      };
+	    })(this));
+	  };
+
+	  IndexedListStore.prototype.add = function(index, ids) {
+	    var currentIds, existingType, id, _i, _len;
+	    invariant(_.isNumber(index) || _.isString(index), "IndexedListStore.add(...): First parameter should be a number (id) or a string identifier.");
+	    invariant(_.isNumber(ids) || _.isString(ids) || _.isArray(ids), "IndexedListStore.add(...): Second parameter should be a number or string (id) or an array of numbers (ids).");
+	    if (!_.isArray(ids)) {
+	      ids = [ids];
+	    }
+	    currentIds = this.getIds(index);
+	    existingType = ids.size > 0 ? typeof ids[0] : null;
+	    if (currentIds.size > 0) {
+	      existingType = typeof currentIds.get(0);
+	    } else if (ids.length > 0) {
+	      existingType = typeof ids[0];
+	    }
+	    for (_i = 0, _len = ids.length; _i < _len; _i++) {
+	      id = ids[_i];
+	      if (!(!currentIds.includes(id))) {
+	        continue;
+	      }
+	      invariant(existingType === typeof id, "IndexedListStore.add(...): Trying to mix numbers and strings as ids");
+	      currentIds = currentIds.push(id);
+	    }
+	    return this.setIds(index, currentIds);
+	  };
+
+	  IndexedListStore.prototype.getIds = function(index) {
+	    var _ref;
+	    return (_ref = this.get('map').get(index)) != null ? _ref : Immutable.List([]);
+	  };
+
+	  IndexedListStore.prototype.setIds = function(index, ids) {
+	    var map, t;
+	    ids = Immutable.fromJS(ids);
+	    map = this.get('map');
+	    if (ids.size > 0) {
+	      t = typeof (ids.get(0));
+	      invariant(t === 'number' || t === 'string', "IndexedListStore.setIds(...) type of ids must be a number or a string");
+	      invariant(ids.find(function(e) {
+	        return typeof e !== t;
+	      }) == null, "IndexedListStore.setIds(...) mixed numbers and strings in ids");
+	    }
+	    map = map.set(index, ids);
+	    return this.set('map', map);
+	  };
+
+	  IndexedListStore.prototype.remove = function(index, id) {
+	    var currentIds, indexOf;
+	    currentIds = this.getIds(index);
+	    indexOf = currentIds.indexOf(id);
+	    invariant(indexOf !== -1, "ListStore.remove(...): Id " + id + " was not found in the store");
+	    currentIds = currentIds.remove(indexOf);
+	    return this.setIds(index, currentIds);
+	  };
+
+	  IndexedListStore.prototype.removeIndex = function(index) {
+	    var map;
+	    map = this.get('map');
+	    map = map.remove(index);
+	    this.set('map', map);
+	    return this.unset('cached_list_' + index);
+	  };
+
+	  IndexedListStore.prototype.resetAll = function() {
+	    return this.set('map', Immutable.Map({}));
+	  };
+
+	  IndexedListStore.prototype.reset = function(index, ids) {
+	    invariant(index != null, "IndexedListStore.reset(...): No index was provided.");
+	    invariant((ids == null) || (_.isNumber(ids) || _.isString(ids) || _.isArray(ids)), "IndexedListStore.reset(...): Reset only accepts an id, an array of ids or nothing as the second parameter.");
+	    if (ids != null) {
+	      if (!_.isArray(ids)) {
+	        ids = [ids];
+	      }
+	    } else {
+	      ids = [];
+	    }
+	    return this.setIds(index, ids);
+	  };
+
+	  IndexedListStore.prototype.getItems = function(index) {
+	    var ids, items;
+	    ids = this.getIds(index);
+	    items = this.containsEntity.getItemsWithIds(ids);
+	    return this.cache('cached_list_' + index, items);
+	  };
+
+	  IndexedListStore.prototype.getItem = function(index, id) {
+	    var ids;
+	    ids = this.getIds(index);
+	    if (ids.includes(id)) {
+	      return this.containsEntity.getItem(id);
+	    }
+	    return null;
+	  };
+
+	  return IndexedListStore;
+
+	})(Store);
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var InvariantError;
 
-	InvariantError = __webpack_require__(10);
+	InvariantError = __webpack_require__(13);
 
 
 	/*
@@ -531,28 +1176,28 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 6 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_6__;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_9__;
 
 /***/ },
-/* 7 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_7__;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_10__;
 
 /***/ },
-/* 8 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Dispatcher, Signal, invariant,
 	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
 	  __slice = [].slice;
 
-	invariant = __webpack_require__(5);
+	invariant = __webpack_require__(8);
 
-	Signal = __webpack_require__(11).Signal;
+	Signal = __webpack_require__(14).Signal;
 
 	'use strict';
 
@@ -761,12 +1406,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 9 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Action, dispatcher;
 
-	dispatcher = __webpack_require__(8);
+	dispatcher = __webpack_require__(11);
 
 	Action = (function() {
 
@@ -796,7 +1441,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 10 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var InvariantError,
@@ -817,7 +1462,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*jslint onevar:true, undef:true, newcap:true, regexp:true, bitwise:true, maxerr:50, indent:4, white:false, nomen:false, plusplus:false */
