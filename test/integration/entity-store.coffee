@@ -152,6 +152,45 @@ describe 'EntityStore', () ->
 		expect UserStore._references.articles2.store
 		.to.be.equal usersArticles
 
+	it 'should change when relationships change', () ->
+
+		profile = new class ProfileStore extends EntityStore
+
+			initialize: () ->
+				super
+				@setItem {id: 1, value: 'test'}
+
+		article = new class ArticleStore extends EntityStore
+
+			initialize: () ->
+				super
+				@setItem {id: 1, title: 'test article'}
+
+		usersArticles = new class UserArticleStore extends IndexedListStore
+
+			containsEntity: article
+			initialize: () ->
+				super
+				@add 1, 1
+
+		user = new class UserStore extends EntityStore
+
+			@hasOne 'profile', profile
+			@hasMany('articles').through(usersArticles)
+
+			initialize: () ->
+				super
+				@setItem {id: 1, name: "John Doe"}
+
+		changed = sinon.spy()
+		user.changed.add changed
+
+		profile.changed.dispatch()
+		usersArticles.changed.dispatch()
+
+		expect changed.callCount
+		.to.equal 2
+
 	it 'should return null when the property value for a one to one relationship is undefined', () ->
 		profile = new class ProfileStore extends EntityStore
 

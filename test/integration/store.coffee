@@ -137,6 +137,36 @@ describe 'Store', () ->
 		expect TestStore._references.testEntities2.store
 		.to.be.equal list
 
+	it 'should change when relation changes', () ->
+
+		entity = new class TestEntityStore extends EntityStore
+
+			initialize: () ->
+				super
+				@setItem {id: 1, value: 'test'}
+
+		list = new class TestListStore extends ListStore
+
+			containsEntity: entity
+			initialize: () ->
+				super
+				@add 1
+
+		store = new class TestStore extends Store
+
+			@hasOne 'testEntity', entity
+			@hasMany 'testEntities', list
+
+		changed = sinon.spy()
+		store.changed.add changed
+
+		list.changed.dispatch()
+		entity.changed.dispatch()
+
+		# When entity changes, list changes again so we expect 3 change events, not 2
+		expect changed.callCount
+		.to.equal 3
+
 	it 'should return null when the property value for a one to one relationship is undefined', () ->
 		entity = new class TestEntityStore extends EntityStore
 

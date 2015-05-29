@@ -66,7 +66,7 @@ module.exports = class Store
 		@_handlers ?= {}
 		invariant action instanceof Action and typeof fn is "function",
 			"""
-			#{@constructor.name}.action(...): Provided action should be created via the action 
+			#{@constructor.name}.action(...): Provided action should be created via the action
 			manager and a handler must be given as a second parameter.
 			If you're trying to reference a prototype method, don't do that.
 			"""
@@ -94,7 +94,7 @@ module.exports = class Store
 	###
 	@hasOne: (key, entityStore) ->
 		invariant entityStore._type is 'entity', """
-			#{@constructor.name}.entityReference(...): the entity store specified for the key #{key} is invalid. 
+			#{@constructor.name}.entityReference(...): the entity store specified for the key #{key} is invalid.
 			You must specify a store that is a descendant of Capacitor.EntityStore.
 		"""
 		@_references ?= {}
@@ -110,7 +110,7 @@ module.exports = class Store
 	###
 	@hasMany: (key, listStore) ->
 		invariant listStore._type is 'list', """
-			#{@constructor.name}.listReference(...): the list store specified for the key #{key} is invalid. 
+			#{@constructor.name}.listReference(...): the list store specified for the key #{key} is invalid.
 			You must specify a store that is a descendant of Capacitor.ListStore.
 		"""
 		@_references ?= {}
@@ -142,6 +142,11 @@ module.exports = class Store
 		invariant !!@_baseInitialized, """
 			Initialize on the base store wasn't called. You are probably missing a super call on #{@constructor.name}.
 		"""
+
+		# Set up change listeners on relationships
+		if @constructor._references?
+			for key, reference of @constructor._references
+				reference.store.changed.add () => @changed.dispatch()
 
 		# Return proxy object used to interact with this store
 		that = @
@@ -237,7 +242,7 @@ module.exports = class Store
 			references = @constructor._references
 			if references?
 				that = this
-				dereferencedProperties = @_properties.withMutations (map) -> 
+				dereferencedProperties = @_properties.withMutations (map) ->
 					for key of references
 						map.set key, that.dereference(key)
 				val = @cache 'dereffed_props', dereferencedProperties
@@ -287,7 +292,7 @@ module.exports = class Store
 			keys = key
 			values = {}
 			references = @constructor._references
-			for key of keys 
+			for key of keys
 				if key in _.keys(references)
 					values[key] = @validateReferenceOnSet references[key].type, key, keys[key]
 				else
