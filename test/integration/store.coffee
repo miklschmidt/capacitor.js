@@ -227,6 +227,30 @@ describe 'Store', () ->
 		expect first
 		.to.equal second
 
+	it 'should not try to dereference nonexistant items', () ->
+
+		entity2 = new class TestEntity2Store extends EntityStore
+
+		list = new class TestListStore extends IndexedListStore
+			containsEntity: entity2
+			initialize: () ->
+				super
+				@add 1, 1
+
+		entity = new class TestEntityStore extends EntityStore
+			@hasMany('testEntities').through(list)
+
+		store = new class TestStore extends Store
+
+			@hasOne 'testEntity', entity
+
+			initialize: () ->
+				super
+				@set id: 1, testEntity: 1
+
+		expect store.get('testEntity')
+		.to.not.exist
+
 	it 'should not dereference when using Raw methods', () ->
 
 		entity = new class TestEntityStore extends EntityStore

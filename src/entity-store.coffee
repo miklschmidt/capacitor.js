@@ -61,7 +61,7 @@ module.exports = class EntityStore extends Store
 		references = @constructor._references
 		if references?
 			that = this
-			dereferencedProperties = item.withMutations (map) -> 
+			dereferencedProperties = item.withMutations (map) ->
 				for key of references
 					map.set key, that.dereference(item, key)
 			val = @cache "dereffed-item-#{item.get('id')}", dereferencedProperties
@@ -99,14 +99,17 @@ module.exports = class EntityStore extends Store
 		invariant _.isString(id) or _.isNumber(id), """
 			#{@constructor.name}.addItem(...): id has to be either a string or a number.
 		"""
-		@dereferenceItem @get('items').get(id)
+		result = null
+		item = @get('items').get(id)
+		result = @dereferenceItem item if item?
+		return result
 
 	getRawItem: (id) ->
 		@getRawItems().get(id)
 
 	getItems: () ->
 		@cache 'items',  @get('items').map (item) => @dereferenceItem item
-		
+
 	getRawItems: () ->
 		@get('items')
 
@@ -114,7 +117,7 @@ module.exports = class EntityStore extends Store
 	# Method for getting values from this store, with dereferencing disabled.
 	# References for an entity store is defined for the items not for the store itself.
 	#
-	# @overrides Store::get 
+	# @overrides Store::get
 	###
 	get: (key) ->
 		val = null

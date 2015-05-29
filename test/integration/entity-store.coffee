@@ -182,7 +182,7 @@ describe 'EntityStore', () ->
 		user = new class UserStore extends EntityStore
 
 			@hasOne 'profile', profile
-			
+
 			initialize: () ->
 				super
 				@setItem {id: 1, profile: 1}
@@ -244,7 +244,7 @@ describe 'EntityStore', () ->
 
 			@hasOne 'profile', profile
 			@hasMany('articles').through(usersArticles)
-			
+
 			initialize: () ->
 				super
 				@setItem {id: 1, profile: 1, articles: 1}
@@ -255,6 +255,32 @@ describe 'EntityStore', () ->
 		expect first
 		.to.be.equal second
 
+	it 'should not attempt to dereference items that do not exist', () ->
+
+
+		article = new class ArticleStore extends EntityStore
+
+		usersArticles = new class UserArticleStore extends IndexedListStore
+
+			containsEntity: article
+
+			initialize: () ->
+				super
+				@add 1, 1
+
+		profile = new class ProfileStore extends EntityStore
+			@hasMany('articles').through(usersArticles)
+
+		user = new class UserStore extends EntityStore
+
+			@hasOne 'profile', profile
+
+			initialize: () ->
+				super
+				@setItem {id: 1, profile: 1, articles: 1}
+
+		expect user.getItem(1).get('profile')
+		.to.not.exist
 
 	it 'should not dereference when using Raw methods', () ->
 
@@ -282,7 +308,7 @@ describe 'EntityStore', () ->
 
 			@hasOne 'profile', profile
 			@hasMany('articles').through(usersArticles)
-			
+
 			dereference: sinon.spy()
 
 			initialize: () ->
@@ -290,7 +316,7 @@ describe 'EntityStore', () ->
 				@setItem {id: 1, profile: 1, articles: 1}
 
 				item = @getRawItem(1)
-			
+
 				expect item
 				.to.exist
 
