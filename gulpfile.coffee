@@ -29,15 +29,6 @@ gulp.task 'git', () ->
 				throw err if err?
 				gutil.log gutil.colors.green "Version #{gutil.env.version} has been tagged"
 
-			prompt.confirm
-				message: 'Are you sure you want to push and publish to NPM?',
-				default: no
-			, (res) ->
-				if res
-					# exec "git push && npm publish", (err, stdout) ->
-						# throw err if err?
-					gutil.log gutil.colors.green "Version #{gutil.env.version} has been deployed"
-
 
 gulp.task 'test', () ->
 	# Load and run the test files.
