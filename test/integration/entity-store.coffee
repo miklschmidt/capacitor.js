@@ -1,13 +1,15 @@
-EntityStore = require '../../src/entity-store'
+EntityStore      = require '../../src/entity-store'
 IndexedListStore = require '../../src/indexed-list-store'
-ListStore = require '../../src/list-store'
-Store = require '../../src/store'
+ListStore        = require '../../src/list-store'
+Store            = require '../../src/store'
+ActionCreator    = require '../../src/action-creator'
+actionManager    = require '../../src/action-manager'
+invariant        = require '../../src/invariant'
+InvariantError   = require '../../src/invariant-error'
 
-invariant = require '../../src/invariant'
-InvariantError = require '../../src/invariant-error'
-{expect} = require 'chai'
-Immutable = require 'immutable'
-sinon = require 'sinon'
+{expect}         = require 'chai'
+Immutable        = require 'immutable'
+sinon            = require 'sinon'
 
 describe 'EntityStore', () ->
 
@@ -154,7 +156,12 @@ describe 'EntityStore', () ->
 
 	it 'should change when relationships change', () ->
 
+		action = actionManager.create 'entity-store-relationship-change-test-action'
+
 		profile = new class ProfileStore extends EntityStore
+
+			@action action, () ->
+				@changed()
 
 			initialize: () ->
 				super
@@ -172,6 +179,9 @@ describe 'EntityStore', () ->
 				@setItem {id: 1, title: 'test article'}
 
 		usersArticles = new class UserArticleStore extends IndexedListStore
+
+			@action action, () ->
+				@changed()
 
 			containsEntity: article
 			initialize: () ->
@@ -200,6 +210,18 @@ describe 'EntityStore', () ->
 
 		expect changed.callCount
 		.to.equal 2
+
+		changedViaAction = sinon.spy()
+
+		user.changed.add changedViaAction
+
+		creator = new class TestActionCreator extends ActionCreator
+		creator.dispatch action
+
+		# Batched change events so only 1 change event should be dispatched.
+		# Even though both the profile and the usersArticles are changed.
+		expect changedViaAction.callCount
+		.to.equal 1
 
 	it 'should return null when the property value for a one to one relationship is undefined', () ->
 		profile = new class ProfileStore extends EntityStore

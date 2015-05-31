@@ -4,10 +4,13 @@ ListStore        = require '../../src/list-store'
 IndexedListStore = require '../../src/indexed-list-store'
 invariant        = require '../../src/invariant'
 InvariantError   = require '../../src/invariant-error'
+ActionCreator    = require '../../src/action-creator'
+actionManager    = require '../../src/action-manager'
 
 {expect}         = require 'chai'
 Immutable        = require 'immutable'
 sinon            = require 'sinon'
+
 
 describe 'Store', () ->
 
@@ -139,7 +142,16 @@ describe 'Store', () ->
 
 	it 'should change when relation changes', () ->
 
+		action = actionManager.create 'store-relationship-change-test-action'
+
 		entity = new class TestEntityStore extends EntityStore
+
+			@action action, () ->
+				# Just to make sure the batch process works.
+				@changed()
+				@changed()
+				@changed()
+				@changed()
 
 			initialize: () ->
 				super
@@ -151,6 +163,13 @@ describe 'Store', () ->
 				obj
 
 		list = new class TestListStore extends ListStore
+
+			@action action, () ->
+				# Just to make sure the batch process works.
+				@changed()
+				@changed()
+				@changed()
+				@changed()
 
 			containsEntity: entity
 			initialize: () ->
@@ -176,6 +195,18 @@ describe 'Store', () ->
 		# When entity changes, list changes again so we expect 3 change events, not 2
 		expect changed.callCount
 		.to.equal 3
+
+		changedViaAction = sinon.spy()
+
+		store.changed.add changedViaAction
+
+		creator = new class TestActionCreator extends ActionCreator
+		creator.dispatch action
+
+		# Batched change events so only 1 change event should be dispatched.
+		# Even though both the profile and the usersArticles are changed.
+		expect changedViaAction.callCount
+		.to.equal 1
 
 	it 'should return null when the property value for a one to one relationship is undefined', () ->
 		entity = new class TestEntityStore extends EntityStore
