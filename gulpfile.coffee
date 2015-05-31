@@ -6,6 +6,38 @@ gutil   = require 'gulp-util'
 fs      = require 'fs'
 path    = require 'path'
 webpack = require 'webpack'
+exec    = require('child_process').exec
+prompt  = require 'gulp-prompt'
+
+gulp.task 'git', () ->
+	throw new Error("Version parameter is required") unless gutil.env.version?
+	exec "git status --porcelain", (err, stdout) ->
+		files = stdout.split('\n')
+		files = files.slice 0, -1
+		if files.length > 2
+			throw new gutil.PluginError 'git', "You're in a dirty working copy, please do something about that."
+
+		for file in files when file.indexOf('package.json') is -1 and file.indexOf('dist/capacitor.js') is -1
+			throw new gutil.PluginError 'git', "You're in a dirty working copy, please do something about that."
+
+		exec "git add . && git commit -m 'v#{gutil.env.version}' ", (err, stdout) ->
+
+			gutil.log gutil.colors.green "Version #{gutil.env.version} has been committed"
+
+			# Beware: if you write stupid things such as '; rm -rf /;' in --version, you're gonna have a bad time..
+			exec "git tag -a v#{gutil.env.version} -m 'published version #{gutil.env.version}'", (err, stdout) ->
+				throw err if err?
+				gutil.log gutil.colors.green "Version #{gutil.env.version} has been tagged"
+
+			prompt.confirm
+				message: 'Are you sure you want to push and publish to NPM?',
+				default: no
+			, (res) ->
+				if res
+					# exec "git push && npm publish", (err, stdout) ->
+						# throw err if err?
+					gutil.log gutil.colors.green "Version #{gutil.env.version} has been deployed"
+
 
 gulp.task 'test', () ->
 	# Load and run the test files.
