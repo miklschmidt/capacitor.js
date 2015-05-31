@@ -1,5 +1,4 @@
 invariant = require './invariant'
-{Signal}  = require 'signals'
 
 'use strict'
 
@@ -39,15 +38,10 @@ module.exports = new class Dispatcher
 	currentAction = null
 
 	###
-    # @var {object} Signal triggered when the dispatcher is started.
-	# @public
+	# @var {array} finalizers An array of callbacks to be called when the store is finished dispatching.
+	# @private
 	###
-	started: new Signal()
-	###
-    # @var {object} Signal triggered when the dispatcher is stopped.
-	# @public
-	###
-	stopped: new Signal()
+	finalizers = []
 
 	###
     # Sets the dispatcher to a state where all stores are neither
@@ -62,18 +56,39 @@ module.exports = new class Dispatcher
 			isPending[id] = no
 			isHandled[id] = no
 
-		@started.dispatch()
+	###
+    # Method for hooking up a finalizer callback
+    #
+	# @private
+	###
+	onFinalize: (fn) ->
+		finalizers.push fn
 
 	###
-    # Resets the dispatcher state after dispatching.
+    # Method for calling finalizer callbacks
+    #
+	# @private
+	###
+	callFinalizers: () ->
+		finalizer() for finalizer in finalizers
+
+	###
+    # Method for checking if the dispatcher is currently dispatching.
+    #
+	# @public
+	###
+	isDispatching: () ->
+		return dispatching
+
+	###
+    # Resets the dispatcher state after dispatching, and fires store events.
     #
 	# @private
 	###
 	finalizeDispatching = () ->
+		@callFinalizers()
 		currentAction = null
 		dispatching = no
-
-		@stopped.dispatch()
 
 	###
     # Calls the action handler on a store with the current action and payload.

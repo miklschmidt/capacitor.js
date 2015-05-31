@@ -35,7 +35,7 @@ module.exports = class IndexedListStore extends Store
 		"""
 		@set 'map', Immutable.Map {}
 		# This store has effictively changed if it's entity store has changed.
-		@containsEntity.changed.add () => @changed.dispatch()
+		@containsEntity.changed.addImmediate () => @changed.dispatch()
 
 	add: (index, ids) ->
 		invariant _.isNumber(index) or _.isString(index), """
@@ -43,7 +43,7 @@ module.exports = class IndexedListStore extends Store
 		"""
 
 		invariant _.isNumber(ids) or _.isString(ids) or _.isArray(ids), """
-			IndexedListStore.add(...): Second parameter should be a number or string (id) or an array of numbers (ids).
+			IndexedListStore.add(...): Second parameter should be a number/string (id) or an array of numbers/strings (ids).
 		"""
 
 		ids = [ids] unless _.isArray(ids)

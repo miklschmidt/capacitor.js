@@ -145,12 +145,22 @@ describe 'Store', () ->
 				super
 				@setItem {id: 1, value: 'test'}
 
+			getInterface: () ->
+				obj = super
+				obj.dispatch = @changed.dispatch
+				obj
+
 		list = new class TestListStore extends ListStore
 
 			containsEntity: entity
 			initialize: () ->
 				super
 				@add 1
+
+			getInterface: () ->
+				obj = super
+				obj.dispatch = @changed.dispatch
+				obj
 
 		store = new class TestStore extends Store
 
@@ -160,8 +170,8 @@ describe 'Store', () ->
 		changed = sinon.spy()
 		store.changed.add changed
 
-		list.changed.dispatch()
-		entity.changed.dispatch()
+		list.dispatch()
+		entity.dispatch()
 
 		# When entity changes, list changes again so we expect 3 change events, not 2
 		expect changed.callCount

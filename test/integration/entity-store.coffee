@@ -160,6 +160,11 @@ describe 'EntityStore', () ->
 				super
 				@setItem {id: 1, value: 'test'}
 
+			getInterface: () ->
+				obj = super
+				obj.dispatch = @changed.dispatch
+				obj
+
 		article = new class ArticleStore extends EntityStore
 
 			initialize: () ->
@@ -173,6 +178,11 @@ describe 'EntityStore', () ->
 				super
 				@add 1, 1
 
+			getInterface: () ->
+				obj = super
+				obj.dispatch = @changed.dispatch
+				obj
+
 		user = new class UserStore extends EntityStore
 
 			@hasOne 'profile', profile
@@ -185,8 +195,8 @@ describe 'EntityStore', () ->
 		changed = sinon.spy()
 		user.changed.add changed
 
-		profile.changed.dispatch()
-		usersArticles.changed.dispatch()
+		profile.dispatch()
+		usersArticles.dispatch()
 
 		expect changed.callCount
 		.to.equal 2

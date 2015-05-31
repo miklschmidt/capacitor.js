@@ -1,9 +1,9 @@
 _          = require 'lodash'
-{Signal}   = require 'signals'
 Action     = require './action'
 dispatcher = require './dispatcher'
 invariant  = require './invariant'
 Immutable  = require 'immutable'
+EventBroker = require './event-broker'
 
 ###
 #	implementation example:
@@ -118,7 +118,6 @@ module.exports = class Store
 		return null
 
 	@_makeInterfaceImmutable: (interfaceObj) ->
-		interfaceObj._type = @_getStoreType()
 		return Object.freeze(interfaceObj)
 
 	@_getStoreType: () ->
@@ -133,7 +132,7 @@ module.exports = class Store
 		@_cache = Immutable.Map()
 
 		# Set up change event.
-		@changed = new Signal
+		@changed = EventBroker()
 
 		# Initialize the store.
 		@_baseInitialized = no
@@ -150,7 +149,16 @@ module.exports = class Store
 
 		# Return proxy object used to interact with this store
 		that = @
-		return @constructor._makeInterfaceImmutable @getInterface()
+		return @constructor._makeInterfaceImmutable @_setRequiredInterfaceProperties @getInterface()
+
+	_setRequiredInterfaceProperties: (interfaceObj) ->
+		interfaceObj.changed =
+			add: @changed.add
+			remove: @changed.remove
+			addImmediate: @changed.addImmediate
+			removeImmediate: @changed.removeImmediate
+		interfaceObj._type = @constructor._getStoreType()
+		return interfaceObj
 
 	initialize: () ->
 		@_baseInitialized = yes
@@ -163,7 +171,6 @@ module.exports = class Store
 		return {
 			get: @get.bind(@)
 			getIn: @getIn.bind(@)
-			@changed
 			_id: @_id
 		}
 

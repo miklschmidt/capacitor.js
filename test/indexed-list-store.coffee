@@ -52,6 +52,10 @@ describe 'IndexedListStore', () ->
 	it 'should properly propagate change events from the entity store', () ->
 
 		entityInstance = new class TestEntityStore extends EntityStore
+			getInterface: () ->
+				obj = super
+				obj.dispatch = @changed.dispatch
+				obj
 
 		changed = sinon.spy()
 
@@ -62,7 +66,7 @@ describe 'IndexedListStore', () ->
 				super
 				@changed.add changed
 
-		entityInstance.changed.dispatch()
+		entityInstance.dispatch()
 
 		expect changed.calledOnce
 		.to.be.true

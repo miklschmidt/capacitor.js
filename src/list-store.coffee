@@ -35,7 +35,7 @@ module.exports = class ListStore extends Store
 		"""
 		@setIds Immutable.List()
 		# This store has effictively changed if it's entity store has changed.
-		@containsEntity.changed.add () => @changed.dispatch()
+		@containsEntity.changed.addImmediate () => @changed.dispatch()
 
 	add: (ids) ->
 		if Immutable.Iterable.isIterable(ids)
