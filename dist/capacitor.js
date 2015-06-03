@@ -108,9 +108,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = new (ActionManager = (function() {
 
-	  /*
-	  	 * @var {Object} actions a list of all existing actions
-	  	 * @private
+	  /**
+	  	* @var {Object} actions a list of all existing actions
+	  	* @private
 	   */
 	  var actions;
 
@@ -119,11 +119,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  actions = {};
 
 
-	  /*
-	  	 * Method for creating an action
-	  	#
-	  	 * @param {string} name The (unique) name of the action.
-	  	 * @return {Action} the created action.
+	  /**
+	  	* Method for creating an action
+	  	*
+	  	* @param {string} name The (unique) name of the action.
+	  	* @return {Action} the created action.
 	   */
 
 	  ActionManager.prototype.create = function(name) {
@@ -133,10 +133,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	  	 * Method for listing all existing actions
-	  	#
-	  	 * @return {Array} list of existing actions
+	  /**
+	  	* Method for listing all existing actions
+	  	*
+	  	* @return {Array} list of existing actions
 	   */
 
 	  ActionManager.prototype.list = function() {
@@ -150,10 +150,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	  	 * Method to check if an action exists
-	  	#
-	  	 * @return {boolean}
+	  /**
+	  	* Method to check if an action exists
+	  	*
+	  	* @return {boolean}
 	   */
 
 	  ActionManager.prototype.exists = function(name) {
@@ -182,6 +182,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	_requestID = 0;
 
 	ActionInstance = (function() {
+
+	  /**
+	  	* @constructor
+	   */
 	  function ActionInstance(type, payload1) {
 	    this.type = type;
 	    this.payload = payload1;
@@ -202,14 +206,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 
 	module.exports = ActionCreator = (function() {
+
+	  /**
+	  	* @constructor
+	   */
 	  function ActionCreator() {}
 
 
-	  /*
-	  	 * Dispatches an action through the dispatcher
-	  	#
-	  	 * @param {Action} action The action to dispatch
-	  	 * @param {mixed} payload Payload for the action
+	  /**
+	  	* Dispatches an action through the dispatcher
+	  	*
+	  	* @param {Action} action The action to dispatch
+	  	* @param {mixed} payload Payload for the action
 	   */
 
 	  ActionCreator.prototype.dispatch = function(action, payload) {
@@ -220,11 +228,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	  	 * Creates an action instance for dispatching
-	  	#
-	  	 * @param {Action} action The action to dispatch
-	  	 * @param {mixed} payload Payload for the action
+	  /**
+	  	* Creates an action instance for dispatching
+	  	*
+	  	* @param {Action} action The action to dispatch
+	  	* @param {mixed} payload Payload for the action
 	   */
 
 	  ActionCreator.prototype.createActionInstance = function(action, payload) {
@@ -233,8 +241,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	  	 * Generates a request id. Useful for tracking specific requests in components.
+	  /**
+	  	* Generates a request id. Useful for tracking specific requests in components.
 	   */
 
 	  ActionCreator.prototype.generateRequestID = function() {
@@ -267,72 +275,50 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	EventBroker = __webpack_require__(13);
 
-
-	/*
-	#	implementation example:
-	#
-	#	class TodoStore extends Store
-	#		@action someAction, () ->
-	#			@doStuff()
-	#			@doOtherStuff()
-	#			@profit()
-	#
-	#		doStuff: () ->
-	#			# Do things..
-	#
-	#
-	#		doOtherStuff: () ->
-	#			# Do things..
-	#
-	#		profit: () ->
-	#			# Do things..
-	#			@changed.dispatch()
-	 */
-
 	module.exports = Store = (function() {
 
-	  /*
-	  	 * @static
-	  	 * @private
+	  /**
+	  	* @static
+	  	* @private
 	   */
 	  Store._handlers = null;
 
 
-	  /*
-	  	 * @static
-	  	 * @private
+	  /**
+	  	* @static
+	  	* @private
 	   */
 
 	  Store._references = null;
 
 
-	  /*
-	  	 * @private
+	  /**
+	  	* @private
 	   */
 
 	  Store.prototype._properties = null;
 
 
-	  /*
-	  	 * @private
+	  /**
+	  	* @private
 	   */
 
 	  Store.prototype._cache = null;
 
 
-	  /*
-	  	 * @private
+	  /**
+	  	* @private
 	   */
 
 	  Store.prototype._currentActionInstance = null;
 
 
-	  /*
-	  	 * Static method for defining action handlers on a Store.
-	  	#
-	  	 * @static
-	  	 * @param {Action} action The Action to associated with the handler.
-	  	 * @param {Function} fn The handler to call when Action is triggered.
+	  /**
+	  	* Static method for defining action handlers on a Store.
+	  	*
+	  	* @static
+	  	* @param {Action} action The Action to associated with the handler.
+	  	* @param {Function} fn The handler to call when Action is triggered.
 	   */
 
 	  Store.action = function(action, fn) {
@@ -354,12 +340,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	  	 * Static method for defining a one to one relationship to another store.
-	  	#
-	  	 * @static
-	  	 * @param {String} key The key that should reference another store
-	  	 * @param {EntityStore} entityStore the entity store that is referenced from this store
+	  /**
+	  	* Static method for defining a one to one relationship to another store.
+	  	*
+	  	* @static
+	  	* @param {String} key The key that should reference another store
+	  	* @param {EntityStore} entityStore the entity store that is referenced from this store
 	   */
 
 	  Store.hasOne = function(key, entityStore) {
@@ -375,12 +361,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	  	 * Static method for defining a one to many relationship to another store.
-	  	#
-	  	 * @static
-	  	 * @param {String} key The key that should reference another store
-	  	 * @param {ListStore} listStore the list store that is referenced from this store
+	  /**
+	  	* Static method for defining a one to many relationship to another store.
+	  	*
+	  	* @static
+	  	* @param {String} key The key that should reference another store
+	  	* @param {ListStore} listStore the list store that is referenced from this store
 	   */
 
 	  Store.hasMany = function(key, listStore) {
@@ -404,8 +390,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	  	 * Constructor function that sets up actions and events on the store
+	  /**
+	  	* Constructor function that sets up actions and events on the store
 	   */
 
 	  function Store() {
@@ -449,9 +435,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	  	 * Override this to change which methods are available to consumers.
-	  	 * NOTE: Remember that nothing but the store itself should be able to change the data in the store.
+	  /**
+	  	* Override this to change which methods are available to consumers.
+	  	* NOTE: Remember that nothing but the store itself should be able to change the data in the store.
 	   */
 
 	  Store.prototype.getInterface = function() {
@@ -463,12 +449,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	  	 * Method for caching results, this is used when dereferencing to make sure the same immutable is
-	  	 * returned if the references haven't changed.
-	  	#
-	  	 * @param {String} name The name for the cache
-	  	 * @param {value} name The value that is written to the cache if it's different from the previous value.
+	  /**
+	  	* Method for caching results, this is used when dereferencing to make sure the same immutable is
+	  	* returned if the references haven't changed.
+	  	*
+	  	* @param {String} name The name for the cache
+	  	* @param {value} name The value that is written to the cache if it's different from the previous value.
 	   */
 
 	  Store.prototype.cache = function(name, value) {
@@ -482,10 +468,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	  	 * Method for dereferencing a value by using the key's related store.
-	  	#
-	  	 * @param {String} key The key for the value to dereference
+	  /**
+	  	* Method for dereferencing a value by using the key's related store.
+	  	*
+	  	* @param {String} key The key for the value to dereference
 	   */
 
 	  Store.prototype.dereference = function(key) {
@@ -634,12 +620,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	  	 * Method for calling handlers on the store when an action is executed.
-	  	#
-	  	 * @param {string} actionName The name of the executed action
-	  	 * @param {mixed} payload The payload passed to the handler
-	  	 * @param {array} waitFor An array of other signals to wait for in this dispatcher run.
+	  /**
+	  	* Method for calling handlers on the store when an action is executed.
+	  	*
+	  	* @param {string} actionName The name of the executed action
+	  	* @param {mixed} payload The payload passed to the handler
+	  	* @param {array} waitFor An array of other signals to wait for in this dispatcher run.
 	   */
 
 	  Store.prototype._handleAction = function(actionInstance, waitFor) {
@@ -706,12 +692,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	  	 * Dereferences a specific key on an item, similar to Store.dereference.
-	  	#
-	  	 * @overrides Store::dereference
-	  	 * @param {Immutable.Map} item The item that will be dereferenced
-	  	 * @param {String} key The key on the item to dereference
+	  /**
+	  	* Dereferences a specific key on an item, similar to Store.dereference.
+	  	*
+	  	* @overrides Store::dereference
+	  	* @param {Immutable.Map} item The item that will be dereferenced
+	  	* @param {String} key The key on the item to dereference
 	   */
 
 	  EntityStore.prototype.dereference = function(item, key) {
@@ -732,10 +718,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	  	 * Dereferences all defined relationships on an item
-	  	#
-	  	 * @param {Immutable.Map} item The item to dereference
+	  /**
+	  	* Dereferences all defined relationships on an item
+	  	*
+	  	* @param {Immutable.Map} item The item to dereference
 	   */
 
 	  EntityStore.prototype.dereferenceItem = function(item) {
@@ -812,11 +798,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	  	 * Method for getting values from this store, with dereferencing disabled.
-	  	 * References for an entity store is defined for the items not for the store itself.
-	  	#
-	  	 * @overrides Store::get
+	  /**
+	  	* Method for getting values from this store, with dereferencing disabled.
+	  	* References for an entity store is defined for the items not for the store itself.
+	  	*
+	  	* @overrides Store::get
 	   */
 
 	  EntityStore.prototype.get = function(key) {
@@ -832,13 +818,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	  	 * This method does not guarantee the same list to be returned for the same set of ids.
-	  	 * That said, the items contained in the list are gauranteed to be equal to the items in other lists.
-	  	 * If you require getting the same List instance on every call, you must cache the results yourself.
-	  	 * Use Store::cache for this.
-	  	#
-	  	 * @return The items with the given ids, in the same order as specified in ids
+	  /**
+	  	* This method does not guarantee the same list to be returned for the same set of ids.
+	  	* That said, the items contained in the list are gauranteed to be equal to the items in other lists.
+	  	* If you require getting the same List instance on every call, you must cache the results yourself.
+	  	* Use Store::cache for this.
+	  	*
+	  	* @return The items with the given ids, in the same order as specified in ids
 	   */
 
 	  EntityStore.prototype.getItemsWithIds = function(ids) {
@@ -1175,16 +1161,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	InvariantError = __webpack_require__(14);
 
 
-	/*
-	 * Use invariant() to assert state which your program assumes to be true.
-	#
-	 * Provided arguments are automatically type checked and logged correctly to the console
-	 * Chrome's console.log sprintf format.
-	#
-	 * ex: invariant(!hasFired, "hasFired was expected to be true but was", hasFired)
-	#
-	 * The invariant message will be stripped in production, but the invariant
-	 * will remain to ensure logic does not differ in production.
+	/**
+	* Use invariant() to assert state which your program assumes to be true.
+	*
+	* Provided arguments are automatically type checked and logged correctly to the console
+	* Chrome's console.log sprintf format.
+	*
+	* ex: invariant(!hasFired, "hasFired was expected to be true but was", hasFired)
+	*
+	* The invariant message will be stripped in production, but the invariant
+	* will remain to ensure logic does not differ in production.
 	 */
 
 	module.exports = function(condition, message) {
@@ -1227,9 +1213,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = new (Dispatcher = (function() {
 
-	  /*
-	  	 * @var {boolean} dispatching Wether or not the dispatcher is currently dispatching.
-	  	 * @private
+	  /**
+	  	* @var {boolean} dispatching Wether or not the dispatcher is currently dispatching.
+	  	* @private
 	   */
 	  var currentAction, dispatching, finalizeDispatching, finalizers, isHandled, isPending, notifyStore, prepareForDispatching, storeID, stores;
 
@@ -1241,59 +1227,59 @@ return /******/ (function(modules) { // webpackBootstrap
 	  dispatching = false;
 
 
-	  /*
-	  	 * @var {integer} storeID ID to use for the next store that gets registered.
-	  	 * @private
+	  /**
+	  	* @var {integer} storeID ID to use for the next store that gets registered.
+	  	* @private
 	   */
 
 	  storeID = 0;
 
 
-	  /*
-	  	 * @var {object} stores Store registry.
-	  	 * @private
+	  /**
+	  	* @var {object} stores Store registry.
+	  	* @private
 	   */
 
 	  stores = {};
 
 
-	  /*
-	      * @var {object} isPending Object for tracking pending store callbacks.
-	  	 * @private
+	  /**
+	  	* @var {object} isPending Object for tracking pending store callbacks.
+	  	* @private
 	   */
 
 	  isPending = {};
 
 
-	  /*
-	      * @var {object} isPending Object for tracking handled store callbacks.
-	  	 * @private
+	  /**
+	  	* @var {object} isPending Object for tracking handled store callbacks.
+	  	* @private
 	   */
 
 	  isHandled = {};
 
 
-	  /*
-	      * @var {string} isPending The current action being dispatched, if any.
-	  	 * @private
+	  /**
+	  	* @var {string} isPending The current action being dispatched, if any.
+	  	* @private
 	   */
 
 	  currentAction = null;
 
 
-	  /*
-	  	 * @var {array} finalizers An array of callbacks to be called when the store is finished dispatching.
-	  	 * @private
+	  /**
+	  	* @var {array} finalizers An array of callbacks to be called when the store is finished dispatching.
+	  	* @private
 	   */
 
 	  finalizers = [];
 
 
-	  /*
-	      * Sets the dispatcher to a state where all stores are neither
-	      * pending nor handled.
-	     #
-	  	 * @private
+	  /**
+	  	* Sets the dispatcher to a state where all stores are neither
+	  	* pending nor handled.
+	  	*
+	  	* @private
 	   */
 
 	  prepareForDispatching = function() {
@@ -1308,10 +1294,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	      * Method for hooking up a finalizer callback
-	     #
-	  	 * @private
+	  /**
+	  	* Method for hooking up a finalizer callback
+	  	*
+	  	* @private
 	   */
 
 	  Dispatcher.prototype.onFinalize = function(fn) {
@@ -1319,10 +1305,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	      * Method for calling finalizer callbacks
-	     #
-	  	 * @private
+	  /**
+	  	* Method for calling finalizer callbacks
+	  	*
+	  	* @private
 	   */
 
 	  Dispatcher.prototype.callFinalizers = function() {
@@ -1336,10 +1322,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	      * Method for checking if the dispatcher is currently dispatching.
-	     #
-	  	 * @public
+	  /**
+	  	* Method for checking if the dispatcher is currently dispatching.
+	  	*
+	  	* @public
 	   */
 
 	  Dispatcher.prototype.isDispatching = function() {
@@ -1347,10 +1333,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	      * Resets the dispatcher state after dispatching, and fires store events.
-	     #
-	  	 * @private
+	  /**
+	  	* Resets the dispatcher state after dispatching, and fires store events.
+	  	*
+	  	* @private
 	   */
 
 	  finalizeDispatching = function() {
@@ -1360,12 +1346,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	      * Calls the action handler on a store with the current action and payload.
-	      * This method is used when dispatching.
-	     #
-	      * @param {integer} id The ID of the store to notify
-	  	 * @private
+	  /**
+	  	* Calls the action handler on a store with the current action and payload.
+	  	* This method is used when dispatching.
+	  	*
+	  	* @param {integer} id The ID of the store to notify
+	  	* @private
 	   */
 
 	  notifyStore = function(id) {
@@ -1376,11 +1362,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	      * Registers a store with the dispatcher so that it's notified when actions
-	      * are dispatched.
-	     #
-	      * @param {Object} store The store to register with the dispatcher
+	  /**
+	  	* Registers a store with the dispatcher so that it's notified when actions
+	  	* are dispatched.
+	  	*
+	  	* @param {Object} store The store to register with the dispatcher
 	   */
 
 	  Dispatcher.prototype.register = function(store) {
@@ -1389,11 +1375,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	      * Unregisters a store from the dispatcher so that it's no longer
-	      * notified when actions are dispatched.
-	     #
-	      * @param {Object} store The store to unregister from the dispatcher
+	  /**
+	  	* Unregisters a store from the dispatcher so that it's no longer
+	  	* notified when actions are dispatched.
+	  	*
+	  	* @param {Object} store The store to unregister from the dispatcher
 	   */
 
 	  Dispatcher.prototype.unregister = function(store) {
@@ -1402,12 +1388,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	      * Method for waiting for other stores to complete their handling
-	      * of actions. This method is passed along to the Stores when an action
-	      * is dispatched.
-	     #
-	      * @see notifyStore
+	  /**
+	  	* Method for waiting for other stores to complete their handling
+	  	* of actions. This method is passed along to the Stores when an action
+	  	* is dispatched.
+	  	*
+	  	* @see notifyStore
 	   */
 
 	  Dispatcher.prototype.waitFor = function() {
@@ -1429,12 +1415,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  /*
-	      * Method for dispatching in action. This method is used by the Action class
-	      * when calling Action.dispatch().
-	     #
-	      * @param {string} actionName The name of the action to dispatch
-	      * @param {mixed} payload The payload for the event.
+	  /**
+	  	* Method for dispatching in action. This method is used by the Action class
+	  	* when calling Action.dispatch().
+	  	*
+	  	* @param {string} actionName The name of the action to dispatch
+	  	* @param {mixed} payload The payload for the event.
 	   */
 
 	  Dispatcher.prototype.dispatch = function(actionInstance) {
@@ -1471,18 +1457,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Action = (function() {
 
-	  /*
-	  	 * Constructor
-	  	#
-	  	 * @param {string} The name of the action
+	  /**
+	  	* Constructor
+	  	*
+	  	* @param {string} The name of the action
 	   */
 	  function Action(type) {
 	    this.type = type;
 	  }
 
 
-	  /*
-	  	 * Magic method for coercing an action to a string
+	  /**
+	  	* Magic method for coercing an action to a string
 	   */
 
 	  Action.prototype.toString = function() {

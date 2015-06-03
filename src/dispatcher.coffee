@@ -4,50 +4,50 @@ invariant = require './invariant'
 
 module.exports = new class Dispatcher
 
-	###
-	# @var {boolean} dispatching Wether or not the dispatcher is currently dispatching.
-	# @private
+	###*
+	* @var {boolean} dispatching Wether or not the dispatcher is currently dispatching.
+	* @private
 	###
 	dispatching = no
-	###
-	# @var {integer} storeID ID to use for the next store that gets registered.
-	# @private
+	###*
+	* @var {integer} storeID ID to use for the next store that gets registered.
+	* @private
 	###
 	storeID = 0
 
-	###
-	# @var {object} stores Store registry.
-	# @private
+	###*
+	* @var {object} stores Store registry.
+	* @private
 	###
 	stores = {}
-	###
-    # @var {object} isPending Object for tracking pending store callbacks.
-	# @private
+	###*
+	* @var {object} isPending Object for tracking pending store callbacks.
+	* @private
 	###
 	isPending = {}
-	###
-    # @var {object} isPending Object for tracking handled store callbacks.
-	# @private
+	###*
+	* @var {object} isPending Object for tracking handled store callbacks.
+	* @private
 	###
 	isHandled = {}
 
-	###
-    # @var {string} isPending The current action being dispatched, if any.
-	# @private
+	###*
+	* @var {string} isPending The current action being dispatched, if any.
+	* @private
 	###
 	currentAction = null
 
-	###
-	# @var {array} finalizers An array of callbacks to be called when the store is finished dispatching.
-	# @private
+	###*
+	* @var {array} finalizers An array of callbacks to be called when the store is finished dispatching.
+	* @private
 	###
 	finalizers = []
 
-	###
-    # Sets the dispatcher to a state where all stores are neither
-    # pending nor handled.
-    #
-	# @private
+	###*
+	* Sets the dispatcher to a state where all stores are neither
+	* pending nor handled.
+	*
+	* @private
 	###
 	prepareForDispatching = () ->
 		dispatching = yes
@@ -56,46 +56,46 @@ module.exports = new class Dispatcher
 			isPending[id] = no
 			isHandled[id] = no
 
-	###
-    # Method for hooking up a finalizer callback
-    #
-	# @private
+	###*
+	* Method for hooking up a finalizer callback
+	*
+	* @private
 	###
 	onFinalize: (fn) ->
 		finalizers.push fn
 
-	###
-    # Method for calling finalizer callbacks
-    #
-	# @private
+	###*
+	* Method for calling finalizer callbacks
+	*
+	* @private
 	###
 	callFinalizers: () ->
 		finalizer() for finalizer in finalizers
 
-	###
-    # Method for checking if the dispatcher is currently dispatching.
-    #
-	# @public
+	###*
+	* Method for checking if the dispatcher is currently dispatching.
+	*
+	* @public
 	###
 	isDispatching: () ->
 		return dispatching
 
-	###
-    # Resets the dispatcher state after dispatching, and fires store events.
-    #
-	# @private
+	###*
+	* Resets the dispatcher state after dispatching, and fires store events.
+	*
+	* @private
 	###
 	finalizeDispatching = () ->
 		@callFinalizers()
 		currentAction = null
 		dispatching = no
 
-	###
-    # Calls the action handler on a store with the current action and payload.
-    # This method is used when dispatching.
-    #
-    # @param {integer} id The ID of the store to notify
-	# @private
+	###*
+	* Calls the action handler on a store with the current action and payload.
+	* This method is used when dispatching.
+	*
+	* @param {integer} id The ID of the store to notify
+	* @private
 	###
 	notifyStore = (id) ->
 		invariant currentAction?,
@@ -105,35 +105,35 @@ module.exports = new class Dispatcher
 		stores[id]._handleAction.call stores[id], currentAction, @waitFor
 		isHandled[id] = yes
 
+	###*
+	* Registers a store with the dispatcher so that it's notified when actions
+	* are dispatched.
+	*
+	* @param {Object} store The store to register with the dispatcher
 	###
-    # Registers a store with the dispatcher so that it's notified when actions
-    # are dispatched.
-    #
-    # @param {Object} store The store to register with the dispatcher
-    ###
 	register: (store) ->
 		stores[storeID] = store
 		store._id = storeID++;
 
 
+	###*
+	* Unregisters a store from the dispatcher so that it's no longer
+	* notified when actions are dispatched.
+	*
+	* @param {Object} store The store to unregister from the dispatcher
 	###
-    # Unregisters a store from the dispatcher so that it's no longer
-    # notified when actions are dispatched.
-    #
-    # @param {Object} store The store to unregister from the dispatcher
-    ###
 	unregister: (store) ->
 		invariant store._id? and stores[store._id]?,
 			"dispatcher.unregister(...): Store is not registered with the dispatcher."
 		delete stores[store._id]
 
+	###*
+	* Method for waiting for other stores to complete their handling
+	* of actions. This method is passed along to the Stores when an action
+	* is dispatched.
+	*
+	* @see notifyStore
 	###
-    # Method for waiting for other stores to complete their handling
-    # of actions. This method is passed along to the Stores when an action
-    # is dispatched.
-    #
-    # @see notifyStore
-    ###
 	waitFor: (storeDependencies...) =>
 		# We can only wait for dependencies if the dispatcher is dispatching.
 		# In other words, waitFor() has to be called inside an action handler.
@@ -161,13 +161,13 @@ module.exports = new class Dispatcher
 			# Make the dependency handle the action.
 			notifyStore.call @, id
 
+	###*
+	* Method for dispatching in action. This method is used by the Action class
+	* when calling Action.dispatch().
+	*
+	* @param {string} actionName The name of the action to dispatch
+	* @param {mixed} payload The payload for the event.
 	###
-    # Method for dispatching in action. This method is used by the Action class
-    # when calling Action.dispatch().
-    #
-    # @param {string} actionName The name of the action to dispatch
-    # @param {mixed} payload The payload for the event.
-    ###
 	dispatch: (actionInstance) =>
 		# The flux architecture dictates that an action cannot
 		# immediately trigger another action, which leads to cascading

@@ -19,5 +19,5 @@ module.exports =
 		extensions: ['', '.js', '.coffee']
 	module:
 		loaders: [
-			{test: /\.coffee/, loaders: ['coffee']}
+			{test: /\.coffee/, loaders: ['coffee?bare=true']}
 		]

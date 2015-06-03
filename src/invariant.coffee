@@ -1,15 +1,15 @@
 InvariantError = require './invariant-error'
 
-###
-# Use invariant() to assert state which your program assumes to be true.
-#
-# Provided arguments are automatically type checked and logged correctly to the console
-# Chrome's console.log sprintf format.
-#
-# ex: invariant(!hasFired, "hasFired was expected to be true but was", hasFired)
-#
-# The invariant message will be stripped in production, but the invariant
-# will remain to ensure logic does not differ in production.
+###*
+* Use invariant() to assert state which your program assumes to be true.
+*
+* Provided arguments are automatically type checked and logged correctly to the console
+* Chrome's console.log sprintf format.
+*
+* ex: invariant(!hasFired, "hasFired was expected to be true but was", hasFired)
+*
+* The invariant message will be stripped in production, but the invariant
+* will remain to ensure logic does not differ in production.
 ###
 
 module.exports = (condition, message) ->

@@ -34,7 +34,7 @@ module.exports = () ->
 				This is due to events being batched by the dispatcher, to avoid unnecessary computations. 
 				If you have a good reason to send a payload, you can use the unbatched dispatchImmediate and addImmediate.
 			"""
-			# if we're inside a dispatch loop, batch the change events. 
+			# If we're inside a dispatch loop, batch the change events. 
 			# If not, go ahead and call the listeners.
 			if dispatcher.isDispatching()
 				shouldTrigger = yes

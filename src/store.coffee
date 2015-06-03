@@ -5,62 +5,41 @@ invariant  = require './invariant'
 Immutable  = require 'immutable'
 EventBroker = require './event-broker'
 
-###
-#	implementation example:
-#
-#	class TodoStore extends Store
-#		@action someAction, () ->
-#			@doStuff()
-#			@doOtherStuff()
-#			@profit()
-#
-#		doStuff: () ->
-#			# Do things..
-#
-#
-#		doOtherStuff: () ->
-#			# Do things..
-#
-#		profit: () ->
-#			# Do things..
-#			@changed.dispatch()
-###
-
 module.exports = class Store
 
-	###
-	# @static
-	# @private
+	###*
+	* @static
+	* @private
 	###
 	@_handlers: null
 
-	###
-	# @static
-	# @private
+	###*
+	* @static
+	* @private
 	###
 	@_references: null
 
-	###
-	# @private
+	###*
+	* @private
 	###
 	_properties: null
 
-	###
-	# @private
+	###*
+	* @private
 	###
 	_cache: null
 
-	###
-	# @private
+	###*
+	* @private
 	###
 	_currentActionInstance: null
 
-	###
-	# Static method for defining action handlers on a Store.
-	#
-	# @static
-	# @param {Action} action The Action to associated with the handler.
-	# @param {Function} fn The handler to call when Action is triggered.
+	###*
+	* Static method for defining action handlers on a Store.
+	*
+	* @static
+	* @param {Action} action The Action to associated with the handler.
+	* @param {Function} fn The handler to call when Action is triggered.
 	###
 	@action: (action, fn) ->
 		@_handlers ?= {}
@@ -85,12 +64,12 @@ module.exports = class Store
 				""", action, @
 		return null
 
-	###
-	# Static method for defining a one to one relationship to another store.
-	#
-	# @static
-	# @param {String} key The key that should reference another store
-	# @param {EntityStore} entityStore the entity store that is referenced from this store
+	###*
+	* Static method for defining a one to one relationship to another store.
+	*
+	* @static
+	* @param {String} key The key that should reference another store
+	* @param {EntityStore} entityStore the entity store that is referenced from this store
 	###
 	@hasOne: (key, entityStore) ->
 		invariant entityStore._type is 'entity', """
@@ -101,12 +80,12 @@ module.exports = class Store
 		@_references[key] = {store: entityStore, type: 'entity'}
 		return null
 
-	###
-	# Static method for defining a one to many relationship to another store.
-	#
-	# @static
-	# @param {String} key The key that should reference another store
-	# @param {ListStore} listStore the list store that is referenced from this store
+	###*
+	* Static method for defining a one to many relationship to another store.
+	*
+	* @static
+	* @param {String} key The key that should reference another store
+	* @param {ListStore} listStore the list store that is referenced from this store
 	###
 	@hasMany: (key, listStore) ->
 		invariant listStore._type is 'list', """
@@ -123,8 +102,8 @@ module.exports = class Store
 	@_getStoreType: () ->
 		return 'store'
 
-	###
-	# Constructor function that sets up actions and events on the store
+	###*
+	* Constructor function that sets up actions and events on the store
 	###
 	constructor: () ->
 		dispatcher.register(@)
@@ -163,9 +142,9 @@ module.exports = class Store
 	initialize: () ->
 		@_baseInitialized = yes
 
-	###
-	# Override this to change which methods are available to consumers.
-	# NOTE: Remember that nothing but the store itself should be able to change the data in the store.
+	###*
+	* Override this to change which methods are available to consumers.
+	* NOTE: Remember that nothing but the store itself should be able to change the data in the store.
 	###
 	getInterface: () ->
 		return {
@@ -174,12 +153,12 @@ module.exports = class Store
 			_id: @_id
 		}
 
-	###
-	# Method for caching results, this is used when dereferencing to make sure the same immutable is
-	# returned if the references haven't changed.
-	#
-	# @param {String} name The name for the cache
-	# @param {value} name The value that is written to the cache if it's different from the previous value.
+	###*
+	* Method for caching results, this is used when dereferencing to make sure the same immutable is
+	* returned if the references haven't changed.
+	*
+	* @param {String} name The name for the cache
+	* @param {value} name The value that is written to the cache if it's different from the previous value.
 	###
 	cache: (name, value) ->
 		last = @_cache.get name
@@ -190,10 +169,10 @@ module.exports = class Store
 
 		return last
 
-	###
-	# Method for dereferencing a value by using the key's related store.
-	#
-	# @param {String} key The key for the value to dereference
+	###*
+	* Method for dereferencing a value by using the key's related store.
+	*
+	* @param {String} key The key for the value to dereference
 	###
 	dereference: (key) ->
 		reference = @constructor._references?[key]
@@ -329,12 +308,12 @@ module.exports = class Store
 		@_currentActionInstance.actionID
 
 
-	###
-	# Method for calling handlers on the store when an action is executed.
-	#
-	# @param {string} actionName The name of the executed action
-	# @param {mixed} payload The payload passed to the handler
-	# @param {array} waitFor An array of other signals to wait for in this dispatcher run.
+	###*
+	* Method for calling handlers on the store when an action is executed.
+	*
+	* @param {string} actionName The name of the executed action
+	* @param {mixed} payload The payload passed to the handler
+	* @param {array} waitFor An array of other signals to wait for in this dispatcher run.
 	###
 	_handleAction: (actionInstance, waitFor) =>
 		return unless @constructor._handlers?[actionInstance.type]?

@@ -21,12 +21,12 @@ module.exports = class EntityStore extends Store
 	@_getStoreType: () ->
 		return 'entity'
 
-	###
-	# Dereferences a specific key on an item, similar to Store.dereference.
-	#
-	# @overrides Store::dereference
-	# @param {Immutable.Map} item The item that will be dereferenced
-	# @param {String} key The key on the item to dereference
+	###*
+	* Dereferences a specific key on an item, similar to Store.dereference.
+	*
+	* @overrides Store::dereference
+	* @param {Immutable.Map} item The item that will be dereferenced
+	* @param {String} key The key on the item to dereference
 	###
 	dereference: (item, key) ->
 		reference = @constructor._references?[key]
@@ -51,10 +51,10 @@ module.exports = class EntityStore extends Store
 
 		return result
 
-	###
-	# Dereferences all defined relationships on an item
-	#
-	# @param {Immutable.Map} item The item to dereference
+	###*
+	* Dereferences all defined relationships on an item
+	*
+	* @param {Immutable.Map} item The item to dereference
 	###
 	dereferenceItem: (item) ->
 		# Handle dereferencing
@@ -113,11 +113,11 @@ module.exports = class EntityStore extends Store
 	getRawItems: () ->
 		@get('items')
 
-	###
-	# Method for getting values from this store, with dereferencing disabled.
-	# References for an entity store is defined for the items not for the store itself.
-	#
-	# @overrides Store::get
+	###*
+	* Method for getting values from this store, with dereferencing disabled.
+	* References for an entity store is defined for the items not for the store itself.
+	*
+	* @overrides Store::get
 	###
 	get: (key) ->
 		val = null
@@ -128,13 +128,13 @@ module.exports = class EntityStore extends Store
 			val = @_properties
 		return val
 
-	###
-	# This method does not guarantee the same list to be returned for the same set of ids.
-	# That said, the items contained in the list are gauranteed to be equal to the items in other lists.
-	# If you require getting the same List instance on every call, you must cache the results yourself.
-	# Use Store::cache for this.
-	#
-	# @return The items with the given ids, in the same order as specified in ids
+	###*
+	* This method does not guarantee the same list to be returned for the same set of ids.
+	* That said, the items contained in the list are gauranteed to be equal to the items in other lists.
+	* If you require getting the same List instance on every call, you must cache the results yourself.
+	* Use Store::cache for this.
+	*
+	* @return The items with the given ids, in the same order as specified in ids
 	###
 	getItemsWithIds: (ids) ->
 		if Immutable.Iterable.isIterable(ids)
