@@ -1,6 +1,6 @@
 ## Introduction
 #### WARNING: Still being documented.
-Capacitor.js is a well tested implementation of facebook's flux architecture written in CoffeeScript (Yes, we like CoffeeScript, don't hate us). Capacitor.js aims to do the following things:
+Capacitor.js is a well tested implementation of facebook's flux architecture written in CoffeeScript, which aims to do the following things:
 
 * Be as close to the official definition of flux as possible, only making optimizations/features where there's too much boilerplate. 
 * Be easy to use, even for beginners, which means it should be easy to do it right, hard to do it wrong.
