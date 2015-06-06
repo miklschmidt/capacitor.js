@@ -3,18 +3,15 @@
 Capacitor.js is a well tested implementation of facebook's flux architecture written in CoffeeScript (Yes, we like CoffeeScript, don't hate us). Capacitor.js aims to do the following things:
 
 * Be as close to the official definition of flux as possible, only making optimizations/features where there's too much boilerplate. 
-* Don't remove parts of the architecture just because it seems unnecessary, it's probably there for a good reason. We've found several edge cases where having all the parts paid off.
 * Be easy to use, even for beginners, which means it should be easy to do it right, hard to do it wrong.
-  * An example is our action creators, which is the only way to dispatch an action without going out of your way.
+  * An example is the ActionCreators, which is the only way to dispatch an action without going out of your way.
 * Have all stores be comprised of immutable data with immutable.js
 * Handle relationships between stores with ease, without the boilerplate
 * Be easy to extend, where extensions make sense.
-* Scale well when used in teams by heavily encouraging thought before coding, and try to minize how many ways you can solve a single problem.
-* Feel great to use in coffeescript
-* Feel just as great to use in typescript/es6
+* Scale well when used in teams by heavily encouraging thought before code, and try to minize how many ways you can solve a single problem.
+* Feel great to use in CoffeeScript
+* Feel just as great to use in TypeScript/ES6
 * Support all the loaders, AMD/CommonJS/ES6/Globals whatever you need.
-
-Capacitor.js is (as far as we know) the first to automatically handle relationships between stores, for easy seperation of store concerns, without impacting the way you get your data.
 
 ## Features
 * The dispatcher is an implementation detail, you never interact with it manually.
