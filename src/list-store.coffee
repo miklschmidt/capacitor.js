@@ -46,9 +46,9 @@ module.exports = class ListStore extends Store
 
 		ids = [ids] unless _.isArray(ids)
 
-		currentIds = @getIds()
-		for id in ids when not currentIds.includes(id)
-			currentIds = currentIds.push id
+		currentIds = @getIds().withMutations (list) ->
+			for id in ids
+				list.push id
 		@setIds currentIds
 
 	remove: (id) ->

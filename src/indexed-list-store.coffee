@@ -30,7 +30,7 @@ module.exports = class IndexedListStore extends Store
 	initialize: () ->
 		super
 		invariant @containsEntity?, """
-			IndexedListStore.initialize(...): Missing @containsEntity property. 
+			#{@constructor.name}.initialize(...): Missing @containsEntity property. 
 			You need to define an entity store to use the IndexedIndexedListStore.
 		"""
 		@set 'map', Immutable.Map {}
@@ -39,11 +39,11 @@ module.exports = class IndexedListStore extends Store
 
 	add: (index, ids) ->
 		invariant _.isNumber(index) or _.isString(index), """
-			IndexedListStore.add(...): First parameter should be a number (id) or a string identifier.
+			#{@constructor.name}.add(...): First parameter should be a number (id) or a string identifier.
 		"""
 
 		invariant _.isNumber(ids) or _.isString(ids) or _.isArray(ids), """
-			IndexedListStore.add(...): Second parameter should be a number/string (id) or an array of numbers/strings (ids).
+			#{@constructor.name}.add(...): Second parameter should be a number/string (id) or an array of numbers/strings (ids).
 		"""
 
 		ids = [ids] unless _.isArray(ids)
@@ -54,12 +54,12 @@ module.exports = class IndexedListStore extends Store
 			existingType = typeof currentIds.get(0)
 		else if ids.length > 0
 			existingType = typeof(ids[0])
-		for id in ids when not currentIds.includes id
-			invariant existingType is typeof(id), """
-				IndexedListStore.add(...): Trying to mix numbers and strings as ids
-			"""
-			currentIds = currentIds.push id
-		@setIds index, currentIds
+		@setIds index, currentIds.withMutations (list) ->
+			for id in ids
+				invariant existingType is typeof(id), """
+					#{@constructor.name}.add(...): Trying to mix numbers and strings as ids
+				"""
+				list.push id
 
 	getIds: (index) ->
 		@get('map').get(index) ? Immutable.List([])
@@ -70,10 +70,10 @@ module.exports = class IndexedListStore extends Store
 		if ids.size > 0
 			t = typeof(ids.get(0))
 			invariant t is 'number' or t is 'string', """
-				IndexedListStore.setIds(...) type of ids must be a number or a string
+				#{@constructor.name}.setIds(...) type of ids must be a number or a string
 			"""
 			invariant !ids.find((e) -> typeof(e) != t)?, """
-				IndexedListStore.setIds(...) mixed numbers and strings in ids
+				#{@constructor.name}.setIds(...) mixed numbers and strings in ids
 			"""
 		map = map.set index, ids
 		@set 'map', map
@@ -82,7 +82,7 @@ module.exports = class IndexedListStore extends Store
 		currentIds = @getIds(index)
 		indexOf = currentIds.indexOf id
 		invariant indexOf isnt -1, """
-			ListStore.remove(...): Id #{id} was not found in the store
+			#{@constructor.name}.remove(...): Id #{id} was not found in the store
 		"""
 		currentIds = currentIds.remove(indexOf)
 		@setIds index, currentIds
@@ -98,10 +98,10 @@ module.exports = class IndexedListStore extends Store
 
 	reset: (index, ids) ->
 		invariant index?, """
-			IndexedListStore.reset(...): No index was provided.
+			#{@constructor.name}.reset(...): No index was provided.
 		"""
 		invariant not ids? or (_.isNumber(ids) or _.isString(ids) or _.isArray(ids)), """
-			IndexedListStore.reset(...): Reset only accepts an id, an array of ids or nothing as the second parameter.
+			#{@constructor.name}.reset(...): Reset only accepts an id, an array of ids or nothing as the second parameter.
 		"""
 		if ids?
 			ids = [ids] unless _.isArray(ids)
