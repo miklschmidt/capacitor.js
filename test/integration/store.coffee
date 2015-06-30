@@ -359,3 +359,35 @@ describe 'Store', () ->
 
 				expect @dereference.called
 				.to.equal false
+
+	it 'should be able to unset a value', () ->
+
+		entity = new class TestEntityStore extends EntityStore
+
+			initialize: () ->
+				super
+				@setItem id: 1, value: 'whatever'
+
+		store = new class TestStore extends Store
+
+			@hasOne 'test', entity
+
+			initialize: () ->
+				super
+				@set 'test', 1
+				@set 'another', 'test'
+
+				expect @get('test').get('value')
+				.to.equal 'whatever'
+
+				expect @get('another')
+				.to.equal 'test'
+
+				@unset 'test'
+				@unset 'another'
+
+				expect @get('test')
+				.to.not.exist
+
+				expect @get('test')
+				.to.not.exist

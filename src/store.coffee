@@ -319,7 +319,7 @@ module.exports = class Store
 
 	unset: (name) ->
 		invariant _.isString(name), "#{@constructor.name}.unset(...): first parameter must be a string."
-		delete @_properties = @_properties.remove name if @_properties[name]?
+		@_properties = @_properties.remove name if @_properties.get(name)?
 		return @
 
 	getCurrentActionID: () ->
