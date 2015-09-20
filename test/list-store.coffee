@@ -12,7 +12,7 @@ describe 'ListStore', () ->
 
 		instance = new class TestEntityStore extends EntityStore
 
-		testInstance = new class TestIndexListStore extends ListStore
+		testInstance = new class TestListStore extends ListStore
 			containsEntity: instance
 
 		expect testInstance.getItems
@@ -24,19 +24,19 @@ describe 'ListStore', () ->
 	it 'should not allow relationships', () ->
 
 		expect () ->
-			new class TestIndexListStore extends ListStore
+			new class TestListStore extends ListStore
 				@hasOne()
 		.to.throw Error
 
 		expect () ->
-			new class TestIndexListStore extends ListStore
+			new class TestListStore extends ListStore
 				@hasMany()
 		.to.throw Error
 
 	it 'should throw when containsEntity is not defined', () ->
 
 		expect () ->
-			instance = new class TestIndexListStore extends ListStore
+			instance = new class TestListStore extends ListStore
 		.to.throw InvariantError
 
 
@@ -45,7 +45,7 @@ describe 'ListStore', () ->
 		instance = new class TestEntityStore extends EntityStore
 
 		expect () ->
-			new class TestIndexListStore extends ListStore
+			new class TestListStore extends ListStore
 				containsEntity: instance
 		.to.not.throw InvariantError
 
@@ -59,7 +59,7 @@ describe 'ListStore', () ->
 
 		changed = sinon.spy()
 
-		instance = new class TestIndexListStore extends ListStore
+		instance = new class TestListStore extends ListStore
 			containsEntity: entityInstance
 
 			initialize: () ->
@@ -75,7 +75,7 @@ describe 'ListStore', () ->
 
 		entityInstance = new class TestEntityStore extends EntityStore
 
-		instance = new class TestIndexListStore extends ListStore
+		instance = new class TestListStore extends ListStore
 			containsEntity: entityInstance
 
 			initialize: () ->
@@ -97,7 +97,7 @@ describe 'ListStore', () ->
 
 		entityInstance = new class TestEntityStore extends EntityStore
 
-		instance = new class TestIndexListStore extends ListStore
+		instance = new class TestListStore extends ListStore
 			containsEntity: entityInstance
 
 			initialize: () ->
@@ -119,7 +119,7 @@ describe 'ListStore', () ->
 
 		entityInstance = new class TestEntityStore extends EntityStore
 
-		instance = new class TestIndexListStore extends ListStore
+		instance = new class TestListStore extends ListStore
 			containsEntity: entityInstance
 
 			initialize: () ->
@@ -143,7 +143,7 @@ describe 'ListStore', () ->
 
 		entityInstance = new class TestEntityStore extends EntityStore
 
-		instance = new class TestIndexListStore extends ListStore
+		instance = new class TestListStore extends ListStore
 			containsEntity: entityInstance
 
 			initialize: () ->
@@ -165,7 +165,7 @@ describe 'ListStore', () ->
 				@setItem {id: 1, test: "value"}
 				@setItem {id: 2, test: "another value"}
 
-		instance = new class TestIndexListStore extends ListStore
+		instance = new class TestListStore extends ListStore
 			containsEntity: entityInstance
 
 			initialize: () ->
@@ -195,7 +195,7 @@ describe 'ListStore', () ->
 				@setItem {id: 1, test: "value"}
 				@setItem {id: 2, test: "another value"}
 
-		instance = new class TestIndexListStore extends ListStore
+		instance = new class TestListStore extends ListStore
 			containsEntity: entityInstance
 
 			initialize: () ->
