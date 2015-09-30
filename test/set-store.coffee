@@ -1,18 +1,74 @@
 EntityStore = require '../src/entity-store'
-ListStore = require '../src/list-store'
+SetStore = require '../src/set-store'
 InvariantError = require '../src/invariant-error'
 
 expect = require('chai').expect
 sinon = require 'sinon'
 Immutable = require 'immutable'
 
-describe 'ListStore', () ->
+describe 'SetStore', () ->
+
+	it 'should contain unique values', () ->
+
+		instance = new class TestEntityStore extends EntityStore
+
+		testInstance = new class TestSetStore extends SetStore
+			containsEntity: instance
+
+			initialize: () ->
+				super
+				@add [1,2,3]
+
+				expect @getIds().count()
+				.to.equal 3
+
+				@add 2
+
+				expect @getIds().count()
+				.to.equal 3
+
+				@remove 2
+
+				expect @getIds().count()
+				.to.equal 2
+
+	it 'should return the same immutable when id is already contained', () ->
+
+		instance = new class TestEntityStore extends EntityStore
+			initialize: () ->
+				super
+				@setItem {id: 1, test: "value"}
+				@setItem {id: 2, test: "another value"}
+				@setItem {id: 3, test: "third value"}
+
+		testInstance = new class TestSetStore extends SetStore
+			containsEntity: instance
+
+			initialize: () ->
+				super
+				@add [1,2]
+
+				initial = @getItems()
+
+				@add 1
+
+				duplicate = @getItems()
+
+				@add 3
+
+				changed = @getItems()
+
+				expect initial
+				.to.equal duplicate
+
+				expect initial
+				.to.not.equal changed
 
 	it 'should return the correct interface', () ->
 
 		instance = new class TestEntityStore extends EntityStore
 
-		testInstance = new class TestListStore extends ListStore
+		testInstance = new class TestSetStore extends SetStore
 			containsEntity: instance
 
 		expect testInstance.getItems
@@ -24,19 +80,19 @@ describe 'ListStore', () ->
 	it 'should not allow relationships', () ->
 
 		expect () ->
-			new class TestListStore extends ListStore
+			new class TestSetStore extends SetStore
 				@hasOne()
 		.to.throw Error
 
 		expect () ->
-			new class TestListStore extends ListStore
+			new class TestSetStore extends SetStore
 				@hasMany()
 		.to.throw Error
 
 	it 'should throw when containsEntity is not defined', () ->
 
 		expect () ->
-			instance = new class TestListStore extends ListStore
+			instance = new class TestSetStore extends SetStore
 		.to.throw InvariantError
 
 
@@ -45,7 +101,7 @@ describe 'ListStore', () ->
 		instance = new class TestEntityStore extends EntityStore
 
 		expect () ->
-			new class TestListStore extends ListStore
+			new class TestSetStore extends SetStore
 				containsEntity: instance
 		.to.not.throw InvariantError
 
@@ -59,7 +115,7 @@ describe 'ListStore', () ->
 
 		changed = sinon.spy()
 
-		instance = new class TestListStore extends ListStore
+		instance = new class TestSetStore extends SetStore
 			containsEntity: entityInstance
 
 			initialize: () ->
@@ -75,14 +131,14 @@ describe 'ListStore', () ->
 
 		entityInstance = new class TestEntityStore extends EntityStore
 
-		instance = new class TestListStore extends ListStore
+		instance = new class TestSetStore extends SetStore
 			containsEntity: entityInstance
 
 			initialize: () ->
 				super
 				@add [1, 2, 3]
 
-				expect Immutable.List.isList @getIds()
+				expect Immutable.Set.isSet @getIds()
 				.to.be.true
 
 				expect @getIds().count()
@@ -97,7 +153,7 @@ describe 'ListStore', () ->
 
 		entityInstance = new class TestEntityStore extends EntityStore
 
-		instance = new class TestListStore extends ListStore
+		instance = new class TestSetStore extends SetStore
 			containsEntity: entityInstance
 
 			initialize: () ->
@@ -109,17 +165,14 @@ describe 'ListStore', () ->
 				expect @getIds().count()
 				.to.equal 2
 
-				expect @getIds().get(0)
-				.to.equal 1
-
-				expect @getIds().get(1)
-				.to.equal 3
+				expect @getIds().equals(Immutable.Set([1,3]))
+				.to.be.true
 
 	it 'should be able to reset the list', () ->
 
 		entityInstance = new class TestEntityStore extends EntityStore
 
-		instance = new class TestListStore extends ListStore
+		instance = new class TestSetStore extends SetStore
 			containsEntity: entityInstance
 
 			initialize: () ->
@@ -143,7 +196,7 @@ describe 'ListStore', () ->
 
 		entityInstance = new class TestEntityStore extends EntityStore
 
-		instance = new class TestListStore extends ListStore
+		instance = new class TestSetStore extends SetStore
 			containsEntity: entityInstance
 
 			initialize: () ->
@@ -165,7 +218,7 @@ describe 'ListStore', () ->
 				@setItem {id: 1, test: "value"}
 				@setItem {id: 2, test: "another value"}
 
-		instance = new class TestListStore extends ListStore
+		instance = new class TestSetStore extends SetStore
 			containsEntity: entityInstance
 
 			initialize: () ->
@@ -173,7 +226,7 @@ describe 'ListStore', () ->
 				@add [1, 2]
 
 				items = @getItems()
-				
+
 				expect items.count()
 				.to.equal 2
 
@@ -195,7 +248,7 @@ describe 'ListStore', () ->
 				@setItem {id: 1, test: "value"}
 				@setItem {id: 2, test: "another value"}
 
-		instance = new class TestListStore extends ListStore
+		instance = new class TestSetStore extends SetStore
 			containsEntity: entityInstance
 
 			initialize: () ->
@@ -203,7 +256,7 @@ describe 'ListStore', () ->
 				@add [1, 2]
 
 				first = @getItems()
-				second = @getItems()	
+				second = @getItems()
 
 				@remove 1
 
@@ -214,5 +267,4 @@ describe 'ListStore', () ->
 
 				expect third
 				.to.not.equal first
-
 
