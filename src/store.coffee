@@ -108,13 +108,13 @@ module.exports = class Store
 	# @param {String} key The key that should reference another store
 	# @param {ListStore} listStore the list store that is referenced from this store
 	###
-	@hasMany: (key, listStore) ->
-		invariant listStore._type is 'list', """
-			#{@constructor.name}.listReference(...): the list store specified for the key #{key} is invalid.
-			You must specify a store that is a descendant of Capacitor.ListStore.
+	@hasMany: (key, relatedStore) ->
+		invariant relatedStore._type in ['list', 'set'], """
+			#{@constructor.name}.listReference(...): the related store specified for the key #{key} is invalid.
+			You must specify a store that is a descendant of Capacitor.ListStore or Capacitor.SetStore.
 		"""
 		@_references ?= {}
-		@_references[key] = {store: listStore, type: 'list'}
+		@_references[key] = {store: relatedStore, type: relatedStore._type}
 		return null
 
 	@_makeInterfaceImmutable: (interfaceObj) ->

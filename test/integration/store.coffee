@@ -2,6 +2,8 @@ Store            = require '../../src/store'
 EntityStore      = require '../../src/entity-store'
 ListStore        = require '../../src/list-store'
 IndexedListStore = require '../../src/indexed-list-store'
+SetStore         = require '../../src/set-store'
+IndexedSetStore  = require '../../src/indexed-set-store'
 invariant        = require '../../src/invariant'
 InvariantError   = require '../../src/invariant-error'
 ActionCreator    = require '../../src/action-creator'
@@ -391,3 +393,27 @@ describe 'Store', () ->
 
 				expect @get('test')
 				.to.not.exist
+
+
+	it 'should be able to define a one to many relationship with a ListStore', () ->
+		article = new class ArticleStore extends EntityStore
+
+		randomArticles = new class ArticleListStore extends ListStore
+			containsEntity: article
+
+		user = new class UserStore extends EntityStore
+
+			expect () => @hasMany('articles', randomArticles)
+			.to.not.throw Error
+
+
+	it 'should be able to define a one to many relationship with a SetStore', () ->
+		article = new class ArticleStore extends EntityStore
+
+		randomArticles = new class ArticleListStore extends SetStore
+			containsEntity: article
+
+		user = new class UserStore extends EntityStore
+
+			expect () => @hasMany('articles', randomArticles)
+			.to.not.throw Error

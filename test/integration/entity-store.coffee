@@ -1,6 +1,8 @@
 EntityStore      = require '../../src/entity-store'
 IndexedListStore = require '../../src/indexed-list-store'
 ListStore        = require '../../src/list-store'
+IndexedSetStore = require '../../src/indexed-set-store'
+SetStore        = require '../../src/set-store'
 Store            = require '../../src/store'
 ActionCreator    = require '../../src/action-creator'
 actionManager    = require '../../src/action-manager'
@@ -428,3 +430,30 @@ describe 'EntityStore', () ->
 
 				expect @dereference.called
 				.to.equal false
+
+
+	it 'should be able to define a many to many relationship with an IndexedListStore', () ->
+		article = new class ArticleStore extends EntityStore
+
+		randomArticles = new class ArticleListStore extends IndexedListStore
+			containsEntity: article
+
+		user = new class UserStore extends EntityStore
+
+			expect () => @hasMany('articles').through(randomArticles)
+			.to.not.throw Error
+
+
+	it 'should be able to define a many to many relationship with an IndexedSetStore', () ->
+		article = new class ArticleStore extends EntityStore
+
+		randomArticles = new class ArticleListStore extends IndexedSetStore
+			containsEntity: article
+
+		user = new class UserStore extends EntityStore
+
+			expect () => @hasMany('articles').through(randomArticles)
+			.to.not.throw Error
+
+
+

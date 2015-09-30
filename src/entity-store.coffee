@@ -7,13 +7,13 @@ module.exports = class EntityStore extends Store
 
 	@hasMany: (key, listStore) ->
 		if arguments.length is 1
-			return through: (indexedListStore) =>
-				invariant indexedListStore._type is 'indexed-list', """
-					#{@constructor.name}.hasMany(...).through(...): the indexed list store specified for the key #{key} is invalid.
-					You must specify a store that is a descendant of Capacitor.IndexedListStore.
+			return through: (relatedStore) =>
+				invariant relatedStore._type in ['indexed-list', 'indexed-set'], """
+					#{@constructor.name}.hasMany(...).through(...): the related store specified for the key #{key} is invalid.
+					You must specify a store that is a descendant of Capacitor.IndexedListStore or Capacitor.IndexedSetStore.
 				"""
 				@_references ?= {}
-				@_references[key] = {store: indexedListStore, type: 'indexed-list'}
+				@_references[key] = {store: relatedStore, type: relatedStore._type}
 				return null
 
 		super
