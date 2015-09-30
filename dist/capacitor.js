@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.4.1 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.5.1 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -12,7 +12,7 @@
 		exports["capacitor"] = factory(require("lodash"), require("immutable"));
 	else
 		root["capacitor"] = factory(root["lodash"], root["immutable"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_9__, __WEBPACK_EXTERNAL_MODULE_10__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_11__, __WEBPACK_EXTERNAL_MODULE_12__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -66,7 +66,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ActionCreator, EntityStore, IndexedListStore, ListStore, Store, actionManager, invariant;
+	var ActionCreator, EntityStore, IndexedListStore, IndexedSetStore, ListStore, SetStore, Store, actionManager, invariant;
 
 	actionManager = __webpack_require__(2);
 
@@ -76,17 +76,23 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	EntityStore = __webpack_require__(5);
 
-	ListStore = __webpack_require__(6);
+	SetStore = __webpack_require__(6);
 
-	IndexedListStore = __webpack_require__(7);
+	IndexedSetStore = __webpack_require__(7);
 
-	invariant = __webpack_require__(8);
+	ListStore = __webpack_require__(8);
+
+	IndexedListStore = __webpack_require__(9);
+
+	invariant = __webpack_require__(10);
 
 	module.exports = {
 	  actionManager: actionManager,
 	  ActionCreator: ActionCreator,
 	  Store: Store,
 	  EntityStore: EntityStore,
+	  SetStore: SetStore,
+	  IndexedSetStore: IndexedSetStore,
 	  ListStore: ListStore,
 	  IndexedListStore: IndexedListStore,
 	  invariant: invariant
@@ -100,11 +106,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Action, ActionManager, dispatcher, invariant,
 	  __hasProp = {}.hasOwnProperty;
 
-	invariant = __webpack_require__(8);
+	invariant = __webpack_require__(10);
 
-	dispatcher = __webpack_require__(11);
+	dispatcher = __webpack_require__(13);
 
-	Action = __webpack_require__(12);
+	Action = __webpack_require__(14);
 
 	module.exports = new (ActionManager = (function() {
 
@@ -171,11 +177,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Action, ActionCreator, ActionInstance, dispatcher, invariant, _actionID, _requestID;
 
-	dispatcher = __webpack_require__(11);
+	dispatcher = __webpack_require__(13);
 
-	invariant = __webpack_require__(8);
+	invariant = __webpack_require__(10);
 
-	Action = __webpack_require__(12);
+	Action = __webpack_require__(14);
 
 	_actionID = 0;
 
@@ -255,17 +261,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  __hasProp = {}.hasOwnProperty,
 	  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-	_ = __webpack_require__(9);
+	_ = __webpack_require__(11);
 
-	Action = __webpack_require__(12);
+	Action = __webpack_require__(14);
 
-	dispatcher = __webpack_require__(11);
+	dispatcher = __webpack_require__(13);
 
-	invariant = __webpack_require__(8);
+	invariant = __webpack_require__(10);
 
-	Immutable = __webpack_require__(10);
+	Immutable = __webpack_require__(12);
 
-	EventBroker = __webpack_require__(13);
+	EventBroker = __webpack_require__(15);
 
 
 	/*
@@ -383,14 +389,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  	 * @param {ListStore} listStore the list store that is referenced from this store
 	   */
 
-	  Store.hasMany = function(key, listStore) {
-	    invariant(listStore._type === 'list', "" + this.constructor.name + ".listReference(...): the list store specified for the key " + key + " is invalid.\nYou must specify a store that is a descendant of Capacitor.ListStore.");
+	  Store.hasMany = function(key, relatedStore) {
+	    var _ref;
+	    invariant((_ref = relatedStore._type) === 'list' || _ref === 'set', "" + this.constructor.name + ".listReference(...): the related store specified for the key " + key + " is invalid.\nYou must specify a store that is a descendant of Capacitor.ListStore or Capacitor.SetStore.");
 	    if (this._references == null) {
 	      this._references = {};
 	    }
 	    this._references[key] = {
-	      store: listStore,
-	      type: 'list'
+	      store: relatedStore,
+	      type: relatedStore._type
 	    };
 	    return null;
 	  };
@@ -667,11 +674,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Store = __webpack_require__(4);
 
-	invariant = __webpack_require__(8);
+	invariant = __webpack_require__(10);
 
-	Immutable = __webpack_require__(10);
+	Immutable = __webpack_require__(12);
 
-	_ = __webpack_require__(9);
+	_ = __webpack_require__(11);
 
 	module.exports = EntityStore = (function(_super) {
 	  __extends(EntityStore, _super);
@@ -684,14 +691,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (arguments.length === 1) {
 	      return {
 	        through: (function(_this) {
-	          return function(indexedListStore) {
-	            invariant(indexedListStore._type === 'indexed-list', "" + _this.constructor.name + ".hasMany(...).through(...): the indexed list store specified for the key " + key + " is invalid.\nYou must specify a store that is a descendant of Capacitor.IndexedListStore.");
+	          return function(relatedStore) {
+	            var _ref;
+	            invariant((_ref = relatedStore._type) === 'indexed-list' || _ref === 'indexed-set', "" + _this.constructor.name + ".hasMany(...).through(...): the related store specified for the key " + key + " is invalid.\nYou must specify a store that is a descendant of Capacitor.IndexedListStore or Capacitor.IndexedSetStore.");
 	            if (_this._references == null) {
 	              _this._references = {};
 	            }
 	            _this._references[key] = {
-	              store: indexedListStore,
-	              type: 'indexed-list'
+	              store: relatedStore,
+	              type: relatedStore._type
 	            };
 	            return null;
 	          };
@@ -888,17 +896,81 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Immutable, ListStore, Store, invariant, _,
+	var CollectionStore, Immutable, SetStore,
 	  __hasProp = {}.hasOwnProperty,
 	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-	Store = __webpack_require__(4);
+	CollectionStore = __webpack_require__(16);
 
-	invariant = __webpack_require__(8);
+	Immutable = __webpack_require__(12);
 
-	Immutable = __webpack_require__(10);
+	module.exports = SetStore = (function(_super) {
+	  __extends(SetStore, _super);
 
-	_ = __webpack_require__(9);
+	  function SetStore() {
+	    return SetStore.__super__.constructor.apply(this, arguments);
+	  }
+
+	  SetStore._getStoreType = function() {
+	    return 'set';
+	  };
+
+	  SetStore.prototype._fromJS = Immutable.Set;
+
+	  SetStore.prototype._remove = function(ids, id) {
+	    return ids["delete"](id);
+	  };
+
+	  return SetStore;
+
+	})(CollectionStore);
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Immutable, IndexedCollectionStore, IndexedSetStore,
+	  __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+	IndexedCollectionStore = __webpack_require__(17);
+
+	Immutable = __webpack_require__(12);
+
+	module.exports = IndexedSetStore = (function(_super) {
+	  __extends(IndexedSetStore, _super);
+
+	  function IndexedSetStore() {
+	    return IndexedSetStore.__super__.constructor.apply(this, arguments);
+	  }
+
+	  IndexedSetStore._getStoreType = function() {
+	    return 'indexed-set';
+	  };
+
+	  IndexedSetStore.prototype._fromJS = Immutable.Set;
+
+	  IndexedSetStore.prototype._remove = function(ids, id) {
+	    return ids["delete"](id);
+	  };
+
+	  return IndexedSetStore;
+
+	})(IndexedCollectionStore);
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var CollectionStore, Immutable, ListStore,
+	  __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+	CollectionStore = __webpack_require__(16);
+
+	Immutable = __webpack_require__(12);
 
 	module.exports = ListStore = (function(_super) {
 	  __extends(ListStore, _super);
@@ -907,126 +979,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ListStore.__super__.constructor.apply(this, arguments);
 	  }
 
-	  ListStore.hasOne = function() {
-	    throw new Error("" + this.constructor.name + ".hasOne(...): You can't define relationships on a list store");
-	  };
-
-	  ListStore.hasMany = function() {
-	    throw new Error("" + this.constructor.name + ".hasMany(...): You can't define relationships on a list store");
-	  };
-
 	  ListStore._getStoreType = function() {
 	    return 'list';
 	  };
 
-	  ListStore.prototype.containsEntity = null;
+	  ListStore.prototype._fromJS = Immutable.List;
 
-	  ListStore.prototype.getInterface = function() {
-	    var interfaceObj;
-	    interfaceObj = ListStore.__super__.getInterface.apply(this, arguments);
-	    interfaceObj.getItems = this.getItems.bind(this);
-	    interfaceObj.getItem = this.getItem.bind(this);
-	    return interfaceObj;
-	  };
-
-	  ListStore.prototype.initialize = function() {
-	    ListStore.__super__.initialize.apply(this, arguments);
-	    invariant(this.containsEntity != null, "ListStore.initialize(...): Missing @containsEntity property. \nYou need to define an entity store to use the list store.");
-	    this.setIds(Immutable.List());
-	    return this.containsEntity.changed.addImmediate((function(_this) {
-	      return function() {
-	        return _this.changed.dispatch();
-	      };
-	    })(this));
-	  };
-
-	  ListStore.prototype.add = function(ids) {
-	    var currentIds;
-	    if (Immutable.Iterable.isIterable(ids)) {
-	      ids = ids.toJS();
-	    }
-	    invariant(_.isNumber(ids) || _.isString(ids) || _.isArray(ids), "ListStore.add(...): Add only accepts an id or an array of ids.");
-	    if (!_.isArray(ids)) {
-	      ids = [ids];
-	    }
-	    currentIds = this.getIds().withMutations(function(list) {
-	      var id, _i, _len, _results;
-	      _results = [];
-	      for (_i = 0, _len = ids.length; _i < _len; _i++) {
-	        id = ids[_i];
-	        _results.push(list.push(id));
-	      }
-	      return _results;
-	    });
-	    return this.setIds(currentIds);
-	  };
-
-	  ListStore.prototype.remove = function(id) {
-	    var currentIds, indexOf;
-	    currentIds = this.getIds();
-	    indexOf = currentIds.indexOf(id);
-	    invariant(indexOf !== -1, "ListStore.remove(...): Id " + id + " was not found in the store");
-	    currentIds = currentIds.remove(indexOf);
-	    return this.setIds(currentIds);
-	  };
-
-	  ListStore.prototype.reset = function(ids) {
-	    if (Immutable.Iterable.isIterable(ids)) {
-	      ids = ids.toJS();
-	    }
-	    invariant((ids == null) || _.isNumber(ids) || _.isString(ids) || _.isArray(ids), "ListStore.reset(...): Reset only accepts an id, an array of ids or nothing.");
-	    if (ids != null) {
-	      if (!_.isArray(ids)) {
-	        ids = [ids];
-	      }
-	    } else {
-	      ids = [];
-	    }
-	    return this.setIds(Immutable.List(ids));
-	  };
-
-	  ListStore.prototype.getIds = function() {
-	    return this.get('ids');
-	  };
-
-	  ListStore.prototype.setIds = function(ids) {
-	    return this.set('ids', ids);
-	  };
-
-	  ListStore.prototype.getItems = function() {
-	    var ids, items;
-	    ids = this.getIds();
-	    items = this.containsEntity.getItemsWithIds(ids);
-	    return this.cache('ids_items', items);
-	  };
-
-	  ListStore.prototype.getItem = function(id) {
-	    if (this.get('ids').includes(id)) {
-	      return this.containsEntity.getItem(id);
-	    }
-	    return null;
+	  ListStore.prototype._remove = function(ids, id) {
+	    return ids.remove(ids.indexOf(id));
 	  };
 
 	  return ListStore;
 
-	})(Store);
+	})(CollectionStore);
 
 
 /***/ },
-/* 7 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Immutable, IndexedListStore, Store, invariant, _,
+	var Immutable, IndexedCollectionStore, IndexedListStore,
 	  __hasProp = {}.hasOwnProperty,
 	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-	Store = __webpack_require__(4);
+	IndexedCollectionStore = __webpack_require__(17);
 
-	invariant = __webpack_require__(8);
-
-	Immutable = __webpack_require__(10);
-
-	_ = __webpack_require__(9);
+	Immutable = __webpack_require__(12);
 
 	module.exports = IndexedListStore = (function(_super) {
 	  __extends(IndexedListStore, _super);
@@ -1035,147 +1013,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return IndexedListStore.__super__.constructor.apply(this, arguments);
 	  }
 
-	  IndexedListStore.hasOne = function() {
-	    throw new Error("" + this.constructor.name + ".hasOne(...): You can't define relationships on an indexed list store");
-	  };
-
-	  IndexedListStore.hasMany = function() {
-	    throw new Error("" + this.constructor.name + ".hasMany(...): You can't define relationships on an indexed list store");
-	  };
-
 	  IndexedListStore._getStoreType = function() {
 	    return 'indexed-list';
 	  };
 
-	  IndexedListStore.prototype.containsEntity = null;
+	  IndexedListStore.prototype._fromJS = Immutable.List;
 
-	  IndexedListStore.prototype.getInterface = function() {
-	    var interfaceObj;
-	    interfaceObj = IndexedListStore.__super__.getInterface.apply(this, arguments);
-	    interfaceObj.getItems = this.getItems.bind(this);
-	    interfaceObj.getItem = this.getItem.bind(this);
-	    return interfaceObj;
-	  };
-
-	  IndexedListStore.prototype.initialize = function() {
-	    IndexedListStore.__super__.initialize.apply(this, arguments);
-	    invariant(this.containsEntity != null, "" + this.constructor.name + ".initialize(...): Missing @containsEntity property. \nYou need to define an entity store to use the IndexedIndexedListStore.");
-	    this.set('map', Immutable.Map({}));
-	    return this.containsEntity.changed.addImmediate((function(_this) {
-	      return function() {
-	        return _this.changed.dispatch();
-	      };
-	    })(this));
-	  };
-
-	  IndexedListStore.prototype.add = function(index, ids) {
-	    var currentIds, existingType;
-	    invariant(_.isNumber(index) || _.isString(index), "" + this.constructor.name + ".add(...): First parameter should be a number (id) or a string identifier.");
-	    invariant(_.isNumber(ids) || _.isString(ids) || _.isArray(ids), "" + this.constructor.name + ".add(...): Second parameter should be a number/string (id) or an array of numbers/strings (ids).");
-	    if (!_.isArray(ids)) {
-	      ids = [ids];
-	    }
-	    currentIds = this.getIds(index);
-	    existingType = ids.size > 0 ? typeof ids[0] : null;
-	    if (currentIds.size > 0) {
-	      existingType = typeof currentIds.get(0);
-	    } else if (ids.length > 0) {
-	      existingType = typeof ids[0];
-	    }
-	    return this.setIds(index, currentIds.withMutations(function(list) {
-	      var id, _i, _len, _results;
-	      _results = [];
-	      for (_i = 0, _len = ids.length; _i < _len; _i++) {
-	        id = ids[_i];
-	        invariant(existingType === typeof id, "" + this.constructor.name + ".add(...): Trying to mix numbers and strings as ids");
-	        _results.push(list.push(id));
-	      }
-	      return _results;
-	    }));
-	  };
-
-	  IndexedListStore.prototype.getIds = function(index) {
-	    var _ref;
-	    return (_ref = this.get('map').get(index)) != null ? _ref : Immutable.List([]);
-	  };
-
-	  IndexedListStore.prototype.setIds = function(index, ids) {
-	    var map, t;
-	    ids = Immutable.fromJS(ids);
-	    map = this.get('map');
-	    if (ids.size > 0) {
-	      t = typeof (ids.get(0));
-	      invariant(t === 'number' || t === 'string', "" + this.constructor.name + ".setIds(...) type of ids must be a number or a string");
-	      invariant(ids.find(function(e) {
-	        return typeof e !== t;
-	      }) == null, "" + this.constructor.name + ".setIds(...) mixed numbers and strings in ids");
-	    }
-	    map = map.set(index, ids);
-	    return this.set('map', map);
-	  };
-
-	  IndexedListStore.prototype.remove = function(index, id) {
-	    var currentIds, indexOf;
-	    currentIds = this.getIds(index);
-	    indexOf = currentIds.indexOf(id);
-	    invariant(indexOf !== -1, "" + this.constructor.name + ".remove(...): Id " + id + " was not found in the store");
-	    currentIds = currentIds.remove(indexOf);
-	    return this.setIds(index, currentIds);
-	  };
-
-	  IndexedListStore.prototype.removeIndex = function(index) {
-	    var map;
-	    map = this.get('map');
-	    map = map.remove(index);
-	    this.set('map', map);
-	    return this.unset('cached_list_' + index);
-	  };
-
-	  IndexedListStore.prototype.resetAll = function() {
-	    return this.set('map', Immutable.Map({}));
-	  };
-
-	  IndexedListStore.prototype.reset = function(index, ids) {
-	    invariant(index != null, "" + this.constructor.name + ".reset(...): No index was provided.");
-	    invariant((ids == null) || (_.isNumber(ids) || _.isString(ids) || _.isArray(ids)), "" + this.constructor.name + ".reset(...): Reset only accepts an id, an array of ids or nothing as the second parameter.");
-	    if (ids != null) {
-	      if (!_.isArray(ids)) {
-	        ids = [ids];
-	      }
-	    } else {
-	      ids = [];
-	    }
-	    return this.setIds(index, ids);
-	  };
-
-	  IndexedListStore.prototype.getItems = function(index) {
-	    var ids, items;
-	    ids = this.getIds(index);
-	    items = this.containsEntity.getItemsWithIds(ids);
-	    return this.cache('cached_list_' + index, items);
-	  };
-
-	  IndexedListStore.prototype.getItem = function(index, id) {
-	    var ids;
-	    ids = this.getIds(index);
-	    if (ids.includes(id)) {
-	      return this.containsEntity.getItem(id);
-	    }
-	    return null;
+	  IndexedListStore.prototype._remove = function(ids, id) {
+	    return ids.remove(ids.indexOf(id));
 	  };
 
 	  return IndexedListStore;
 
-	})(Store);
+	})(IndexedCollectionStore);
 
 
 /***/ },
-/* 8 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var InvariantError;
 
-	InvariantError = __webpack_require__(14);
+	InvariantError = __webpack_require__(18);
 
 
 	/*
@@ -1205,26 +1064,26 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_9__;
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_10__;
-
-/***/ },
 /* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_11__;
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_12__;
+
+/***/ },
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Dispatcher, invariant,
 	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
 	  __slice = [].slice;
 
-	invariant = __webpack_require__(8);
+	invariant = __webpack_require__(10);
 
 	'use strict';
 
@@ -1465,12 +1324,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Action, dispatcher;
 
-	dispatcher = __webpack_require__(11);
+	dispatcher = __webpack_require__(13);
 
 	Action = (function() {
 
@@ -1500,15 +1359,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var dispatcher, invariant,
 	  __slice = [].slice;
 
-	dispatcher = __webpack_require__(11);
+	dispatcher = __webpack_require__(13);
 
-	invariant = __webpack_require__(8);
+	invariant = __webpack_require__(10);
 
 	module.exports = function() {
 	  var EventBroker, shouldTrigger, _immediateListeners, _listeners;
@@ -1600,7 +1459,312 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 14 */
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var CollectionStore, Immutable, Store, invariant, _,
+	  __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+	Store = __webpack_require__(4);
+
+	invariant = __webpack_require__(10);
+
+	Immutable = __webpack_require__(12);
+
+	_ = __webpack_require__(11);
+
+
+	/*
+	 * Abstract store containing a collection of ids referencing other entities
+	 */
+
+	module.exports = CollectionStore = (function(_super) {
+	  __extends(CollectionStore, _super);
+
+	  function CollectionStore() {
+	    return CollectionStore.__super__.constructor.apply(this, arguments);
+	  }
+
+	  CollectionStore.hasOne = function() {
+	    var type;
+	    type = this.constructor._getStoreType();
+	    throw new Error("" + this.constructor.name + ".hasOne(...): You can't define relationships on a " + type + " store");
+	  };
+
+	  CollectionStore.hasMany = function() {
+	    var type;
+	    type = this.constructor._getStoreType();
+	    throw new Error("" + this.constructor.name + ".hasMany(...): You can't define relationships on a " + type + " store");
+	  };
+
+	  CollectionStore._getStoreType = function() {
+	    throw new Error("" + this.constructor.name + "._getStoreType(...): This method is abstract");
+	  };
+
+	  CollectionStore.prototype._fromJS = function(values) {
+	    throw new Error("" + this.constructor.name + "._fromJS(...): This method is abstract");
+	  };
+
+	  CollectionStore.prototype._remove = function(ids, id) {
+	    throw new Error("" + this.constructor.name + "._remove(...): This method is abstract");
+	  };
+
+	  CollectionStore.prototype.containsEntity = null;
+
+	  CollectionStore.prototype.getInterface = function() {
+	    var interfaceObj;
+	    interfaceObj = CollectionStore.__super__.getInterface.apply(this, arguments);
+	    interfaceObj.getItems = this.getItems.bind(this);
+	    interfaceObj.getItem = this.getItem.bind(this);
+	    return interfaceObj;
+	  };
+
+	  CollectionStore.prototype.initialize = function() {
+	    CollectionStore.__super__.initialize.apply(this, arguments);
+	    invariant(this.containsEntity != null, "" + this.constructor.name + ".initialize(...): Missing @containsEntity property.\nYou need to define an entity store to use the " + (this.constructor._getStoreType()) + " store.");
+	    this.setIds(this._fromJS([]));
+	    return this.containsEntity.changed.addImmediate((function(_this) {
+	      return function() {
+	        return _this.changed.dispatch();
+	      };
+	    })(this));
+	  };
+
+	  CollectionStore.prototype.add = function(ids) {
+	    var currentIds, newIds;
+	    if (Immutable.Iterable.isIterable(ids)) {
+	      ids = ids.toJS();
+	    }
+	    invariant(_.isNumber(ids) || _.isString(ids) || _.isArray(ids), "" + this.constructor.name + ".add(...): Add only accepts an id or an array of ids.");
+	    if (!_.isArray(ids)) {
+	      ids = [ids];
+	    }
+	    currentIds = this.getIds();
+	    newIds = currentIds.concat(ids);
+	    return this.setIds(newIds);
+	  };
+
+	  CollectionStore.prototype.remove = function(id) {
+	    var currentIds, newIds;
+	    currentIds = this.getIds();
+	    invariant(currentIds.contains(id, "" + this.constructor.name + ".remove(...): Id " + id + " was not found in the store"));
+	    newIds = this._remove(currentIds, id);
+	    return this.setIds(newIds);
+	  };
+
+	  CollectionStore.prototype.reset = function(ids) {
+	    if (Immutable.Iterable.isIterable(ids)) {
+	      ids = ids.toJS();
+	    }
+	    invariant((ids == null) || _.isNumber(ids) || _.isString(ids) || _.isArray(ids), "" + this.constructor.name + ".reset(...): Reset only accepts an id, an array of ids or nothing.");
+	    if (ids != null) {
+	      if (!_.isArray(ids)) {
+	        ids = [ids];
+	      }
+	    } else {
+	      ids = [];
+	    }
+	    return this.setIds(this._fromJS(ids));
+	  };
+
+	  CollectionStore.prototype.getIds = function() {
+	    return this.get('ids');
+	  };
+
+	  CollectionStore.prototype.setIds = function(ids) {
+	    return this.set('ids', ids);
+	  };
+
+	  CollectionStore.prototype.getItems = function() {
+	    var ids, items;
+	    ids = this.getIds();
+	    items = this.containsEntity.getItemsWithIds(ids);
+	    return this.cache('ids_items', items);
+	  };
+
+	  CollectionStore.prototype.getItem = function(id) {
+	    if (this.get('ids').includes(id)) {
+	      return this.containsEntity.getItem(id);
+	    }
+	    return null;
+	  };
+
+	  return CollectionStore;
+
+	})(Store);
+
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Immutable, IndexedCollectionStore, Store, invariant, _,
+	  __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+	Store = __webpack_require__(4);
+
+	invariant = __webpack_require__(10);
+
+	Immutable = __webpack_require__(12);
+
+	_ = __webpack_require__(11);
+
+
+	/*
+	 * Abstract store containing a map from ids to collections of ids referencing other entities
+	 */
+
+	module.exports = IndexedCollectionStore = (function(_super) {
+	  __extends(IndexedCollectionStore, _super);
+
+	  function IndexedCollectionStore() {
+	    return IndexedCollectionStore.__super__.constructor.apply(this, arguments);
+	  }
+
+	  IndexedCollectionStore.hasOne = function() {
+	    var type;
+	    type = type = this.constructor._getStoreType().replace('-', ' ');
+	    throw new Error("" + this.constructor.name + ".hasOne(...): You can't define relationships on a " + type + " store");
+	  };
+
+	  IndexedCollectionStore.hasMany = function() {
+	    var type;
+	    type = type = this.constructor._getStoreType().replace('-', ' ');
+	    throw new Error("" + this.constructor.name + ".hasMany(...): You can't define relationships on a " + type + " store");
+	  };
+
+	  IndexedCollectionStore._getStoreType = function() {
+	    throw new Error("" + this.constructor.name + "._getStoreType(...): This method is abstract");
+	  };
+
+	  IndexedCollectionStore.prototype._fromJS = function(values) {
+	    throw new Error("" + this.constructor.name + "._fromJS(...): This method is abstract");
+	  };
+
+	  IndexedCollectionStore.prototype._remove = function(ids, id) {
+	    throw new Error("" + this.constructor.name + "._remove(...): This method is abstract");
+	  };
+
+	  IndexedCollectionStore.prototype.containsEntity = null;
+
+	  IndexedCollectionStore.prototype.getInterface = function() {
+	    var interfaceObj;
+	    interfaceObj = IndexedCollectionStore.__super__.getInterface.apply(this, arguments);
+	    interfaceObj.getItems = this.getItems.bind(this);
+	    interfaceObj.getItem = this.getItem.bind(this);
+	    return interfaceObj;
+	  };
+
+	  IndexedCollectionStore.prototype.initialize = function() {
+	    IndexedCollectionStore.__super__.initialize.apply(this, arguments);
+	    invariant(this.containsEntity != null, "" + this.constructor.name + ".initialize(...): Missing @containsEntity property.\nYou need to define an entity store to use the " + this.constructor.name + ".");
+	    this.set('map', Immutable.Map({}));
+	    return this.containsEntity.changed.addImmediate((function(_this) {
+	      return function() {
+	        return _this.changed.dispatch();
+	      };
+	    })(this));
+	  };
+
+	  IndexedCollectionStore.prototype.add = function(index, ids) {
+	    var currentIds, existingType, id, _i, _len;
+	    invariant(_.isNumber(index) || _.isString(index), "" + this.constructor.name + ".add(...): First parameter should be a number (id) or a string identifier.");
+	    invariant(_.isNumber(ids) || _.isString(ids) || _.isArray(ids), "" + this.constructor.name + ".add(...): Second parameter should be a number/string (id) or an array of numbers/strings (ids).");
+	    if (!_.isArray(ids)) {
+	      ids = [ids];
+	    }
+	    currentIds = this.getIds(index);
+	    existingType = ids.size > 0 ? typeof ids[0] : null;
+	    if (currentIds.size > 0) {
+	      existingType = typeof currentIds.first();
+	    } else if (ids.length > 0) {
+	      existingType = typeof ids[0];
+	    }
+	    for (_i = 0, _len = ids.length; _i < _len; _i++) {
+	      id = ids[_i];
+	      invariant(existingType === typeof id, "" + this.constructor.name + ".add(...): Trying to mix numbers and strings as ids");
+	    }
+	    return this.setIds(index, currentIds.concat(ids));
+	  };
+
+	  IndexedCollectionStore.prototype.getIds = function(index) {
+	    var _ref;
+	    return (_ref = this.get('map').get(index)) != null ? _ref : this._fromJS([]);
+	  };
+
+	  IndexedCollectionStore.prototype.setIds = function(index, ids) {
+	    var map, t;
+	    ids = Immutable.fromJS(ids);
+	    map = this.get('map');
+	    if (ids.size > 0) {
+	      t = typeof (ids.first());
+	      invariant(t === 'number' || t === 'string', "" + this.constructor.name + ".setIds(...) type of ids must be a number or a string");
+	      invariant(ids.find(function(e) {
+	        return typeof e !== t;
+	      }) == null, "" + this.constructor.name + ".setIds(...) mixed numbers and strings in ids");
+	    }
+	    map = map.set(index, ids);
+	    return this.set('map', map);
+	  };
+
+	  IndexedCollectionStore.prototype.remove = function(index, id) {
+	    var currentIds, newIds;
+	    currentIds = this.getIds(index);
+	    invariant(currentIds.contains(id, "" + this.constructor.name + ".remove(...): Id " + id + " was not found in the store"));
+	    newIds = this._remove(currentIds, id);
+	    return this.setIds(index, newIds);
+	  };
+
+	  IndexedCollectionStore.prototype.removeIndex = function(index) {
+	    var map;
+	    map = this.get('map');
+	    map = map.remove(index);
+	    this.set('map', map);
+	    return this.unset('cached_index_' + index);
+	  };
+
+	  IndexedCollectionStore.prototype.resetAll = function() {
+	    return this.set('map', Immutable.Map({}));
+	  };
+
+	  IndexedCollectionStore.prototype.reset = function(index, ids) {
+	    invariant(index != null, "" + this.constructor.name + ".reset(...): No index was provided.");
+	    invariant((ids == null) || (_.isNumber(ids) || _.isString(ids) || _.isArray(ids)), "" + this.constructor.name + ".reset(...): Reset only accepts an id, an array of ids or nothing as the second parameter.");
+	    if (ids != null) {
+	      if (!_.isArray(ids)) {
+	        ids = [ids];
+	      }
+	    } else {
+	      ids = [];
+	    }
+	    return this.setIds(index, ids);
+	  };
+
+	  IndexedCollectionStore.prototype.getItems = function(index) {
+	    var ids, items;
+	    ids = this.getIds(index);
+	    items = this.containsEntity.getItemsWithIds(ids);
+	    return this.cache('cached_index_' + index, items);
+	  };
+
+	  IndexedCollectionStore.prototype.getItem = function(index, id) {
+	    var ids;
+	    ids = this.getIds(index);
+	    if (ids.includes(id)) {
+	      return this.containsEntity.getItem(id);
+	    }
+	    return null;
+	  };
+
+	  return IndexedCollectionStore;
+
+	})(Store);
+
+
+/***/ },
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var InvariantError,
