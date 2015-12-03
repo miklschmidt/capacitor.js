@@ -3,9 +3,6 @@ Immutable              = require 'immutable'
 
 module.exports = class IndexedListStore extends IndexedCollectionStore
 
-	@_getStoreType: () ->
-		return 'indexed-list'
-
 	_fromJS: Immutable.List
 
 	_remove: (ids, id) ->

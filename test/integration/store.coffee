@@ -68,7 +68,7 @@ describe 'Store', () ->
 		.to.exist
 
 		expect TestStore._references.testEntities.type
-		.to.equal 'list'
+		.to.equal 'collection'
 
 		expect TestStore._references.testEntities.store
 		.to.be.equal list
@@ -128,7 +128,7 @@ describe 'Store', () ->
 		.to.exist
 
 		expect TestStore._references.testEntities.type
-		.to.equal 'list'
+		.to.equal 'collection'
 
 		expect TestStore._references.testEntities.store
 		.to.be.equal list
@@ -137,7 +137,7 @@ describe 'Store', () ->
 		.to.exist
 
 		expect TestStore._references.testEntities2.type
-		.to.equal 'list'
+		.to.equal 'collection'
 
 		expect TestStore._references.testEntities2.store
 		.to.be.equal list

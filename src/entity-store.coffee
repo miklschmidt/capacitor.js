@@ -8,10 +8,12 @@ module.exports = class EntityStore extends Store
 	@hasMany: (key, listStore) ->
 		if arguments.length is 1
 			return through: (relatedStore) =>
-				invariant relatedStore._type in ['indexed-list', 'indexed-set'], """
+				invariant relatedStore._type in ['indexed-list', 'indexed-collection'], """
 					#{@constructor.name}.hasMany(...).through(...): the related store specified for the key #{key} is invalid.
-					You must specify a store that is a descendant of Capacitor.IndexedListStore or Capacitor.IndexedSetStore.
+					You must specify a store that is a descendant of Capacitor.IndexedCollectionStore.
 				"""
+				if relatedStore._type is 'indexed-list'
+					console.error "#{@constructor.name}.hasMany(...): entity type 'list' is deprecated. You don't need to override _getStoreType anymore."
 				@_references ?= {}
 				@_references[key] = {store: relatedStore, type: relatedStore._type}
 				return null
@@ -43,11 +45,16 @@ module.exports = class EntityStore extends Store
 			"""
 			result = reference.store.getItem id
 
-		else if reference.type in ['list', 'set']
+		else if reference.type in ['list', 'collection']
 			result = reference.store.getItems()
+			if reference.type is 'list'
+				console.error "#{@constructor.name}.dereference(...): entity type 'list' is deprecated. You don't need to override _getStoreType anymore."
 
-		else if reference.type in ['indexed-list', 'indexed-set']
+
+		else if reference.type in ['indexed-list', 'indexed-collection']
 			result = reference.store.getItems item.get('id')
+			if reference.type is 'indexed-list'
+				console.error "#{@constructor.name}.dereference(...): entity type 'list' is deprecated. You don't need to override _getStoreType anymore."
 
 		return result
 

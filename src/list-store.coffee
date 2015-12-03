@@ -3,9 +3,6 @@ Immutable       = require 'immutable'
 
 module.exports = class ListStore extends CollectionStore
 
-	@_getStoreType: () ->
-		return 'list'
-
 	_fromJS: Immutable.List
 
 	_remove: (ids, id) ->

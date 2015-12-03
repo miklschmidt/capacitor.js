@@ -71,7 +71,7 @@ describe 'EntityStore', () ->
 		.to.exist
 
 		expect UserStore._references.articles.type
-		.to.equal 'indexed-list'
+		.to.equal 'indexed-collection'
 
 		expect UserStore._references.articles.store
 		.to.be.equal usersArticles
@@ -142,7 +142,7 @@ describe 'EntityStore', () ->
 		.to.exist
 
 		expect UserStore._references.articles.type
-		.to.equal 'indexed-list'
+		.to.equal 'indexed-collection'
 
 		expect UserStore._references.articles.store
 		.to.be.equal usersArticles
@@ -151,7 +151,7 @@ describe 'EntityStore', () ->
 		.to.exist
 
 		expect UserStore._references.articles2.type
-		.to.equal 'indexed-list'
+		.to.equal 'indexed-collection'
 
 		expect UserStore._references.articles2.store
 		.to.be.equal usersArticles

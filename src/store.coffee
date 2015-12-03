@@ -94,7 +94,7 @@ module.exports = class Store
 	###
 	@hasOne: (key, entityStore) ->
 		invariant entityStore._type is 'entity', """
-			#{@constructor.name}.entityReference(...): the entity store specified for the key #{key} is invalid.
+			#{@constructor.name}.hasOne(...): the entity store specified for the key #{key} is invalid.
 			You must specify a store that is a descendant of Capacitor.EntityStore.
 		"""
 		@_references ?= {}
@@ -109,10 +109,13 @@ module.exports = class Store
 	# @param {ListStore} listStore the list store that is referenced from this store
 	###
 	@hasMany: (key, relatedStore) ->
-		invariant relatedStore._type in ['list', 'set'], """
-			#{@constructor.name}.listReference(...): the related store specified for the key #{key} is invalid.
-			You must specify a store that is a descendant of Capacitor.ListStore or Capacitor.SetStore.
+		invariant relatedStore._type in ['list', 'collection'], """
+			#{@constructor.name}.hasMany(...): the related store specified for the key #{key} is invalid.
+			You must specify a store that is a descendant of Capacitor.CollectionStore.
 		"""
+		if relatedStore._type is 'list'
+			console.error "#{@constructor.name}.hasMany(...): entity type 'list' is deprecated. You don't need to override _getStoreType anymore."
+
 		@_references ?= {}
 		@_references[key] = {store: relatedStore, type: relatedStore._type}
 		return null
@@ -207,9 +210,8 @@ module.exports = class Store
 			"""
 			result = reference.store.getItem id
 
-		else if reference.type in ['list', 'set']
+		else if reference.type in ['list', 'collection']
 			result = reference.store.getItems()
-
 		return result
 
 	getIn: (path) ->

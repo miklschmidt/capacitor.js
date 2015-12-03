@@ -21,10 +21,7 @@ module.exports = class CollectionStore extends Store
 			#{@constructor.name}.hasMany(...): You can't define relationships on a #{type} store
 		"""
 
-	@_getStoreType: () ->
-		throw new Error """
-			#{@constructor.name}._getStoreType(...): This method is abstract
-		"""
+	@_getStoreType: () -> 'collection'
 
 	# Convert the array `values` to an Immutable.Collection type
 	_fromJS: (values) ->
@@ -56,6 +53,9 @@ module.exports = class CollectionStore extends Store
 		@setIds @_fromJS([])
 		# This store has effictively changed if it's entity store has changed.
 		@containsEntity.changed.addImmediate () => @changed.dispatch()
+
+		unless @constructor._getStoreType() is 'collection'
+			console.error "#{@constructor.name}.initialize(): Overriding _getStoreType() is deprecated and is no longer necessary."
 
 	add: (ids) ->
 		if Immutable.Iterable.isIterable(ids)
