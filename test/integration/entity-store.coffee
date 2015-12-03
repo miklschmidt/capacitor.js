@@ -445,15 +445,86 @@ describe 'EntityStore', () ->
 
 
 	it 'should be able to define a many to many relationship with an IndexedSetStore', () ->
+
 		article = new class ArticleStore extends EntityStore
+
+			initialize: () ->
+				super
+				@setItem {
+					id: 1
+					title: 'test'
+				}
 
 		randomArticles = new class ArticleListStore extends IndexedSetStore
 			containsEntity: article
+			initialize: () ->
+				super
+				@add 1, 1
 
 		user = new class UserStore extends EntityStore
+
+			initialize: () ->
+				super
+				@setItem {
+					id: 1
+					name: 'Test User'
+				}
 
 			expect () => @hasMany('articles').through(randomArticles)
 			.to.not.throw Error
 
+		expect user.getItem(1).get('articles').get(0).get('id')
+		.to.equal 1
 
+		expect user.getItem(1).get('articles').get(0).get('title')
+		.to.equal 'test'
+
+
+	it 'should be able to define a one to many relationship with a ListStore', () ->
+		article = new class ArticleStore extends EntityStore
+
+		randomArticles = new class ArticleListStore extends ListStore
+			containsEntity: article
+
+		test = new class TestStore extends EntityStore
+
+			expect () => @hasMany('articles', randomArticles)
+			.to.not.throw Error
+
+
+	it 'should be able to define a one to many relationship with a SetStore', () ->
+		article = new class ArticleStore extends EntityStore
+
+			initialize: () ->
+				super
+				@setItem {
+					id: 1
+					title: 'test'
+				}
+
+		randomArticles = new class ArticleListStore extends SetStore
+			containsEntity: article
+
+			initialize: () ->
+				super
+				@add 1
+
+		user = new class UserStore extends EntityStore
+
+			initialize: () ->
+				super
+				@setItem {
+					id: 1
+					name: "Test User"
+				}
+
+			expect () => @hasMany('articles', randomArticles)
+			.to.not.throw Error
+
+
+		expect user.getItem(1).get('articles').get(0).get('id')
+		.to.equal 1
+
+		expect user.getItem(1).get('articles').get(0).get('title')
+		.to.equal 'test'
 

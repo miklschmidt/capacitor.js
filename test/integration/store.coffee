@@ -401,7 +401,7 @@ describe 'Store', () ->
 		randomArticles = new class ArticleListStore extends ListStore
 			containsEntity: article
 
-		user = new class UserStore extends EntityStore
+		test = new class TestStore extends Store
 
 			expect () => @hasMany('articles', randomArticles)
 			.to.not.throw Error
@@ -410,10 +410,28 @@ describe 'Store', () ->
 	it 'should be able to define a one to many relationship with a SetStore', () ->
 		article = new class ArticleStore extends EntityStore
 
+			initialize: () ->
+				super
+				@setItem {
+					id: 1
+					title: 'test'
+				}
+
 		randomArticles = new class ArticleListStore extends SetStore
 			containsEntity: article
 
-		user = new class UserStore extends EntityStore
+			initialize: () ->
+				super
+				@add 1
+
+		test = new class TestStore extends Store
 
 			expect () => @hasMany('articles', randomArticles)
 			.to.not.throw Error
+
+
+		expect test.get('articles').get(0).get('id')
+		.to.equal 1
+
+		expect test.get('articles').get(0).get('title')
+		.to.equal 'test'

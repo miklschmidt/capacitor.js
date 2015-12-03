@@ -207,7 +207,7 @@ module.exports = class Store
 			"""
 			result = reference.store.getItem id
 
-		else if reference.type is 'list'
+		else if reference.type in ['list', 'set']
 			result = reference.store.getItems()
 
 		return result

@@ -43,10 +43,10 @@ module.exports = class EntityStore extends Store
 			"""
 			result = reference.store.getItem id
 
-		else if reference.type is 'list'
+		else if reference.type in ['list', 'set']
 			result = reference.store.getItems()
 
-		else if reference.type is 'indexed-list'
+		else if reference.type in ['indexed-list', 'indexed-set']
 			result = reference.store.getItems item.get('id')
 
 		return result
