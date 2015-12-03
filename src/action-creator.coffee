@@ -2,8 +2,8 @@ dispatcher = require './dispatcher'
 invariant = require './invariant'
 Action = require './action'
 
-_actionID = 0
-_requestID = 0
+_actionID = 1
+_requestID = 1
 
 class ActionInstance
 
@@ -37,7 +37,7 @@ module.exports = class ActionCreator
 	# @param {mixed} payload Payload for the action
 	###
 	createActionInstance: (action, payload) ->
-		invariant action instanceof Action and action?.type?, 
+		invariant action instanceof Action and action?.type?,
 			"The action you dispatched does not seem to be an instance of capacitor.Action"
 		new ActionInstance action.type, payload
 
