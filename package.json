@@ -1,6 +1,6 @@
 {
   "name": "capacitor",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "An implementation of facebook's flux architecture, great Scott!",
   "keywords": [
     "flux",
