@@ -189,7 +189,7 @@ describe 'Store', () ->
 			@hasMany 'testEntities', list
 
 		changed = sinon.spy()
-		store.changed.add changed
+		store.changed.add changed, store
 
 		list.dispatch()
 		entity.dispatch()
@@ -200,7 +200,7 @@ describe 'Store', () ->
 
 		changedViaAction = sinon.spy()
 
-		store.changed.add changedViaAction
+		store.changed.add changedViaAction, store
 
 		creator = new class TestActionCreator extends ActionCreator
 		creator.dispatch action

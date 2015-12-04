@@ -120,7 +120,7 @@ describe 'SetStore', () ->
 
 			initialize: () ->
 				super
-				@changed.add changed
+				@changed.add changed, this
 
 		entityInstance.dispatch()
 

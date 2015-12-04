@@ -120,7 +120,7 @@ describe 'IndexedSetStore', () ->
 
 			initialize: () ->
 				super
-				@changed.add changed
+				@changed.add changed, @
 
 		entityInstance.dispatch()
 

@@ -21,7 +21,7 @@ describe 'EventBroker', () ->
 				@changed.dispatch()
 
 		changed = sinon.spy()
-		instance.changed.add changed
+		instance.changed.add changed, this
 
 		creator = new class TestActionCreator extends ActionCreator
 		creator.dispatch action
@@ -38,7 +38,7 @@ describe 'EventBroker', () ->
 
 			initialize: () ->
 				super
-				@changed.add changed
+				@changed.add changed, this
 				@changed()
 				@changed.dispatch()
 
@@ -61,7 +61,7 @@ describe 'EventBroker', () ->
 
 			initialize: () ->
 				super
-				@changed.addImmediate changed
+				@changed.addImmediate changed, this
 				@changed()
 				@changed.dispatch()
 

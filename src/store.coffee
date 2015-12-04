@@ -148,7 +148,7 @@ module.exports = class Store
 		# Set up change listeners on relationships
 		if @constructor._references?
 			for key, reference of @constructor._references
-				reference.store.changed.add () => @changed.dispatch()
+				reference.store.changed.add (() -> @changed.dispatch()), @
 
 		# Return proxy object used to interact with this store
 		that = @

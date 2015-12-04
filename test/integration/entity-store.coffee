@@ -205,7 +205,7 @@ describe 'EntityStore', () ->
 				@setItem {id: 1, name: "John Doe"}
 
 		changed = sinon.spy()
-		user.changed.add changed
+		user.changed.add changed, user
 
 		profile.dispatch()
 		usersArticles.dispatch()
@@ -215,7 +215,7 @@ describe 'EntityStore', () ->
 
 		changedViaAction = sinon.spy()
 
-		user.changed.add changedViaAction
+		user.changed.add changedViaAction, user
 
 		creator = new class TestActionCreator extends ActionCreator
 		creator.dispatch action

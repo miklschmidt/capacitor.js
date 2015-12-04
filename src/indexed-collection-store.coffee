@@ -52,7 +52,7 @@ module.exports = class IndexedCollectionStore extends Store
 		"""
 		@set 'map', Immutable.Map {}
 		# This store has effictively changed if it's entity store has changed.
-		@containsEntity.changed.addImmediate () => @changed.dispatch()
+		@containsEntity.changed.addImmediate (() -> @changed.dispatch()), @
 
 		unless @constructor._getStoreType() is 'indexed-collection'
 			console.error "#{@constructor.name}.initialize(): Overriding _getStoreType() is deprecated and is no longer necessary."

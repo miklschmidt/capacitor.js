@@ -64,7 +64,7 @@ describe 'IndexedListStore', () ->
 
 			initialize: () ->
 				super
-				@changed.add changed
+				@changed.add changed, @
 
 		entityInstance.dispatch()
 
@@ -236,7 +236,7 @@ describe 'IndexedListStore', () ->
 				@add 0, [1, 2]
 
 				items = @getItems(0)
-				
+
 				expect items.count()
 				.to.equal 2
 
@@ -266,7 +266,7 @@ describe 'IndexedListStore', () ->
 				@add 0, [1, 2]
 
 				first = @getItems(0)
-				second = @getItems(0)	
+				second = @getItems(0)
 
 				@remove 0, 1
 

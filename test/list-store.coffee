@@ -64,7 +64,7 @@ describe 'ListStore', () ->
 
 			initialize: () ->
 				super
-				@changed.add changed
+				@changed.add changed, this
 
 		entityInstance.dispatch()
 
@@ -173,7 +173,7 @@ describe 'ListStore', () ->
 				@add [1, 2]
 
 				items = @getItems()
-				
+
 				expect items.count()
 				.to.equal 2
 
@@ -203,7 +203,7 @@ describe 'ListStore', () ->
 				@add [1, 2]
 
 				first = @getItems()
-				second = @getItems()	
+				second = @getItems()
 
 				@remove 1
 
