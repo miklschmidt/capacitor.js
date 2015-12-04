@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.5.3 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.5.4 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -438,11 +438,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      _ref = this.constructor._references;
 	      for (key in _ref) {
 	        reference = _ref[key];
-	        reference.store.changed.add((function(_this) {
-	          return function() {
-	            return _this.changed.dispatch();
-	          };
-	        })(this));
+	        reference.store.changed.add((function() {
+	          return this.changed.dispatch();
+	        }), this);
 	      }
 	    }
 	    that = this;
@@ -1131,11 +1129,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    CollectionStore.__super__.initialize.apply(this, arguments);
 	    invariant(this.containsEntity != null, "" + this.constructor.name + ".initialize(...): Missing @containsEntity property.\nYou need to define an entity store to use the " + (this.constructor._getStoreType()) + " store.");
 	    this.setIds(this._fromJS([]));
-	    this.containsEntity.changed.addImmediate((function(_this) {
-	      return function() {
-	        return _this.changed.dispatch();
-	      };
-	    })(this));
+	    this.containsEntity.changed.addImmediate((function() {
+	      return this.changed.dispatch();
+	    }), this);
 	    if (this.constructor._getStoreType() !== 'collection') {
 	      return console.error("" + this.constructor.name + ".initialize(): Overriding _getStoreType() is deprecated and is no longer necessary.");
 	    }
@@ -1271,11 +1267,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    IndexedCollectionStore.__super__.initialize.apply(this, arguments);
 	    invariant(this.containsEntity != null, "" + this.constructor.name + ".initialize(...): Missing @containsEntity property.\nYou need to define an entity store to use the " + this.constructor.name + ".");
 	    this.set('map', Immutable.Map({}));
-	    this.containsEntity.changed.addImmediate((function(_this) {
-	      return function() {
-	        return _this.changed.dispatch();
-	      };
-	    })(this));
+	    this.containsEntity.changed.addImmediate((function() {
+	      return this.changed.dispatch();
+	    }), this);
 	    if (this.constructor._getStoreType() !== 'indexed-collection') {
 	      return console.error("" + this.constructor.name + ".initialize(): Overriding _getStoreType() is deprecated and is no longer necessary.");
 	    }
@@ -1694,6 +1688,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (context == null) {
 	      context = null;
 	    }
+	    if (context == null) {
+	      console.error("Warning: You should supply context to changed.add(...) as a second parameter.");
+	    }
 	    return _listeners.push({
 	      fn: fn,
 	      context: context
@@ -1705,6 +1702,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      context = null;
 	    }
 	    listeners = [];
+	    if (context == null) {
+	      console.error("Warning: You should supply context to changed.remove(...) as a second parameter. Not doing so will remove listeners from all instances of your component.");
+	    }
 	    for (index = _i = 0, _len = _listeners.length; _i < _len; index = ++_i) {
 	      listener = _listeners[index];
 	      if (listener.fn !== fn && listener.context !== context) {
@@ -1714,6 +1714,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return _listeners = listeners;
 	  };
 	  EventBroker.addImmediate = function(fn, context) {
+	    if (context == null) {
+	      console.error("Warning: You should supply context to changed.addImmediate(...) as a second parameter.");
+	    }
 	    return _immediateListeners.push({
 	      fn: fn,
 	      context: context
@@ -1725,6 +1728,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      context = null;
 	    }
 	    listeners = [];
+	    if (context == null) {
+	      console.error("Warning: You should supply context to changed.removeImmediate(...) as a second parameter. Not doing so will remove listeners from all instances of your component.");
+	    }
 	    for (index = _i = 0, _len = _immediateListeners.length; _i < _len; index = ++_i) {
 	      listener = _immediateListeners[index];
 	      if (listener.fn !== fn && listener.context !== context) {
@@ -1736,13 +1742,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  EventBroker.dispatch = function() {
 	    var args, listener, _i, _len;
 	    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-	    invariant(args.length === 0, "EventBroker.dispatch(...): You can't dispatch with a payload. \nThis is due to events being batched by the dispatcher, to avoid unnecessary computations. \nIf you have a good reason to send a payload, you can use the unbatched dispatchImmediate and addImmediate.");
+	    invariant(args.length === 0, "EventBroker.dispatch(...): You can't dispatch with a payload.\nThis is due to events being batched by the dispatcher, to avoid unnecessary computations.\nIf you have a good reason to send a payload, you can use the unbatched dispatchImmediate and addImmediate.");
 	    if (dispatcher.isDispatching()) {
 	      shouldTrigger = true;
 	    } else {
 	      for (_i = 0, _len = _listeners.length; _i < _len; _i++) {
 	        listener = _listeners[_i];
-	        listener.fn();
+	        if (listener.context != null) {
+	          listener.fn.apply(listener.context);
+	        } else {
+	          listener.fn();
+	        }
 	      }
 	    }
 	    return EventBroker.dispatchImmediate();
@@ -1753,7 +1763,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _results = [];
 	    for (_i = 0, _len = _immediateListeners.length; _i < _len; _i++) {
 	      listener = _immediateListeners[_i];
-	      _results.push(listener.fn.apply(listener, args));
+	      if (listener.context != null) {
+	        _results.push(listener.fn.apply(listener.context, args));
+	      } else {
+	        _results.push(listener.fn());
+	      }
 	    }
 	    return _results;
 	  };
@@ -1762,7 +1776,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (shouldTrigger === true) {
 	      for (_i = 0, _len = _listeners.length; _i < _len; _i++) {
 	        listener = _listeners[_i];
-	        listener.fn();
+	        if (listener.context != null) {
+	          listener.fn.apply(listener.context);
+	        } else {
+	          listener.fn();
+	        }
 	      }
 	    }
 	    return shouldTrigger = false;
