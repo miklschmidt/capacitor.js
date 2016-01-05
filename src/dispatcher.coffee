@@ -86,9 +86,11 @@ module.exports = new class Dispatcher
 	# @private
 	###
 	finalizeDispatching = () ->
-		@callFinalizers()
-		currentAction = null
-		dispatching = no
+		try
+			@callFinalizers()
+		finally
+			currentAction = null
+			dispatching = no
 
 	###
     # Calls the action handler on a store with the current action and payload.

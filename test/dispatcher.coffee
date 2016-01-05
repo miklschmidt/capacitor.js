@@ -58,6 +58,24 @@ describe 'Dispatcher', () ->
 		dispatcher.dispatch actionInstance
 		expectBothStoreCalls actionInstance, dispatcher.waitFor
 
+	it 'should be able to handle finalizer errors gracefully', () ->
+		throwError = true
+		totalCalls = 0
+		error = new Error("My magical test error")
+
+		dispatcher.onFinalize () ->
+			totalCalls++
+			return unless throwError
+			throwError = false
+			throw error
+
+		actionInstance = actionCreator.createActionInstance(action, payload)
+		expect(dispatcher.dispatch.bind(dispatcher, actionInstance)).to.throw(error)
+
+		actionInstance = actionCreator.createActionInstance(action, payload)
+		dispatcher.dispatch actionInstance
+		expect(totalCalls).to.equal 2
+
 	it 'should wait for stores registered earlier', () ->
 
 		dispatcher.register storeA
