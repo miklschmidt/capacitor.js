@@ -1,5 +1,5 @@
 /**
- * @license capacitor.js 0.5.5 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
+ * @license capacitor.js 0.5.6 Copyright (c) 2014, Mikkel Schmidt. All Rights Reserved.
  * Available via the MIT license.
  */
 
@@ -12,7 +12,7 @@
 		exports["capacitor"] = factory(require("lodash"), require("immutable"));
 	else
 		root["capacitor"] = factory(root["lodash"], root["immutable"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_13__, __WEBPACK_EXTERNAL_MODULE_14__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_9__, __WEBPACK_EXTERNAL_MODULE_10__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -57,38 +57,38 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__(1);
 
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var ActionCreator, CollectionStore, EntityStore, IndexedCollectionStore, IndexedListStore, IndexedSetStore, ListStore, SetStore, Store, actionManager, invariant;
 
 	actionManager = __webpack_require__(2);
 
-	ActionCreator = __webpack_require__(3);
+	ActionCreator = __webpack_require__(7);
 
-	Store = __webpack_require__(4);
+	Store = __webpack_require__(8);
 
-	EntityStore = __webpack_require__(5);
+	EntityStore = __webpack_require__(12);
 
-	SetStore = __webpack_require__(6);
+	SetStore = __webpack_require__(13);
 
-	IndexedSetStore = __webpack_require__(7);
+	IndexedSetStore = __webpack_require__(15);
 
-	ListStore = __webpack_require__(8);
+	ListStore = __webpack_require__(17);
 
-	IndexedListStore = __webpack_require__(9);
+	IndexedListStore = __webpack_require__(18);
 
-	invariant = __webpack_require__(10);
+	invariant = __webpack_require__(3);
 
-	CollectionStore = __webpack_require__(11);
+	CollectionStore = __webpack_require__(14);
 
-	IndexedCollectionStore = __webpack_require__(12);
+	IndexedCollectionStore = __webpack_require__(16);
 
 	module.exports = {
 	  actionManager: actionManager,
@@ -105,18 +105,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var Action, ActionManager, dispatcher, invariant,
 	  hasProp = {}.hasOwnProperty;
 
-	invariant = __webpack_require__(10);
+	invariant = __webpack_require__(3);
 
-	dispatcher = __webpack_require__(15);
+	dispatcher = __webpack_require__(5);
 
-	Action = __webpack_require__(16);
+	Action = __webpack_require__(6);
 
 	module.exports = new (ActionManager = (function() {
 
@@ -133,7 +133,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  /*
 	  	 * Method for creating an action
-	  	#
+	  	 *
 	  	 * @param {string} name The (unique) name of the action.
 	  	 * @return {Action} the created action.
 	   */
@@ -147,7 +147,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  /*
 	  	 * Method for listing all existing actions
-	  	#
+	  	 *
 	  	 * @return {Array} list of existing actions
 	   */
 
@@ -164,7 +164,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  /*
 	  	 * Method to check if an action exists
-	  	#
+	  	 *
 	  	 * @return {boolean}
 	   */
 
@@ -177,17 +177,359 @@ return /******/ (function(modules) { // webpackBootstrap
 	})());
 
 
-/***/ },
+/***/ }),
 /* 3 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
+
+	var InvariantError;
+
+	InvariantError = __webpack_require__(4);
+
+
+	/*
+	 * Use invariant() to assert state which your program assumes to be true.
+	 *
+	 * Provided arguments are automatically type checked and logged correctly to the console
+	 * Chrome's console.log sprintf format.
+	 *
+	 * ex: invariant(!hasFired, "hasFired was expected to be true but was", hasFired)
+	 *
+	 * The invariant message will be stripped in production, but the invariant
+	 * will remain to ensure logic does not differ in production.
+	 */
+
+	module.exports = function(condition, message) {
+	  var error;
+	  if (!condition) {
+	    if (message == null) {
+	      error = new InvariantError("Minified exception occurred; use the non-minified dev environment\nfor the full error message and additional helpful warnings.");
+	    } else {
+	      error = new InvariantError(message);
+	    }
+	    error.framesToPop = 1;
+	    throw error;
+	  }
+	};
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+	var InvariantError,
+	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	  hasProp = {}.hasOwnProperty;
+
+	module.exports = InvariantError = (function(superClass) {
+	  extend(InvariantError, superClass);
+
+	  function InvariantError(message) {
+	    this.name = "Invariant Error";
+	    this.message = message;
+	  }
+
+	  return InvariantError;
+
+	})(Error);
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var Dispatcher, invariant,
+	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+	  slice = [].slice;
+
+	invariant = __webpack_require__(3);
+
+	'use strict';
+
+	module.exports = new (Dispatcher = (function() {
+
+	  /*
+	  	 * @var {boolean} dispatching Wether or not the dispatcher is currently dispatching.
+	  	 * @private
+	   */
+	  var currentAction, dispatching, finalizeDispatching, finalizers, isHandled, isPending, notifyStore, prepareForDispatching, storeID, stores;
+
+	  function Dispatcher() {
+	    this.dispatch = bind(this.dispatch, this);
+	    this.waitFor = bind(this.waitFor, this);
+	  }
+
+	  dispatching = false;
+
+
+	  /*
+	  	 * @var {integer} storeID ID to use for the next store that gets registered.
+	  	 * @private
+	   */
+
+	  storeID = 0;
+
+
+	  /*
+	  	 * @var {object} stores Store registry.
+	  	 * @private
+	   */
+
+	  stores = {};
+
+
+	  /*
+	      * @var {object} isPending Object for tracking pending store callbacks.
+	  	 * @private
+	   */
+
+	  isPending = {};
+
+
+	  /*
+	      * @var {object} isPending Object for tracking handled store callbacks.
+	  	 * @private
+	   */
+
+	  isHandled = {};
+
+
+	  /*
+	      * @var {string} isPending The current action being dispatched, if any.
+	  	 * @private
+	   */
+
+	  currentAction = null;
+
+
+	  /*
+	  	 * @var {array} finalizers An array of callbacks to be called when the store is finished dispatching.
+	  	 * @private
+	   */
+
+	  finalizers = [];
+
+
+	  /*
+	      * Sets the dispatcher to a state where all stores are neither
+	      * pending nor handled.
+	      *
+	  	 * @private
+	   */
+
+	  prepareForDispatching = function() {
+	    var id, results;
+	    dispatching = true;
+	    results = [];
+	    for (id in stores) {
+	      isPending[id] = false;
+	      results.push(isHandled[id] = false);
+	    }
+	    return results;
+	  };
+
+
+	  /*
+	      * Method for hooking up a finalizer callback
+	      *
+	  	 * @private
+	   */
+
+	  Dispatcher.prototype.onFinalize = function(fn) {
+	    return finalizers.push(fn);
+	  };
+
+
+	  /*
+	      * Method for calling finalizer callbacks
+	      *
+	  	 * @private
+	   */
+
+	  Dispatcher.prototype.callFinalizers = function() {
+	    var finalizer, i, len, results;
+	    results = [];
+	    for (i = 0, len = finalizers.length; i < len; i++) {
+	      finalizer = finalizers[i];
+	      results.push(finalizer());
+	    }
+	    return results;
+	  };
+
+
+	  /*
+	      * Method for checking if the dispatcher is currently dispatching.
+	      *
+	  	 * @public
+	   */
+
+	  Dispatcher.prototype.isDispatching = function() {
+	    return dispatching;
+	  };
+
+
+	  /*
+	      * Resets the dispatcher state after dispatching, and fires store events.
+	      *
+	  	 * @private
+	   */
+
+	  finalizeDispatching = function() {
+	    try {
+	      return this.callFinalizers();
+	    } finally {
+	      currentAction = null;
+	      dispatching = false;
+	    }
+	  };
+
+
+	  /*
+	      * Calls the action handler on a store with the current action and payload.
+	      * This method is used when dispatching.
+	      *
+	      * @param {integer} id The ID of the store to notify
+	  	 * @private
+	   */
+
+	  notifyStore = function(id) {
+	    invariant(currentAction != null, "Cannot notify store without an action");
+	    isPending[id] = true;
+	    stores[id]._handleAction.call(stores[id], currentAction, this.waitFor);
+	    return isHandled[id] = true;
+	  };
+
+
+	  /*
+	      * Registers a store with the dispatcher so that it's notified when actions
+	      * are dispatched.
+	      *
+	      * @param {Object} store The store to register with the dispatcher
+	   */
+
+	  Dispatcher.prototype.register = function(store) {
+	    stores[storeID] = store;
+	    return store._id = storeID++;
+	  };
+
+
+	  /*
+	      * Unregisters a store from the dispatcher so that it's no longer
+	      * notified when actions are dispatched.
+	      *
+	      * @param {Object} store The store to unregister from the dispatcher
+	   */
+
+	  Dispatcher.prototype.unregister = function(store) {
+	    invariant((store._id != null) && (stores[store._id] != null), "dispatcher.unregister(...): Store is not registered with the dispatcher.");
+	    return delete stores[store._id];
+	  };
+
+
+	  /*
+	      * Method for waiting for other stores to complete their handling
+	      * of actions. This method is passed along to the Stores when an action
+	      * is dispatched.
+	      *
+	      * @see notifyStore
+	   */
+
+	  Dispatcher.prototype.waitFor = function() {
+	    var dependency, i, id, len, results, storeDependencies;
+	    storeDependencies = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+	    invariant(dispatching, "dispatcher.waitFor(): It's not possible to wait for dependencies when the dispatcher isn't dispatching.\nwaitFor() should be called in an action handler.");
+	    results = [];
+	    for (i = 0, len = storeDependencies.length; i < len; i++) {
+	      dependency = storeDependencies[i];
+	      id = dependency._id;
+	      invariant((id != null) && (stores[id] != null), 'dispatcher.waitFor(...): dependency is not registered with the dispatcher.');
+	      if (isPending[id]) {
+	        invariant(isHandled[id], 'dispatcher.waitFor(...): Circular dependency detected.');
+	        continue;
+	      }
+	      results.push(notifyStore.call(this, id));
+	    }
+	    return results;
+	  };
+
+
+	  /*
+	      * Method for dispatching in action. This method is used by the Action class
+	      * when calling Action.dispatch().
+	      *
+	      * @param {string} actionName The name of the action to dispatch
+	      * @param {mixed} payload The payload for the event.
+	   */
+
+	  Dispatcher.prototype.dispatch = function(actionInstance) {
+	    var id, results;
+	    invariant(!dispatching, 'dispatcher.dispatch(...): Cannot dispatch in the middle of a dispatch.');
+	    currentAction = actionInstance;
+	    prepareForDispatching.call(this);
+	    try {
+	      results = [];
+	      for (id in stores) {
+	        if (isPending[id]) {
+	          continue;
+	        }
+	        results.push(notifyStore.call(this, id));
+	      }
+	      return results;
+	    } finally {
+	      finalizeDispatching.call(this);
+	    }
+	  };
+
+	  return Dispatcher;
+
+	})());
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var Action, dispatcher;
+
+	dispatcher = __webpack_require__(5);
+
+	Action = (function() {
+
+	  /*
+	  	 * Constructor
+	  	 *
+	  	 * @param {string} The name of the action
+	   */
+	  function Action(type) {
+	    this.type = type;
+	  }
+
+
+	  /*
+	  	 * Magic method for coercing an action to a string
+	   */
+
+	  Action.prototype.toString = function() {
+	    return this.type;
+	  };
+
+	  return Action;
+
+	})();
+
+	module.exports = Action;
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var Action, ActionCreator, ActionInstance, _actionID, _requestID, dispatcher, invariant;
 
-	dispatcher = __webpack_require__(15);
+	dispatcher = __webpack_require__(5);
 
-	invariant = __webpack_require__(10);
+	invariant = __webpack_require__(3);
 
-	Action = __webpack_require__(16);
+	Action = __webpack_require__(6);
 
 	_actionID = 1;
 
@@ -219,7 +561,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  /*
 	  	 * Dispatches an action through the dispatcher
-	  	#
+	  	 *
 	  	 * @param {Action} action The action to dispatch
 	  	 * @param {mixed} payload Payload for the action
 	   */
@@ -234,7 +576,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  /*
 	  	 * Creates an action instance for dispatching
-	  	#
+	  	 *
 	  	 * @param {Action} action The action to dispatch
 	  	 * @param {mixed} payload Payload for the action
 	   */
@@ -258,47 +600,47 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 
 
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var Action, EventBroker, Immutable, Store, _, dispatcher, invariant,
 	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
 	  hasProp = {}.hasOwnProperty,
 	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-	_ = __webpack_require__(13);
+	_ = __webpack_require__(9);
 
-	Action = __webpack_require__(16);
+	Action = __webpack_require__(6);
 
-	dispatcher = __webpack_require__(15);
+	dispatcher = __webpack_require__(5);
 
-	invariant = __webpack_require__(10);
+	invariant = __webpack_require__(3);
 
-	Immutable = __webpack_require__(14);
+	Immutable = __webpack_require__(10);
 
-	EventBroker = __webpack_require__(17);
+	EventBroker = __webpack_require__(11);
 
 
 	/*
-	#	implementation example:
-	#
-	#	class TodoStore extends Store
-	#		@action someAction, () ->
-	#			@doStuff()
-	#			@doOtherStuff()
-	#			@profit()
-	#
-	#		doStuff: () ->
-	#			# Do things..
-	#
-	#
-	#		doOtherStuff: () ->
-	#			# Do things..
-	#
-	#		profit: () ->
-	#			# Do things..
-	#			@changed.dispatch()
+	 *	implementation example:
+	 *
+	 *	class TodoStore extends Store
+	 *		@action someAction, () ->
+	 *			@doStuff()
+	 *			@doOtherStuff()
+	 *			@profit()
+	 *
+	 *		doStuff: () ->
+	 *			# Do things..
+	 *
+	 *
+	 *		doOtherStuff: () ->
+	 *			# Do things..
+	 *
+	 *		profit: () ->
+	 *			# Do things..
+	 *			@changed.dispatch()
 	 */
 
 	module.exports = Store = (function() {
@@ -341,7 +683,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  /*
 	  	 * Static method for defining action handlers on a Store.
-	  	#
+	  	 *
 	  	 * @static
 	  	 * @param {Action} action The Action to associated with the handler.
 	  	 * @param {Function} fn The handler to call when Action is triggered.
@@ -368,7 +710,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  /*
 	  	 * Static method for defining a one to one relationship to another store.
-	  	#
+	  	 *
 	  	 * @static
 	  	 * @param {String} key The key that should reference another store
 	  	 * @param {EntityStore} entityStore the entity store that is referenced from this store
@@ -389,7 +731,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  /*
 	  	 * Static method for defining a one to many relationship to another store.
-	  	#
+	  	 *
 	  	 * @static
 	  	 * @param {String} key The key that should reference another store
 	  	 * @param {ListStore} listStore the list store that is referenced from this store
@@ -480,7 +822,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  /*
 	  	 * Method for caching results, this is used when dereferencing to make sure the same immutable is
 	  	 * returned if the references haven't changed.
-	  	#
+	  	 *
 	  	 * @param {String} name The name for the cache
 	  	 * @param {value} name The value that is written to the cache if it's different from the previous value.
 	   */
@@ -498,7 +840,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  /*
 	  	 * Method for dereferencing a value by using the key's related store.
-	  	#
+	  	 *
 	  	 * @param {String} key The key for the value to dereference
 	   */
 
@@ -650,7 +992,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  /*
 	  	 * Method for calling handlers on the store when an action is executed.
-	  	#
+	  	 *
 	  	 * @param {string} actionName The name of the executed action
 	  	 * @param {mixed} payload The payload passed to the handler
 	  	 * @param {array} waitFor An array of other signals to wait for in this dispatcher run.
@@ -671,21 +1013,176 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 
 
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 9 */
+/***/ (function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_9__;
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_10__;
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var dispatcher, invariant,
+	  slice = [].slice,
+	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+	dispatcher = __webpack_require__(5);
+
+	invariant = __webpack_require__(3);
+
+	module.exports = function() {
+	  var EventBroker, _immediateListeners, _listeners, removedImmediateListenerSinceLastDispatch, removedListenerSinceLastDispatch, shouldTrigger;
+	  _listeners = [];
+	  _immediateListeners = [];
+	  shouldTrigger = false;
+	  removedListenerSinceLastDispatch = [];
+	  removedImmediateListenerSinceLastDispatch = [];
+	  EventBroker = function() {
+	    return EventBroker.dispatch();
+	  };
+	  EventBroker.add = function(fn, context) {
+	    if (context == null) {
+	      context = null;
+	    }
+	    if (context == null) {
+	      console.error("Warning: You should supply context to changed.add(...) as a second parameter.");
+	    }
+	    return _listeners.push({
+	      fn: fn,
+	      context: context
+	    });
+	  };
+	  EventBroker.remove = function(fn, context) {
+	    var i, index, len, listener, listeners;
+	    if (context == null) {
+	      context = null;
+	    }
+	    listeners = [];
+	    if (context == null) {
+	      console.error("Warning: You should supply context to changed.remove(...) as a second parameter. Not doing so will remove listeners from all instances of your component.");
+	    }
+	    for (index = i = 0, len = _listeners.length; i < len; index = ++i) {
+	      listener = _listeners[index];
+	      if (listener.fn !== fn && listener.context !== context) {
+	        listeners.push(listener);
+	      } else {
+	        removedListenerSinceLastDispatch.push(listener);
+	      }
+	    }
+	    return _listeners = listeners;
+	  };
+	  EventBroker.addImmediate = function(fn, context) {
+	    if (context == null) {
+	      console.error("Warning: You should supply context to changed.addImmediate(...) as a second parameter.");
+	    }
+	    return _immediateListeners.push({
+	      fn: fn,
+	      context: context
+	    });
+	  };
+	  EventBroker.removeImmediate = function(fn, context) {
+	    var i, index, len, listener, listeners;
+	    if (context == null) {
+	      context = null;
+	    }
+	    listeners = [];
+	    if (context == null) {
+	      console.error("Warning: You should supply context to changed.removeImmediate(...) as a second parameter. Not doing so will remove listeners from all instances of your component.");
+	    }
+	    for (index = i = 0, len = _immediateListeners.length; i < len; index = ++i) {
+	      listener = _immediateListeners[index];
+	      if (listener.fn !== fn && listener.context !== context) {
+	        listeners.push(listener);
+	      } else {
+	        removedImmediateListenerSinceLastDispatch.push(listener);
+	      }
+	    }
+	    return _immediateListeners = listeners;
+	  };
+	  EventBroker.dispatch = function() {
+	    var args, i, len, listener, listeners;
+	    args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+	    invariant(args.length === 0, "EventBroker.dispatch(...): You can't dispatch with a payload.\nThis is due to events being batched by the dispatcher, to avoid unnecessary computations.\nIf you have a good reason to send a payload, you can use the unbatched dispatchImmediate and addImmediate.");
+	    if (dispatcher.isDispatching()) {
+	      shouldTrigger = true;
+	    } else {
+	      listeners = _listeners.slice(0);
+	      removedListenerSinceLastDispatch = [];
+	      for (i = 0, len = listeners.length; i < len; i++) {
+	        listener = listeners[i];
+	        if (indexOf.call(removedListenerSinceLastDispatch, listener) < 0) {
+	          if (listener.context != null) {
+	            listener.fn.apply(listener.context);
+	          } else {
+	            listener.fn();
+	          }
+	        }
+	      }
+	    }
+	    return EventBroker.dispatchImmediate();
+	  };
+	  EventBroker.dispatchImmediate = function() {
+	    var args, i, len, listener, listeners, results;
+	    args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+	    listeners = _immediateListeners.slice(0);
+	    removedImmediateListenerSinceLastDispatch = [];
+	    results = [];
+	    for (i = 0, len = listeners.length; i < len; i++) {
+	      listener = listeners[i];
+	      if (indexOf.call(removedImmediateListenerSinceLastDispatch, listener) < 0) {
+	        if (listener.context != null) {
+	          results.push(listener.fn.apply(listener.context, args));
+	        } else {
+	          results.push(listener.fn());
+	        }
+	      }
+	    }
+	    return results;
+	  };
+	  dispatcher.onFinalize(function() {
+	    var i, len, listener, listeners;
+	    if (shouldTrigger === true) {
+	      listeners = _listeners.slice(0);
+	      removedListenerSinceLastDispatch = [];
+	      for (i = 0, len = listeners.length; i < len; i++) {
+	        listener = listeners[i];
+	        if (indexOf.call(removedListenerSinceLastDispatch, listener) < 0) {
+	          if (listener.context != null) {
+	            listener.fn.apply(listener.context);
+	          } else {
+	            listener.fn();
+	          }
+	        }
+	      }
+	    }
+	    return shouldTrigger = false;
+	  });
+	  return EventBroker;
+	};
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var EntityStore, Immutable, Store, _, invariant,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
-	Store = __webpack_require__(4);
+	Store = __webpack_require__(8);
 
-	invariant = __webpack_require__(10);
+	invariant = __webpack_require__(3);
 
-	Immutable = __webpack_require__(14);
+	Immutable = __webpack_require__(10);
 
-	_ = __webpack_require__(13);
+	_ = __webpack_require__(9);
 
 	module.exports = EntityStore = (function(superClass) {
 	  extend(EntityStore, superClass);
@@ -726,7 +1223,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  /*
 	  	 * Dereferences a specific key on an item, similar to Store.dereference.
-	  	#
+	  	 *
 	  	 * @overrides Store::dereference
 	  	 * @param {Immutable.Map} item The item that will be dereferenced
 	  	 * @param {String} key The key on the item to dereference
@@ -758,7 +1255,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  /*
 	  	 * Dereferences all defined relationships on an item
-	  	#
+	  	 *
 	  	 * @param {Immutable.Map} item The item to dereference
 	   */
 
@@ -839,7 +1336,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  /*
 	  	 * Method for getting values from this store, with dereferencing disabled.
 	  	 * References for an entity store is defined for the items not for the store itself.
-	  	#
+	  	 *
 	  	 * @overrides Store::get
 	   */
 
@@ -861,7 +1358,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  	 * That said, the items contained in the list are gauranteed to be equal to the items in other lists.
 	  	 * If you require getting the same List instance on every call, you must cache the results yourself.
 	  	 * Use Store::cache for this.
-	  	#
+	  	 *
 	  	 * @return The items with the given ids, in the same order as specified in ids
 	   */
 
@@ -908,17 +1405,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	})(Store);
 
 
-/***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var CollectionStore, Immutable, SetStore,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
-	CollectionStore = __webpack_require__(11);
+	CollectionStore = __webpack_require__(14);
 
-	Immutable = __webpack_require__(14);
+	Immutable = __webpack_require__(10);
 
 	module.exports = SetStore = (function(superClass) {
 	  extend(SetStore, superClass);
@@ -938,146 +1435,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	})(CollectionStore);
 
 
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Immutable, IndexedCollectionStore, IndexedSetStore,
-	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-	  hasProp = {}.hasOwnProperty;
-
-	IndexedCollectionStore = __webpack_require__(12);
-
-	Immutable = __webpack_require__(14);
-
-	module.exports = IndexedSetStore = (function(superClass) {
-	  extend(IndexedSetStore, superClass);
-
-	  function IndexedSetStore() {
-	    return IndexedSetStore.__super__.constructor.apply(this, arguments);
-	  }
-
-	  IndexedSetStore.prototype._fromJS = Immutable.Set;
-
-	  IndexedSetStore.prototype._remove = function(ids, id) {
-	    return ids["delete"](id);
-	  };
-
-	  return IndexedSetStore;
-
-	})(IndexedCollectionStore);
-
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var CollectionStore, Immutable, ListStore,
-	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-	  hasProp = {}.hasOwnProperty;
-
-	CollectionStore = __webpack_require__(11);
-
-	Immutable = __webpack_require__(14);
-
-	module.exports = ListStore = (function(superClass) {
-	  extend(ListStore, superClass);
-
-	  function ListStore() {
-	    return ListStore.__super__.constructor.apply(this, arguments);
-	  }
-
-	  ListStore.prototype._fromJS = Immutable.List;
-
-	  ListStore.prototype._remove = function(ids, id) {
-	    return ids.remove(ids.indexOf(id));
-	  };
-
-	  return ListStore;
-
-	})(CollectionStore);
-
-
-/***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Immutable, IndexedCollectionStore, IndexedListStore,
-	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-	  hasProp = {}.hasOwnProperty;
-
-	IndexedCollectionStore = __webpack_require__(12);
-
-	Immutable = __webpack_require__(14);
-
-	module.exports = IndexedListStore = (function(superClass) {
-	  extend(IndexedListStore, superClass);
-
-	  function IndexedListStore() {
-	    return IndexedListStore.__super__.constructor.apply(this, arguments);
-	  }
-
-	  IndexedListStore.prototype._fromJS = Immutable.List;
-
-	  IndexedListStore.prototype._remove = function(ids, id) {
-	    return ids.remove(ids.indexOf(id));
-	  };
-
-	  return IndexedListStore;
-
-	})(IndexedCollectionStore);
-
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var InvariantError;
-
-	InvariantError = __webpack_require__(18);
-
-
-	/*
-	 * Use invariant() to assert state which your program assumes to be true.
-	#
-	 * Provided arguments are automatically type checked and logged correctly to the console
-	 * Chrome's console.log sprintf format.
-	#
-	 * ex: invariant(!hasFired, "hasFired was expected to be true but was", hasFired)
-	#
-	 * The invariant message will be stripped in production, but the invariant
-	 * will remain to ensure logic does not differ in production.
-	 */
-
-	module.exports = function(condition, message) {
-	  var error;
-	  if (!condition) {
-	    if (message == null) {
-	      error = new InvariantError("Minified exception occurred; use the non-minified dev environment\nfor the full error message and additional helpful warnings.");
-	    } else {
-	      error = new InvariantError(message);
-	    }
-	    error.framesToPop = 1;
-	    throw error;
-	  }
-	};
-
-
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var CollectionStore, Immutable, Store, _, invariant,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
-	Store = __webpack_require__(4);
+	Store = __webpack_require__(8);
 
-	invariant = __webpack_require__(10);
+	invariant = __webpack_require__(3);
 
-	Immutable = __webpack_require__(14);
+	Immutable = __webpack_require__(10);
 
-	_ = __webpack_require__(13);
+	_ = __webpack_require__(9);
 
 
 	/*
@@ -1201,21 +1573,51 @@ return /******/ (function(modules) { // webpackBootstrap
 	})(Store);
 
 
-/***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var Immutable, IndexedCollectionStore, IndexedSetStore,
+	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	  hasProp = {}.hasOwnProperty;
+
+	IndexedCollectionStore = __webpack_require__(16);
+
+	Immutable = __webpack_require__(10);
+
+	module.exports = IndexedSetStore = (function(superClass) {
+	  extend(IndexedSetStore, superClass);
+
+	  function IndexedSetStore() {
+	    return IndexedSetStore.__super__.constructor.apply(this, arguments);
+	  }
+
+	  IndexedSetStore.prototype._fromJS = Immutable.Set;
+
+	  IndexedSetStore.prototype._remove = function(ids, id) {
+	    return ids["delete"](id);
+	  };
+
+	  return IndexedSetStore;
+
+	})(IndexedCollectionStore);
+
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	var Immutable, IndexedCollectionStore, Store, _, invariant,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
-	Store = __webpack_require__(4);
+	Store = __webpack_require__(8);
 
-	invariant = __webpack_require__(10);
+	invariant = __webpack_require__(3);
 
-	Immutable = __webpack_require__(14);
+	Immutable = __webpack_require__(10);
 
-	_ = __webpack_require__(13);
+	_ = __webpack_require__(9);
 
 
 	/*
@@ -1370,469 +1772,67 @@ return /******/ (function(modules) { // webpackBootstrap
 	})(Store);
 
 
-/***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_13__;
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_14__;
-
-/***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Dispatcher, invariant,
-	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-	  slice = [].slice;
-
-	invariant = __webpack_require__(10);
-
-	'use strict';
-
-	module.exports = new (Dispatcher = (function() {
-
-	  /*
-	  	 * @var {boolean} dispatching Wether or not the dispatcher is currently dispatching.
-	  	 * @private
-	   */
-	  var currentAction, dispatching, finalizeDispatching, finalizers, isHandled, isPending, notifyStore, prepareForDispatching, storeID, stores;
-
-	  function Dispatcher() {
-	    this.dispatch = bind(this.dispatch, this);
-	    this.waitFor = bind(this.waitFor, this);
-	  }
-
-	  dispatching = false;
-
-
-	  /*
-	  	 * @var {integer} storeID ID to use for the next store that gets registered.
-	  	 * @private
-	   */
-
-	  storeID = 0;
-
-
-	  /*
-	  	 * @var {object} stores Store registry.
-	  	 * @private
-	   */
-
-	  stores = {};
-
-
-	  /*
-	      * @var {object} isPending Object for tracking pending store callbacks.
-	  	 * @private
-	   */
-
-	  isPending = {};
-
-
-	  /*
-	      * @var {object} isPending Object for tracking handled store callbacks.
-	  	 * @private
-	   */
-
-	  isHandled = {};
-
-
-	  /*
-	      * @var {string} isPending The current action being dispatched, if any.
-	  	 * @private
-	   */
-
-	  currentAction = null;
-
-
-	  /*
-	  	 * @var {array} finalizers An array of callbacks to be called when the store is finished dispatching.
-	  	 * @private
-	   */
-
-	  finalizers = [];
-
-
-	  /*
-	      * Sets the dispatcher to a state where all stores are neither
-	      * pending nor handled.
-	     #
-	  	 * @private
-	   */
-
-	  prepareForDispatching = function() {
-	    var id, results;
-	    dispatching = true;
-	    results = [];
-	    for (id in stores) {
-	      isPending[id] = false;
-	      results.push(isHandled[id] = false);
-	    }
-	    return results;
-	  };
-
-
-	  /*
-	      * Method for hooking up a finalizer callback
-	     #
-	  	 * @private
-	   */
-
-	  Dispatcher.prototype.onFinalize = function(fn) {
-	    return finalizers.push(fn);
-	  };
-
-
-	  /*
-	      * Method for calling finalizer callbacks
-	     #
-	  	 * @private
-	   */
-
-	  Dispatcher.prototype.callFinalizers = function() {
-	    var finalizer, i, len, results;
-	    results = [];
-	    for (i = 0, len = finalizers.length; i < len; i++) {
-	      finalizer = finalizers[i];
-	      results.push(finalizer());
-	    }
-	    return results;
-	  };
-
-
-	  /*
-	      * Method for checking if the dispatcher is currently dispatching.
-	     #
-	  	 * @public
-	   */
-
-	  Dispatcher.prototype.isDispatching = function() {
-	    return dispatching;
-	  };
-
-
-	  /*
-	      * Resets the dispatcher state after dispatching, and fires store events.
-	     #
-	  	 * @private
-	   */
-
-	  finalizeDispatching = function() {
-	    try {
-	      return this.callFinalizers();
-	    } finally {
-	      currentAction = null;
-	      dispatching = false;
-	    }
-	  };
-
-
-	  /*
-	      * Calls the action handler on a store with the current action and payload.
-	      * This method is used when dispatching.
-	     #
-	      * @param {integer} id The ID of the store to notify
-	  	 * @private
-	   */
-
-	  notifyStore = function(id) {
-	    invariant(currentAction != null, "Cannot notify store without an action");
-	    isPending[id] = true;
-	    stores[id]._handleAction.call(stores[id], currentAction, this.waitFor);
-	    return isHandled[id] = true;
-	  };
-
-
-	  /*
-	      * Registers a store with the dispatcher so that it's notified when actions
-	      * are dispatched.
-	     #
-	      * @param {Object} store The store to register with the dispatcher
-	   */
-
-	  Dispatcher.prototype.register = function(store) {
-	    stores[storeID] = store;
-	    return store._id = storeID++;
-	  };
-
-
-	  /*
-	      * Unregisters a store from the dispatcher so that it's no longer
-	      * notified when actions are dispatched.
-	     #
-	      * @param {Object} store The store to unregister from the dispatcher
-	   */
-
-	  Dispatcher.prototype.unregister = function(store) {
-	    invariant((store._id != null) && (stores[store._id] != null), "dispatcher.unregister(...): Store is not registered with the dispatcher.");
-	    return delete stores[store._id];
-	  };
-
-
-	  /*
-	      * Method for waiting for other stores to complete their handling
-	      * of actions. This method is passed along to the Stores when an action
-	      * is dispatched.
-	     #
-	      * @see notifyStore
-	   */
-
-	  Dispatcher.prototype.waitFor = function() {
-	    var dependency, i, id, len, results, storeDependencies;
-	    storeDependencies = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-	    invariant(dispatching, "dispatcher.waitFor(): It's not possible to wait for dependencies when the dispatcher isn't dispatching.\nwaitFor() should be called in an action handler.");
-	    results = [];
-	    for (i = 0, len = storeDependencies.length; i < len; i++) {
-	      dependency = storeDependencies[i];
-	      id = dependency._id;
-	      invariant((id != null) && (stores[id] != null), 'dispatcher.waitFor(...): dependency is not registered with the dispatcher.');
-	      if (isPending[id]) {
-	        invariant(isHandled[id], 'dispatcher.waitFor(...): Circular dependency detected.');
-	        continue;
-	      }
-	      results.push(notifyStore.call(this, id));
-	    }
-	    return results;
-	  };
-
-
-	  /*
-	      * Method for dispatching in action. This method is used by the Action class
-	      * when calling Action.dispatch().
-	     #
-	      * @param {string} actionName The name of the action to dispatch
-	      * @param {mixed} payload The payload for the event.
-	   */
-
-	  Dispatcher.prototype.dispatch = function(actionInstance) {
-	    var id, results;
-	    invariant(!dispatching, 'dispatcher.dispatch(...): Cannot dispatch in the middle of a dispatch.');
-	    currentAction = actionInstance;
-	    prepareForDispatching.call(this);
-	    try {
-	      results = [];
-	      for (id in stores) {
-	        if (isPending[id]) {
-	          continue;
-	        }
-	        results.push(notifyStore.call(this, id));
-	      }
-	      return results;
-	    } finally {
-	      finalizeDispatching.call(this);
-	    }
-	  };
-
-	  return Dispatcher;
-
-	})());
-
-
-/***/ },
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Action, dispatcher;
-
-	dispatcher = __webpack_require__(15);
-
-	Action = (function() {
-
-	  /*
-	  	 * Constructor
-	  	#
-	  	 * @param {string} The name of the action
-	   */
-	  function Action(type) {
-	    this.type = type;
-	  }
-
-
-	  /*
-	  	 * Magic method for coercing an action to a string
-	   */
-
-	  Action.prototype.toString = function() {
-	    return this.type;
-	  };
-
-	  return Action;
-
-	})();
-
-	module.exports = Action;
-
-
-/***/ },
+/***/ }),
 /* 17 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
-	var dispatcher, invariant,
-	  slice = [].slice,
-	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
-
-	dispatcher = __webpack_require__(15);
-
-	invariant = __webpack_require__(10);
-
-	module.exports = function() {
-	  var EventBroker, _immediateListeners, _listeners, removedImmediateListenerSinceLastDispatch, removedListenerSinceLastDispatch, shouldTrigger;
-	  _listeners = [];
-	  _immediateListeners = [];
-	  shouldTrigger = false;
-	  removedListenerSinceLastDispatch = [];
-	  removedImmediateListenerSinceLastDispatch = [];
-	  EventBroker = function() {
-	    return EventBroker.dispatch();
-	  };
-	  EventBroker.add = function(fn, context) {
-	    if (context == null) {
-	      context = null;
-	    }
-	    if (context == null) {
-	      console.error("Warning: You should supply context to changed.add(...) as a second parameter.");
-	    }
-	    return _listeners.push({
-	      fn: fn,
-	      context: context
-	    });
-	  };
-	  EventBroker.remove = function(fn, context) {
-	    var i, index, len, listener, listeners;
-	    if (context == null) {
-	      context = null;
-	    }
-	    listeners = [];
-	    if (context == null) {
-	      console.error("Warning: You should supply context to changed.remove(...) as a second parameter. Not doing so will remove listeners from all instances of your component.");
-	    }
-	    for (index = i = 0, len = _listeners.length; i < len; index = ++i) {
-	      listener = _listeners[index];
-	      if (listener.fn !== fn && listener.context !== context) {
-	        listeners.push(listener);
-	      } else {
-	        removedListenerSinceLastDispatch.push(listener);
-	      }
-	    }
-	    return _listeners = listeners;
-	  };
-	  EventBroker.addImmediate = function(fn, context) {
-	    if (context == null) {
-	      console.error("Warning: You should supply context to changed.addImmediate(...) as a second parameter.");
-	    }
-	    return _immediateListeners.push({
-	      fn: fn,
-	      context: context
-	    });
-	  };
-	  EventBroker.removeImmediate = function(fn, context) {
-	    var i, index, len, listener, listeners;
-	    if (context == null) {
-	      context = null;
-	    }
-	    listeners = [];
-	    if (context == null) {
-	      console.error("Warning: You should supply context to changed.removeImmediate(...) as a second parameter. Not doing so will remove listeners from all instances of your component.");
-	    }
-	    for (index = i = 0, len = _immediateListeners.length; i < len; index = ++i) {
-	      listener = _immediateListeners[index];
-	      if (listener.fn !== fn && listener.context !== context) {
-	        listeners.push(listener);
-	      } else {
-	        removedImmediateListenerSinceLastDispatch.push(listener);
-	      }
-	    }
-	    return _immediateListeners = listeners;
-	  };
-	  EventBroker.dispatch = function() {
-	    var args, i, len, listener, listeners;
-	    args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-	    invariant(args.length === 0, "EventBroker.dispatch(...): You can't dispatch with a payload.\nThis is due to events being batched by the dispatcher, to avoid unnecessary computations.\nIf you have a good reason to send a payload, you can use the unbatched dispatchImmediate and addImmediate.");
-	    if (dispatcher.isDispatching()) {
-	      shouldTrigger = true;
-	    } else {
-	      listeners = _listeners.slice(0);
-	      removedListenerSinceLastDispatch = [];
-	      for (i = 0, len = listeners.length; i < len; i++) {
-	        listener = listeners[i];
-	        if (indexOf.call(removedListenerSinceLastDispatch, listener) < 0) {
-	          if (listener.context != null) {
-	            listener.fn.apply(listener.context);
-	          } else {
-	            listener.fn();
-	          }
-	        }
-	      }
-	    }
-	    return EventBroker.dispatchImmediate();
-	  };
-	  EventBroker.dispatchImmediate = function() {
-	    var args, i, len, listener, listeners, results;
-	    args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-	    listeners = _immediateListeners.slice(0);
-	    removedImmediateListenerSinceLastDispatch = [];
-	    results = [];
-	    for (i = 0, len = listeners.length; i < len; i++) {
-	      listener = listeners[i];
-	      if (indexOf.call(removedImmediateListenerSinceLastDispatch, listener) < 0) {
-	        if (listener.context != null) {
-	          results.push(listener.fn.apply(listener.context, args));
-	        } else {
-	          results.push(listener.fn());
-	        }
-	      }
-	    }
-	    return results;
-	  };
-	  dispatcher.onFinalize(function() {
-	    var i, len, listener, listeners;
-	    if (shouldTrigger === true) {
-	      listeners = _listeners.slice(0);
-	      removedListenerSinceLastDispatch = [];
-	      for (i = 0, len = listeners.length; i < len; i++) {
-	        listener = listeners[i];
-	        if (indexOf.call(removedListenerSinceLastDispatch, listener) < 0) {
-	          if (listener.context != null) {
-	            listener.fn.apply(listener.context);
-	          } else {
-	            listener.fn();
-	          }
-	        }
-	      }
-	    }
-	    return shouldTrigger = false;
-	  });
-	  return EventBroker;
-	};
-
-
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var InvariantError,
+	var CollectionStore, Immutable, ListStore,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
-	module.exports = InvariantError = (function(superClass) {
-	  extend(InvariantError, superClass);
+	CollectionStore = __webpack_require__(14);
 
-	  function InvariantError(message) {
-	    this.name = "Invariant Error";
-	    this.message = message;
+	Immutable = __webpack_require__(10);
+
+	module.exports = ListStore = (function(superClass) {
+	  extend(ListStore, superClass);
+
+	  function ListStore() {
+	    return ListStore.__super__.constructor.apply(this, arguments);
 	  }
 
-	  return InvariantError;
+	  ListStore.prototype._fromJS = Immutable.List;
 
-	})(Error);
+	  ListStore.prototype._remove = function(ids, id) {
+	    return ids.remove(ids.indexOf(id));
+	  };
+
+	  return ListStore;
+
+	})(CollectionStore);
 
 
-/***/ }
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var Immutable, IndexedCollectionStore, IndexedListStore,
+	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	  hasProp = {}.hasOwnProperty;
+
+	IndexedCollectionStore = __webpack_require__(16);
+
+	Immutable = __webpack_require__(10);
+
+	module.exports = IndexedListStore = (function(superClass) {
+	  extend(IndexedListStore, superClass);
+
+	  function IndexedListStore() {
+	    return IndexedListStore.__super__.constructor.apply(this, arguments);
+	  }
+
+	  IndexedListStore.prototype._fromJS = Immutable.List;
+
+	  IndexedListStore.prototype._remove = function(ids, id) {
+	    return ids.remove(ids.indexOf(id));
+	  };
+
+	  return IndexedListStore;
+
+	})(IndexedCollectionStore);
+
+
+/***/ })
 /******/ ])
 });
 ;

@@ -52,8 +52,8 @@ gulp.task 'change version', () ->
 	.pipe rename extname: ".js"
 	.pipe gulp.dest "build/"
 
-gulp.task 'dist', ['test', 'change version'], (callback) ->
-
+gulp.task 'dist', gulp.series('test', 'change version', (callback) ->
+	
 	compiler = webpack require('./webpack.config')
 	.run (err, stats) ->
 		if err
@@ -68,4 +68,4 @@ gulp.task 'dist', ['test', 'change version'], (callback) ->
 		callback()
 
 	null
-
+)
