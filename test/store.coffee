@@ -322,5 +322,3 @@ describe 'Store', () ->
 				.to.not.be null
 
 		currentID = actionCreator.dispatch(action).actionID
-
-		

@@ -2,7 +2,6 @@ EntityStore          = require('../src/entity-store')
 Action         = require('../src/action')
 ActionCreator  = require('../src/action-creator')
 InvariantError = require('../src/invariant-error')
-_              = require('lodash')
 {expect}       = require 'chai'
 sinon          = require 'sinon'
 Immutable      = require 'immutable'
@@ -87,7 +86,7 @@ describe 'EntityStore', () ->
 		.to.equal 2
 
 		expect list1.toJS()[0].id
-		.to.equal 1 
+		.to.equal 1
 
 		expect list1.toJS()[1].id
 		.to.equal 2
